@@ -1,0 +1,86 @@
+---
+/**
+ * Minimal floating nav. Transparent over hero, glass on scroll.
+ * Three links + one CTA. That's it.
+ */
+const links = [
+  { href: "/architecture", label: "Architecture" },
+  { href: "/research", label: "Research" },
+  { href: "/invest", label: "Invest" },
+];
+---
+
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-[100] transition-all duration-500">
+  <div class="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+    <a href="/" class="text-base font-semibold tracking-[0.2em] text-text-primary uppercase font-body" aria-label="OSCEN Home">
+      OSCEN
+    </a>
+
+    <!-- Desktop -->
+    <div class="hidden md:flex items-center gap-1">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class="px-4 py-2 text-[12px] text-text-muted hover:text-text-primary transition-colors font-mono tracking-wide"
+        >
+          {link.label}
+        </a>
+      ))}
+      <a
+        href="/invest"
+        class="ml-3 px-5 py-2 text-[12px] font-medium rounded-full border border-accent-blue/20 text-accent-blue/80 hover:bg-accent-blue/8 hover:border-accent-blue/40 hover:text-accent-blue transition-all duration-300"
+      >
+        Partner with us
+      </a>
+    </div>
+
+    <!-- Mobile -->
+    <button
+      id="nav-toggle"
+      class="md:hidden p-2 text-text-muted hover:text-text-primary transition-colors"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <div id="nav-mobile" class="hidden md:hidden glass mx-4 mb-4 rounded-xl overflow-hidden">
+    <div class="p-3 flex flex-col gap-1">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class="px-4 py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-white/[0.03] rounded-lg transition-all font-mono"
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script>
+  const nav = document.getElementById("main-nav")!;
+  const toggle = document.getElementById("nav-toggle")!;
+  const menu = document.getElementById("nav-mobile")!;
+
+  let ticking = false;
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrolled = window.scrollY > 60;
+        nav.classList.toggle("glass", scrolled);
+        nav.style.borderBottom = scrolled ? "1px solid rgba(94,164,245,0.04)" : "none";
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  toggle.addEventListener("click", () => {
+    const open = menu.classList.toggle("hidden");
+    toggle.setAttribute("aria-expanded", String(!open));
+  });
+</script>

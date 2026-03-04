@@ -1,0 +1,317 @@
+---
+/**
+ * Invest — Market data, patent details, competitive landscape, investment thesis.
+ * For investors and strategic partners. Numbers-first, narrative-second.
+ */
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+---
+
+<Base title="Invest | OSCEN" description="OSCEN investment thesis: patent-protected neuromorphic brain for robotics. $200M+ neuromorphic VC in 2025.">
+  <Nav />
+
+  <main class="pt-32 pb-24">
+    <!-- Page header -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Invest</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
+        The opportunity<br />
+        <span class="italic gradient-text">in intelligence.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        Neuromorphic computing is the next platform shift. OSCEN is the first patent-protected brain architecture built for real-world robots.
+      </p>
+    </section>
+
+    <!-- The Thesis - 3 sentences -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <div class="reveal glass-bright rounded-2xl p-8 md:p-12">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Investment Thesis</p>
+        <div class="space-y-4 text-lg text-text-secondary leading-relaxed max-w-3xl">
+          <p>Every robot will need a brain. Today's AI is built on frozen transformers trained on massive datasets that can't learn from experience, can't run on edge hardware, and can't adapt in real time.</p>
+          <p>OSCEN is building the brain that can. A neuromorphic architecture with <span class="text-text-primary">6 patented learning mechanisms</span> that grows through developmental phases, modeled on biological brain development.</p>
+          <p>The market is early. The hardware wave is coming. And <span class="text-accent-blue">no one else is building this</span>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Market Numbers -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Market signals
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Neuromorphic computing investment is accelerating.</p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        {[
+          { value: "$200M+", label: "Neuromorphic VC in 2025", sub: "3× increase from 2024", color: "text-accent-amber" },
+          { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs estimate", color: "text-accent-blue" },
+          { value: "73–109×", label: "Energy advantage", sub: "SNN vs GPU on neuromorphic HW", color: "text-accent-green" },
+          { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
+        ].map((stat) => (
+          <div class="flip-card reveal h-40" tabindex="0" role="button" aria-label={`${stat.value}: ${stat.label}`}>
+            <div class="flip-inner w-full h-full">
+              <div class="flip-front w-full h-full glass-bright rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                <div class={`text-xl md:text-2xl font-mono font-bold ${stat.color}`}>{stat.value}</div>
+                <div class="text-[10px] text-text-muted mt-2 uppercase tracking-wider leading-tight">{stat.label}</div>
+              </div>
+              <div class="flip-back w-full h-full glass rounded-xl p-4 flex items-center justify-center text-center">
+                <p class="text-[11px] text-text-secondary">{stat.sub}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Energy Problem -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        The energy problem
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Current AI is unsustainable for edge deployment. Robots need intelligence that runs on batteries, not data centers.</p>
+
+      <div class="reveal glass rounded-xl p-6 mb-6">
+        <div class="space-y-4">
+          {[
+            { label: "GPT-4o", value: "~0.3 Wh per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
+            { label: "Gemini", value: "~0.24 Wh per prompt", source: "Google official", bar: 80, color: "accent-amber" },
+            { label: "GPU Robot Brain", value: "50–200W continuous", source: "Industry standard", bar: 90, color: "accent-pink" },
+            { label: "OSCEN (Loihi target)", value: "<5W continuous", source: "Intel benchmarks", bar: 5, color: "accent-green" },
+          ].map((item) => (
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <div>
+                  <span class="text-sm text-text-primary">{item.label}</span>
+                  <span class="text-[9px] font-mono text-text-muted ml-2">{item.source}</span>
+                </div>
+                <span class={`text-[11px] font-mono text-${item.color}`}>{item.value}</span>
+              </div>
+              <div class="h-1.5 rounded-full bg-elevated overflow-hidden">
+                <div class={`h-full rounded-full bg-${item.color}/50`} style={`width: ${item.bar}%`}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p class="reveal text-xs text-text-muted italic text-center">
+        Neuromorphic hardware computes only when neurons fire, not idle GPU cycles. The architecture is ready; the hardware is catching up.
+      </p>
+    </section>
+
+    <!-- Patent Protection -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Patent protection
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The architecture is protected. The IP moat is real.</p>
+
+      <div class="reveal glass-bright rounded-2xl p-6 md:p-8 mb-8">
+        <div class="flex flex-wrap items-center gap-4 mb-6">
+          <span class="px-3 py-1 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-[10px] font-mono uppercase tracking-wider">Patent Pending</span>
+          <span class="text-sm text-text-primary font-mono">US 63/986,737</span>
+          <span class="text-xs text-text-muted">Filed February 20, 2026</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            { claim: "1", title: "Integrated Multi-Mechanism Learning", desc: "6 learning rules operating simultaneously every step across all synapse groups" },
+            { claim: "2", title: "Developmental Critical Periods", desc: "5 phases with experience-dependent adolescent entry: pruning, myelination, identity" },
+            { claim: "3", title: "Hybrid SNN-LLM Architecture", desc: "Brain learns when to query external knowledge through emergent STDP, not hardcoded rules" },
+            { claim: "4", title: "Cross-Modal Binding", desc: "Arbitrary sensor modalities bind through spike-timing coincidence with multiplicative instinctual gain" },
+            { claim: "5", title: "Multi-Compartment Dendrites", desc: "4 compartments per neuron with independent dynamics and supralinear dendritic spikes" },
+            { claim: "6", title: "Neuromodulatory Continual Learning", desc: "Eligibility traces + homeostatic scaling + myelination enable learning without forgetting" },
+          ].map((c) => (
+            <div class="glass rounded-xl p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-mono text-accent-purple">Claim {c.claim}</span>
+                <span class="text-sm text-text-primary">{c.title}</span>
+              </div>
+              <p class="text-[11px] text-text-secondary leading-relaxed">{c.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div class="reveal glass rounded-xl p-4 text-center">
+          <div class="text-xl font-mono text-accent-blue font-bold">258</div>
+          <div class="text-[10px] text-text-muted mt-1">Prior art patents searched</div>
+        </div>
+        <div class="reveal glass rounded-xl p-4 text-center">
+          <div class="text-xl font-mono text-accent-green font-bold">0</div>
+          <div class="text-[10px] text-text-muted mt-1">Overlapping claims found</div>
+        </div>
+        <div class="reveal glass rounded-xl p-4 text-center">
+          <div class="text-xl font-mono text-accent-amber font-bold">20</div>
+          <div class="text-[10px] text-text-muted mt-1">Continuation patents planned</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What's Built -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        What's built
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">This is not a pitch deck. The brain is running.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {[
+          { stat: "1,001,800", label: "Spiking neurons", desc: "11 brain regions. 24 synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning." },
+          { stat: "1.19B", label: "Synapses", desc: "Sparse CSR matrices. Eligibility traces on every group. BCM, neuromodulation, and synaptic scaling active system-wide." },
+          { stat: "7 months", label: "Solo development", desc: "Complete architecture built by one founder. Sensory gateway, brain, motor output, cognitive action, speech motor. All working." },
+          { stat: "24/7", label: "Continuous training", desc: "Enterprise-grade 32-core server with 256 GB RAM. Processing a 403-video curriculum around the clock. Currently entering the juvenile developmental phase." },
+          { stat: "6", label: "Learning rules", desc: "All running simultaneously every simulation step. STDP, eligibility traces, BCM, neuromodulation, homeostatic scaling, R-STDP." },
+          { stat: "5", label: "Developmental phases", desc: "Infant → Toddler → Juvenile → Adolescent → Mature. Phase transitions are experience-dependent, not hardcoded." },
+        ].map((item) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-lg font-mono text-accent-blue font-bold">{item.stat}</span>
+                <span class="text-xs text-text-muted ml-2">{item.label}</span>
+              </div>
+              <span class="expand-indicator text-text-muted/40 text-sm">+</span>
+            </div>
+            <div class="expand-body mt-3">
+              <p class="text-xs text-text-secondary leading-relaxed">{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Live status -->
+      <div class="reveal text-center mt-8">
+        <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-border">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
+          <span class="text-[10px] font-mono text-text-muted tracking-wider">
+            Training live &middot; Juvenile phase &middot; 403-video curriculum
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Built with conviction -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Built with conviction
+      </h2>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div>
+            <div class="text-lg font-mono text-accent-green font-bold">3,500+ hours</div>
+            <div class="text-[10px] text-text-muted mt-1">Dedicated R&D</div>
+          </div>
+          <div>
+            <div class="text-lg font-mono text-accent-blue font-bold">7 months</div>
+            <div class="text-[10px] text-text-muted mt-1">Continuous development</div>
+          </div>
+          <div>
+            <div class="text-lg font-mono text-accent-amber font-bold">1 person</div>
+            <div class="text-[10px] text-text-muted mt-1">Team size</div>
+          </div>
+          <div>
+            <div class="text-lg font-mono text-accent-purple font-bold">Full-stack</div>
+            <div class="text-[10px] text-text-muted mt-1">Expertise</div>
+          </div>
+        </div>
+        <p class="text-xs text-text-secondary text-center mt-6 leading-relaxed max-w-xl mx-auto">
+          Deep domain knowledge across computational neuroscience, distributed systems, sparse linear algebra, and real-time sensor fusion.
+          This level of cross-disciplinary understanding is what makes the architecture work.
+        </p>
+      </div>
+    </section>
+
+    <!-- Use of Funds (high level) -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        What funding enables
+      </h2>
+
+      <div class="space-y-2">
+        {[
+          { priority: "01", item: "Neuromorphic hardware", desc: "Intel Loihi 2 or SpiNNaker2 deployment. Move from CPU simulation to purpose-built silicon. 73–109× energy reduction." },
+          { priority: "02", item: "Robotics integration", desc: "Physical robot body. Camera, servos, touch sensors. Close the full sensorimotor loop with real-world feedback." },
+          { priority: "03", item: "Team expansion", desc: "Computational neuroscientist, robotics engineer, hardware specialist. Three hires transform timeline from solo → production." },
+          { priority: "04", item: "Patent portfolio", desc: "Non-provisional filing by Feb 2027. 20 continuation patents covering hardware mapping, fleet learning, safety architecture." },
+          { priority: "05", item: "Benchmarks & papers", desc: "Formal evaluation on standard robotics tasks. Published results for academic credibility and partnership conversations." },
+        ].map((item) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center gap-4">
+              <span class="text-[10px] font-mono text-text-muted">{item.priority}</span>
+              <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{item.item}</h3>
+              <span class="expand-indicator text-text-muted/40 text-sm ml-auto">+</span>
+            </div>
+            <div class="expand-body mt-3 ml-10">
+              <p class="text-xs text-text-secondary leading-relaxed">{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Founder -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Founder
+      </h2>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="flex flex-col md:flex-row gap-6 items-start">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-purple/20 border border-border-bright flex items-center justify-center shrink-0">
+            <span class="text-2xl font-display text-text-primary">JB</span>
+          </div>
+          <div>
+            <h3 class="text-lg text-text-primary font-medium">Jay Balderas</h3>
+            <p class="text-xs text-text-muted font-mono mt-1">Founder & Sole Developer</p>
+            <p class="text-sm text-text-secondary mt-4 leading-relaxed max-w-2xl">
+              Built the complete OSCEN architecture, from spiking neuron model to 1M-neuron deployment, in 7 months of solo development.
+              Sensory gateway, brain simulation, motor output, cognitive action channel, speech motor, developmental phases, and training pipeline.
+              Every line of code. Every architectural decision. Every patent claim.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="reveal text-center">
+        <p class="ghost-text font-display text-[clamp(1.5rem,3.5vw,2.5rem)] text-text-primary leading-snug mb-10">
+          The brain is built. The patent is filed.<br />
+          <span class="italic text-text-secondary">Now it needs fuel.</span>
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a
+            href="mailto:jesus@oscen.ai"
+            class="px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
+          >
+            Get in touch
+          </a>
+          <a
+            href="/architecture"
+            class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+          >
+            Read the architecture
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Back to home -->
+    <section class="max-w-5xl mx-auto px-6 text-center">
+      <div class="divider max-w-24 mx-auto mb-10"></div>
+      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+    </section>
+  </main>
+</Base>
+
+<script>
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>(".expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>

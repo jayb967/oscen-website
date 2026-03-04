@@ -1,0 +1,77 @@
+---
+/**
+ * Section 4: Proof — This is real. This is running. Flip cards for depth.
+ */
+const proofs = [
+  {
+    value: "1,001,800",
+    label: "neurons",
+    back: "11 brain regions. 24 synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning.",
+    color: "text-accent-blue",
+  },
+  {
+    value: "6",
+    label: "learning rules",
+    back: "STDP, eligibility traces, BCM metaplasticity, neuromodulation, homeostatic scaling, and reward-modulated learning. All running simultaneously, every step.",
+    color: "text-accent-cyan",
+  },
+  {
+    value: "7 months",
+    label: "training continuously",
+    back: "Started as a blank slate. Watching video, listening to audio. Forming associations through temporal correlation. Growing through developmental phases.",
+    color: "text-accent-amber",
+  },
+  {
+    value: "Patent pending",
+    label: "US 63/986,737",
+    back: "Filed February 20, 2026. 6 core claims covering the complete architecture. 258 prior art patents searched, zero overlap. 20 continuation patents planned.",
+    color: "text-accent-purple",
+    link: "/invest",
+    linkLabel: "Patent details",
+  },
+];
+---
+
+<section id="proof" class="section relative">
+  <div class="max-w-4xl mx-auto w-full">
+    <div class="text-center mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Proof</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        Not a concept.<br />
+        <span class="text-text-secondary">A running system.</span>
+      </h2>
+    </div>
+
+    <!-- Flip cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+      {proofs.map((p) => (
+        <div class="flip-card reveal h-48" tabindex="0" role="button" aria-label={`${p.value} ${p.label}. Hover for details.`}>
+          <div class="flip-inner w-full h-full">
+            <div class="flip-front w-full h-full glass-bright rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+              <div class={`text-2xl md:text-3xl font-mono font-bold tracking-tight ${p.color}`}>{p.value}</div>
+              <div class="text-xs text-text-muted mt-2 uppercase tracking-wider">{p.label}</div>
+            </div>
+            <div class="flip-back w-full h-full glass rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+              <p class="text-xs text-text-secondary leading-relaxed">{p.back}</p>
+              {p.link && (
+                <a href={p.link} class="text-[10px] font-mono text-accent-purple/70 hover:text-accent-purple mt-2 transition-colors">
+                  {p.linkLabel} →
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Live status — extremely subtle -->
+    <div class="reveal text-center">
+      <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-border">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
+        <span class="text-[10px] font-mono text-text-muted tracking-wider">
+          Training continuously on dedicated infrastructure
+        </span>
+      </div>
+    </div>
+  </div>
+</section>

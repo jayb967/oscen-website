@@ -1,0 +1,71 @@
+---
+/**
+ * Section 2: The Problem — Three facts. Two sentences. No paragraphs.
+ * Flip cards reveal context on hover.
+ */
+const stats = [
+  {
+    value: "~0.3 Wh",
+    label: "per query",
+    back: "GPT-4o uses ~0.3 Wh per query. Multiply by billions of daily requests.",
+    source: "Epoch AI, 2025",
+    color: "text-accent-red",
+  },
+  {
+    value: "$100M+",
+    label: "to train",
+    back: "Training a frontier model costs $100M+. And when it's done, it's frozen forever.",
+    source: "Public filings",
+    color: "text-accent-amber",
+  },
+  {
+    value: "0",
+    label: "real-time learning",
+    back: "Once deployed, these models can't learn from experience. Static weights. No adaptation.",
+    source: "By design",
+    color: "text-accent-pink",
+  },
+];
+---
+
+<section id="problem" class="section relative">
+  <div class="max-w-4xl mx-auto w-full">
+    <!-- Two lines, that's it -->
+    <div class="text-center mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Problem</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        AI today is powerful.<br />
+        <span class="text-text-secondary">But it can't learn from experience.</span>
+      </h2>
+    </div>
+
+    <!-- Flip cards — hover reveals depth -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
+      {stats.map((s) => (
+        <div class="flip-card reveal h-44" tabindex="0" role="button" aria-label={`${s.value} ${s.label}. Hover for details.`}>
+          <div class="flip-inner w-full h-full">
+            <!-- Front -->
+            <div class="flip-front w-full h-full glass-bright rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+              <div class={`text-3xl md:text-4xl font-mono font-bold tracking-tight ${s.color}`}>{s.value}</div>
+              <div class="text-sm text-text-secondary mt-2">{s.label}</div>
+            </div>
+            <!-- Back -->
+            <div class="flip-back w-full h-full glass rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+              <p class="text-sm text-text-secondary leading-relaxed">{s.back}</p>
+              <span class="text-[9px] font-mono text-text-muted uppercase tracking-wider mt-3">{s.source}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Pivot — the turn toward solution -->
+    <div class="text-center">
+      <div class="divider max-w-24 mx-auto mb-14"></div>
+      <p id="pivot-line" class="ghost-text font-display text-[clamp(1.8rem,4vw,3rem)] text-text-primary italic leading-snug">
+        What if intelligence could
+        <span class="not-italic gradient-text">grow</span>?
+      </p>
+    </div>
+  </div>
+</section>

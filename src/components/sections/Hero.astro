@@ -1,0 +1,72 @@
+---
+/**
+ * Hero — Pure awe. The brain IS the experience.
+ * Three words of tagline. The visualization does the rest.
+ */
+---
+
+<section id="hero" class="relative h-screen w-full overflow-hidden flex items-center justify-center">
+  <!-- Brain visualization — full viewport -->
+  <div class="absolute inset-0 z-0">
+    <iframe
+      id="brain-frame"
+      src="/brain-viz/index.html?embed=true&labels=false"
+      class="w-full h-full border-0 opacity-0 transition-opacity duration-[2s]"
+      loading="eager"
+      title="OSCEN Neural Activity"
+      aria-hidden="true"
+      style="pointer-events: none;"
+    ></iframe>
+    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 20%, var(--color-abyss) 100%);"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-64 pointer-events-none" style="background: linear-gradient(to top, var(--color-abyss), transparent);"></div>
+  </div>
+
+  <!-- Content — deliberately sparse -->
+  <div class="relative z-10 text-center max-w-4xl mx-auto px-6">
+    <h1 id="hero-title" class="font-display text-[clamp(3.5rem,9vw,9rem)] leading-[0.85] tracking-tight hero-text-shadow">
+      <span class="block text-text-primary">Intelligence</span>
+      <span
+        class="block italic mt-1"
+        style="background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-cyan) 40%, var(--color-accent-purple) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 2px 20px rgba(94, 164, 245, 0.3));"
+      >that grows</span>
+    </h1>
+
+    <!-- Minimal stat line — whisper-quiet -->
+    <div id="hero-stats" class="mt-16 flex items-center justify-center gap-6 text-text-muted hero-text-shadow">
+      <span class="text-[11px] font-mono tracking-wider">1.0M neurons</span>
+      <span class="text-text-muted/20">&middot;</span>
+      <span class="text-[11px] font-mono tracking-wider">1.19B synapses</span>
+      <span class="text-text-muted/20">&middot;</span>
+      <span class="text-[11px] font-mono tracking-wider text-accent-green/70">Live</span>
+    </div>
+  </div>
+
+  <!-- Scroll hint — a single subtle line -->
+  <div id="hero-scroll" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+    <div class="w-px h-8 bg-gradient-to-b from-transparent to-text-muted/30"></div>
+  </div>
+</section>
+
+<style>
+  .hero-text-shadow {
+    text-shadow: 0 2px 30px rgba(5, 8, 16, 0.9), 0 4px 60px rgba(5, 8, 16, 0.6);
+  }
+</style>
+
+<script>
+  const frame = document.getElementById("brain-frame") as HTMLIFrameElement;
+  frame?.addEventListener("load", () => {
+    requestAnimationFrame(() => (frame.style.opacity = "1"));
+  });
+
+  // Mouse parallax: send normalized mouse position to brain viz
+  const hero = document.getElementById("hero")!;
+  hero.addEventListener("mousemove", (e) => {
+    const x = (e.clientX / window.innerWidth) * 2 - 1;   // -1 to 1
+    const y = (e.clientY / window.innerHeight) * 2 - 1;   // -1 to 1
+    frame?.contentWindow?.postMessage({ mouse: { x, y } }, "*");
+  });
+  hero.addEventListener("mouseleave", () => {
+    frame?.contentWindow?.postMessage({ mouse: { x: 0, y: 0 } }, "*");
+  });
+</script>

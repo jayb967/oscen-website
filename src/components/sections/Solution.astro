@@ -1,0 +1,81 @@
+---
+/**
+ * Section 3: The Solution — What OSCEN IS, not how it works.
+ * Four expand-on-hover cards. No equations. No jargon.
+ * Technical depth lives on /architecture.
+ */
+const features = [
+  {
+    title: "Learns from experience",
+    body: "One million spiking neurons connected by 1.19 billion synapses. Learning happens through spike timing, the same mechanism biological brains use. No training datasets. No gradient descent.",
+    link: "/architecture",
+    linkLabel: "Explore the architecture",
+    accent: "accent-blue",
+  },
+  {
+    title: "Runs on milliwatts",
+    body: "Spiking neural networks compute only when neurons fire. On neuromorphic hardware, that means 73–109× less energy than traditional AI. The efficiency gap widens at scale.",
+    link: "/research",
+    linkLabel: "See the benchmarks",
+    accent: "accent-green",
+  },
+  {
+    title: "Grows through phases",
+    body: "Like a human brain, OSCEN develops through infant, toddler, juvenile, adolescent, and mature phases. Each phase changes what the brain learns, what it prunes, and what it preserves forever.",
+    link: "/research",
+    linkLabel: "Read the science",
+    accent: "accent-amber",
+  },
+  {
+    title: "Works with any body",
+    body: "Camera, microphone, IMU, touch sensor. Any input. Servos, motors, speakers. Any output. The brain connects to any robotic body through a universal message bus. The brain is the product.",
+    link: "/architecture",
+    linkLabel: "View the integration",
+    accent: "accent-purple",
+  },
+];
+---
+
+<section id="solution" class="section relative">
+  <div class="max-w-4xl mx-auto w-full">
+    <div class="text-center mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Answer</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        A brain that learns<br />
+        <span class="italic gradient-text">like a child.</span>
+      </h2>
+    </div>
+
+    <!-- Expand cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {features.map((f) => (
+        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group" tabindex="0">
+          <div class="flex items-center justify-between">
+            <h3 class={`text-lg font-medium text-${f.accent} group-hover:text-text-primary transition-colors duration-300`}>
+              {f.title}
+            </h3>
+            <span class={`expand-indicator text-${f.accent}/40 text-lg`}>+</span>
+          </div>
+          <div class="expand-body mt-4">
+            <p class="text-sm text-text-secondary leading-relaxed">{f.body}</p>
+            <a
+              href={f.link}
+              class={`inline-block mt-4 text-xs font-mono text-${f.accent}/70 hover:text-${f.accent} transition-colors`}
+            >
+              {f.linkLabel} →
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Mobile: tap to toggle expanded state (hover doesn't exist)
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>(".expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>

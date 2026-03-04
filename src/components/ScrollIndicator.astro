@@ -1,0 +1,56 @@
+---
+/**
+ * Minimal dot nav for 6 sections. Hidden on mobile.
+ */
+const sections = [
+  { id: "hero", label: "Home" },
+  { id: "problem", label: "Problem" },
+  { id: "solution", label: "Solution" },
+  { id: "proof", label: "Proof" },
+  { id: "vision", label: "Vision" },
+  { id: "cta", label: "Connect" },
+];
+---
+
+<div
+  id="scroll-dots"
+  class="fixed right-5 top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col gap-3"
+  role="navigation"
+  aria-label="Page sections"
+>
+  {sections.map((s) => (
+    <a
+      href={`#${s.id}`}
+      class="scroll-dot group relative flex items-center justify-end"
+      data-section={s.id}
+      aria-label={s.label}
+    >
+      <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-3 text-[9px] font-mono text-text-muted uppercase tracking-[0.15em] whitespace-nowrap pointer-events-none">
+        {s.label}
+      </span>
+      <span class="relative block w-[5px] h-[5px] rounded-full bg-text-muted/15 group-hover:bg-accent-blue/40 transition-all duration-300">
+        <span class="dot-fill absolute inset-0 rounded-full bg-accent-blue scale-0 transition-transform duration-300"></span>
+      </span>
+    </a>
+  ))}
+</div>
+
+<script>
+  const dots = document.querySelectorAll<HTMLAnchorElement>(".scroll-dot");
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        dots.forEach((dot) => {
+          const fill = dot.querySelector<HTMLSpanElement>(".dot-fill")!;
+          fill.style.transform = dot.dataset.section === entry.target.id ? "scale(1)" : "scale(0)";
+        });
+      }
+    },
+    { threshold: 0.3 },
+  );
+  dots.forEach((dot) => {
+    const el = document.getElementById(dot.dataset.section!);
+    if (el) observer.observe(el);
+  });
+</script>

@@ -1,0 +1,345 @@
+---
+/**
+ * Architecture: Technical deep-dive for engineers, researchers, and curious investors.
+ * Brain regions, learning rules, neuron model, processing hierarchy.
+ * Progressive disclosure: clean headline → expand for depth.
+ */
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import { REGIONS, SYNAPSE_PATHWAYS, BRAIN_STATS, formatNeurons, rgbToHex } from "../data/brain";
+
+const learningRules = [
+  {
+    name: "STDP",
+    desc: "Spike-Timing Dependent Plasticity",
+    detail: "Pre-synaptic spike before post-synaptic spike strengthens the connection. Reverse order weakens it. Configurable tau and amplitude per synapse group.",
+    accent: "accent-blue",
+  },
+  {
+    name: "Eligibility Traces",
+    desc: "Temporal credit assignment",
+    detail: "STDP marks synapses as eligible for change. Traces decay over ~1000ms, waiting for a neuromodulatory signal to convert potential into actual weight change. Bridges the gap between spike timing and delayed reward.",
+    accent: "accent-cyan",
+  },
+  {
+    name: "BCM Metaplasticity",
+    desc: "Sliding plasticity threshold",
+    detail: "Per-postsynaptic-neuron theta that tracks recent activity. Highly active neurons become harder to potentiate, preventing runaway excitation and creating competition between inputs.",
+    accent: "accent-green",
+  },
+  {
+    name: "Neuromodulation",
+    desc: "4-channel gating system",
+    detail: "Dopamine (reward), Acetylcholine (attention), Norepinephrine (arousal), and Serotonin (mood) gate when and how strongly eligibility traces convert to weight changes. Each channel has phase-dependent baselines.",
+    accent: "accent-amber",
+  },
+  {
+    name: "Synaptic Scaling",
+    desc: "Homeostatic normalization",
+    detail: "Per-neuron multiplicative normalization prevents weight explosion or collapse. Reduced during high-plasticity developmental phases to allow rapid reorganization.",
+    accent: "accent-pink",
+  },
+  {
+    name: "R-STDP",
+    desc: "Reward-modulated learning",
+    detail: "Prediction error scales STDP weight changes on motor pathways. When the brain's prediction matches reality, motor learning is reinforced. When it doesn't, pathways weaken.",
+    accent: "accent-purple",
+  },
+];
+
+const compartments = [
+  { name: "Apical Distal", role: "Top-down context and feedback", color: "accent-purple" },
+  { name: "Apical Proximal", role: "Prediction signals", color: "accent-blue" },
+  { name: "Basal", role: "Feedforward sensory input", color: "accent-cyan" },
+  { name: "Perisomatic", role: "Inhibitory control", color: "accent-pink" },
+];
+
+const phases = [
+  { name: "Infant", steps: "0–60K", plasticity: "1.0×", desc: "Maximum exploration. All neuromodulators elevated. The brain absorbs everything." },
+  { name: "Toddler", steps: "60K–360K", plasticity: "0.7×", desc: "Sensory patterns stabilize. Feature extraction begins. Basic cross-modal associations form." },
+  { name: "Juvenile", steps: "360K–2.16M", plasticity: "0.48×", desc: "Hierarchical layers activate. Concept formation begins. Working memory strengthens." },
+  { name: "Adolescent", steps: "Experience-triggered", plasticity: "1.5×", desc: "Synaptic pruning (max 5%/round). Myelination locks pathways to 10% plasticity. Identity tagging at 1%. The brain sculpts itself." },
+  { name: "Mature", steps: "Ongoing", plasticity: "0.3×", desc: "Consolidated identity. Selective learning only. New skills without forgetting old ones." },
+];
+
+const motorRanges = [
+  { range: "0–30%", name: "Locomotion", color: "accent-green" },
+  { range: "30–60%", name: "Manipulation", color: "accent-blue" },
+  { range: "60–80%", name: "Head Control", color: "accent-cyan" },
+  { range: "80–83%", name: "Speech", color: "accent-amber" },
+  { range: "83–85%", name: "Expression", color: "accent-pink" },
+  { range: "85–100%", name: "Cognitive Action", color: "accent-purple" },
+];
+---
+
+<Base title="Architecture | OSCEN" description="Technical deep-dive into OSCEN's neuromorphic brain: 11 regions, 6 learning rules, 5 developmental phases.">
+  <Nav />
+
+  <main class="pt-32 pb-24">
+    <!-- Page header -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Architecture</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
+        Inside the<br />
+        <span class="italic gradient-text">living brain.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        {BRAIN_STATS.totalNeurons.toLocaleString()} neurons. {(BRAIN_STATS.totalSynapses / 1_000_000_000).toFixed(2)}B synapses.
+        {BRAIN_STATS.synapseGroups} synapse groups. {BRAIN_STATS.learningMechanisms} learning rules running simultaneously, every step.
+      </p>
+    </section>
+
+    <!-- Brain Regions -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        {BRAIN_STATS.brainRegions} brain regions
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Each region has a distinct computational role. Together they form a unified mind through {BRAIN_STATS.synapseGroups} synapse pathways.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {REGIONS.map((r) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center gap-3">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style={`background: ${rgbToHex(r.color)}`}></span>
+              <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{r.label}</h3>
+              <span class="ml-auto text-[10px] font-mono text-text-muted">{formatNeurons(r.neurons)}</span>
+              <span class="expand-indicator text-text-muted/40 text-sm">+</span>
+            </div>
+            <div class="expand-body mt-3">
+              <p class="text-xs text-text-secondary leading-relaxed">{r.description}</p>
+              <p class="text-[10px] font-mono text-text-muted mt-2">{r.connections}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Learning Rules -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        6 learning rules
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-4 max-w-xl">All six operate simultaneously every simulation step. This is Patent Claim #1.</p>
+
+      <!-- Three-factor pipeline -->
+      <div class="reveal flex items-center gap-2 mb-12 text-[10px] font-mono text-text-muted overflow-x-auto pb-2">
+        <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70 whitespace-nowrap">STDP</span>
+        <span class="text-text-muted/30">→</span>
+        <span class="px-3 py-1.5 rounded-full border border-accent-cyan/20 text-accent-cyan/70 whitespace-nowrap">Eligibility Trace</span>
+        <span class="text-text-muted/30">→</span>
+        <span class="px-3 py-1.5 rounded-full border border-accent-amber/20 text-accent-amber/70 whitespace-nowrap">Neuromodulator</span>
+        <span class="text-text-muted/30">→</span>
+        <span class="px-3 py-1.5 rounded-full border border-accent-green/20 text-accent-green/70 whitespace-nowrap">Weight Update</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {learningRules.map((rule) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class={`text-sm font-medium text-${rule.accent} group-hover:text-text-primary transition-colors`}>{rule.name}</h3>
+                <p class="text-[11px] text-text-muted mt-0.5">{rule.desc}</p>
+              </div>
+              <span class={`expand-indicator text-${rule.accent}/40 text-sm`}>+</span>
+            </div>
+            <div class="expand-body mt-3">
+              <p class="text-xs text-text-secondary leading-relaxed">{rule.detail}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Neuron Model -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        The neuron
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Leaky Integrate-and-Fire with 4 dendritic compartments. 80% excitatory, 20% inhibitory.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- LIF equation -->
+        <div class="reveal glass rounded-xl p-6">
+          <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-4">Membrane Dynamics</p>
+          <div class="font-mono text-lg text-accent-blue tracking-wide mb-4">
+            &tau; &middot; dV/dt = -(V - V<sub>rest</sub>) + R &middot; I<sub>syn</sub>
+          </div>
+          <p class="text-xs text-text-secondary leading-relaxed">
+            Each neuron integrates synaptic current, leaks toward rest, and fires a spike when voltage crosses threshold.
+            After firing, voltage resets and a refractory period prevents immediate re-firing.
+          </p>
+          <div class="flex gap-4 mt-4">
+            <div class="text-center">
+              <div class="text-sm font-mono text-accent-green">80%</div>
+              <div class="text-[10px] text-text-muted">Excitatory</div>
+            </div>
+            <div class="text-center">
+              <div class="text-sm font-mono text-accent-pink">20%</div>
+              <div class="text-[10px] text-text-muted">Inhibitory</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dendritic compartments -->
+        <div class="reveal glass rounded-xl p-6">
+          <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-4">4 Dendritic Compartments</p>
+          <div class="space-y-3">
+            {compartments.map((c) => (
+              <div class="flex items-center gap-3">
+                <span class={`w-1.5 h-1.5 rounded-full bg-${c.color}`}></span>
+                <span class="text-sm text-text-primary w-32">{c.name}</span>
+                <span class="text-xs text-text-muted">{c.role}</span>
+              </div>
+            ))}
+          </div>
+          <p class="text-xs text-text-secondary leading-relaxed mt-4">
+            Each compartment has independent membrane dynamics. Apical compartments exhibit supralinear dendritic spikes (2.5&times; amplification). Patent Claim #5.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Developmental Phases -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        5 developmental phases
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The brain develops through critical periods modeled on human brain ontogeny. Adolescent entry is experience-dependent, never hardcoded. Patent Claim #2.</p>
+
+      <div class="space-y-2">
+        {phases.map((p, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center gap-4">
+              <span class="text-[10px] font-mono text-text-muted w-6">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="text-sm font-medium text-text-primary">{p.name}</h3>
+              <span class="text-[10px] font-mono text-text-muted ml-auto">{p.plasticity}</span>
+              <span class="expand-indicator text-text-muted/40 text-sm">+</span>
+            </div>
+            <div class="expand-body mt-3 ml-10">
+              <p class="text-xs text-text-secondary leading-relaxed">{p.desc}</p>
+              <span class="text-[10px] font-mono text-text-muted mt-1 inline-block">{p.steps} steps</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Processing Hierarchy -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Processing hierarchy
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">From raw sensor data to abstract concepts. Each layer learns its representations through STDP. No backpropagation.</p>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="space-y-3">
+          {[
+            { layer: "Sensory Cortex", n: "200K", role: "Raw input encoding: vision, audio, touch, proprioception", color: "accent-cyan" },
+            { layer: "Feature Layer", n: "20K", role: "Edge, texture, and phoneme extraction", color: "accent-green" },
+            { layer: "Association Cortex", n: "500K", role: "Cross-modal binding via spike-timing coincidence", color: "accent-blue" },
+            { layer: "Concept Layer", n: "5K", role: "Sparse winner-take-all abstract representations", color: "accent-amber" },
+            { layer: "Predictive Layer", n: "100K", role: "Sequence learning and world model", color: "accent-purple" },
+            { layer: "Meta Controller", n: "3K", role: "Executive attention and learning gating", color: "accent-pink" },
+          ].map((l, i) => (
+            <div class="flex items-center gap-4">
+              <span class={`w-2 h-2 rounded-full bg-${l.color}`}></span>
+              <span class="text-sm text-text-primary w-40">{l.layer}</span>
+              <span class="text-[10px] font-mono text-text-muted w-12">{l.n}</span>
+              <span class="text-xs text-text-secondary">{l.role}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Motor Cortex -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Motor output
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">100,000 motor neurons divided into 6 functional sub-ranges. Speech and cognitive action channels emerge through development.</p>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="space-y-2">
+          {motorRanges.map((m) => (
+            <div class="flex items-center gap-4">
+              <span class={`text-[10px] font-mono text-${m.color} w-20`}>{m.range}</span>
+              <div class="flex-1 h-1.5 rounded-full bg-elevated overflow-hidden">
+                <div class={`h-full rounded-full bg-${m.color}/40`} style={`width: ${parseInt(m.range.split('–')[1] || m.range.split('–')[0]) - parseInt(m.range.split('–')[0])}%`}></div>
+              </div>
+              <span class="text-sm text-text-primary w-36">{m.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Cognitive Action Channel -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Cognitive action channel
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">When the brain encounters something it can't predict, it learns to ask for help. The decision to query is emergent, not hardcoded. Patent Claim #3.</p>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { step: "01", label: "Unknown input", desc: "Sensory pattern doesn't match learned concepts" },
+            { step: "02", label: "Prediction error", desc: "Sustained high error in predictive layer" },
+            { step: "03", label: "Motor fires", desc: "Cognitive sub-range activates via STDP" },
+            { step: "04", label: "LLM query", desc: "NATS publishes to Ollama bridge" },
+            { step: "05", label: "Response injection", desc: "Answer re-enters sensory pipeline" },
+            { step: "06", label: "STDP learning", desc: "Brain learns. No query needed next time" },
+          ].map((s) => (
+            <div class="text-center">
+              <div class="text-lg font-mono text-accent-purple/50">{s.step}</div>
+              <div class="text-xs text-text-primary mt-1">{s.label}</div>
+              <p class="text-[10px] text-text-muted mt-1 leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Sensorimotor Loop -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Closed sensorimotor loop
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The brain learns from its own actions. Motor commands fire, actuators move, proprioceptive sensors capture the outcome, and R-STDP adjusts motor pathways.</p>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="flex items-center justify-center gap-3 flex-wrap text-[11px] font-mono">
+          <span class="px-3 py-1.5 rounded-full border border-accent-green/20 text-accent-green/70">Motor fires</span>
+          <span class="text-text-muted/30">→</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70">Actuator moves</span>
+          <span class="text-text-muted/30">→</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-cyan/20 text-accent-cyan/70">Sensor feedback</span>
+          <span class="text-text-muted/30">→</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-amber/20 text-accent-amber/70">R-STDP learns</span>
+          <span class="text-text-muted/30">→</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-green/20 text-accent-green/70">Better motor</span>
+        </div>
+        <p class="text-xs text-text-secondary text-center mt-6 leading-relaxed max-w-lg mx-auto">
+          Sensors supported: Camera, Microphone, IMU/Gyro, Joint Encoders, Force Sensors, Serial (ESP32/Arduino).
+          Any sensor, any actuator, connected via universal NATS message bus.
+        </p>
+      </div>
+    </section>
+
+    <!-- Back to home -->
+    <section class="max-w-5xl mx-auto px-6 text-center">
+      <div class="divider max-w-24 mx-auto mb-10"></div>
+      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+    </section>
+  </main>
+</Base>
+
+<script>
+  // Mobile: tap to toggle expanded state
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>(".expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>

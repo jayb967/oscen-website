@@ -1,0 +1,290 @@
+---
+/**
+ * Research — Scientific foundations, benchmarks, honest limitations.
+ * For researchers, technical investors, and curious engineers.
+ */
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+---
+
+<Base title="Research | OSCEN" description="Scientific foundations of OSCEN's spiking neural network: neuroscience basis, energy benchmarks, and honest limitations.">
+  <Nav />
+
+  <main class="pt-32 pb-24">
+    <!-- Page header -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Research</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
+        The science<br />
+        <span class="italic gradient-text">behind the brain.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        OSCEN is grounded in decades of computational neuroscience. We build on established research, and we're honest about where we diverge.
+      </p>
+    </section>
+
+    <!-- Neuroscience Foundations -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Neuroscience foundations
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Each mechanism in OSCEN maps to established neuroscience research.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {[
+          {
+            mechanism: "STDP",
+            basis: "Bi & Poo (1998), Markram et al. (1997)",
+            note: "The foundational discovery that spike timing determines synaptic plasticity direction and magnitude. Our implementation uses configurable time constants per synapse group.",
+            accent: "accent-blue",
+          },
+          {
+            mechanism: "Eligibility Traces",
+            basis: "Izhikevich (2007), Gerstner et al. (2018)",
+            note: "Three-factor learning rules where STDP creates a 'tag' that neuromodulators later convert to permanent change. Bridges millisecond spike timing with second-scale reward signals.",
+            accent: "accent-cyan",
+          },
+          {
+            mechanism: "BCM Theory",
+            basis: "Bienenstock, Cooper & Munro (1982)",
+            note: "Sliding threshold for synaptic modification. Active neurons become harder to excite further. Creates competition and selectivity in neural responses.",
+            accent: "accent-green",
+          },
+          {
+            mechanism: "Neuromodulation",
+            basis: "Schultz (1998), Hasselmo (2006)",
+            note: "Dopaminergic reward prediction error, cholinergic attention gating, noradrenergic arousal modulation, serotonergic mood regulation. Each modeled as a global gain channel.",
+            accent: "accent-amber",
+          },
+          {
+            mechanism: "Synaptic Scaling",
+            basis: "Turrigiano et al. (1998)",
+            note: "Multiplicative homeostatic plasticity that normalizes total synaptic input per neuron. Prevents runaway excitation while preserving relative weight distributions.",
+            accent: "accent-pink",
+          },
+          {
+            mechanism: "Critical Periods",
+            basis: "Hensch (2005), Knudsen (2004)",
+            note: "Experience-dependent windows of heightened plasticity. Our adolescent phase models the reminiscence bump: a period of rapid pruning, myelination, and identity formation.",
+            accent: "accent-purple",
+          },
+        ].map((item) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center justify-between">
+              <h3 class={`text-sm font-medium text-${item.accent} group-hover:text-text-primary transition-colors`}>{item.mechanism}</h3>
+              <span class={`expand-indicator text-${item.accent}/40 text-sm`}>+</span>
+            </div>
+            <p class="text-[10px] font-mono text-text-muted mt-1">{item.basis}</p>
+            <div class="expand-body mt-3">
+              <p class="text-xs text-text-secondary leading-relaxed">{item.note}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Energy Benchmarks -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Energy efficiency
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Spiking neural networks compute only when neurons fire. On neuromorphic hardware, this translates to dramatic energy savings.</p>
+
+      <div class="reveal glass rounded-xl p-6 mb-6">
+        <div class="space-y-4">
+          {[
+            { label: "GPU Inference", power: "50–200W", bar: 100, color: "accent-red" },
+            { label: "LLM API Call", power: "~0.3 Wh/query", bar: 60, color: "accent-amber" },
+            { label: "OSCEN (CPU sim)", power: "~45W", bar: 40, color: "accent-blue" },
+            { label: "OSCEN (Neuromorphic)", power: "<5W", bar: 5, color: "accent-green" },
+          ].map((item) => (
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm text-text-primary">{item.label}</span>
+                <span class={`text-[11px] font-mono text-${item.color}`}>{item.power}</span>
+              </div>
+              <div class="h-1.5 rounded-full bg-elevated overflow-hidden">
+                <div class={`h-full rounded-full bg-${item.color}/50`} style={`width: ${item.bar}%`}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="reveal glass rounded-xl p-5">
+          <div class="text-2xl font-mono text-accent-green font-bold">73×</div>
+          <div class="text-xs text-text-muted mt-1">less energy than CPU</div>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Measured on Intel Loihi for robotics peg-in-hole task. IEEE 2024.</p>
+        </div>
+        <div class="reveal glass rounded-xl p-5">
+          <div class="text-2xl font-mono text-accent-green font-bold">109×</div>
+          <div class="text-xs text-text-muted mt-1">less energy than GPU</div>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Measured on Intel Loihi for keyword spotting. Published benchmark.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SNN State of the Art -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        SNN state of the art
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Where spiking neural networks stand today, the capabilities and the gaps.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+        <div class="reveal glass rounded-xl p-5">
+          <h3 class="text-sm font-medium text-accent-blue mb-3">Capabilities</h3>
+          <ul class="space-y-2">
+            {[
+              "Continual learning without catastrophic forgetting",
+              "Event-driven computation (compute only when needed)",
+              "Temporal pattern recognition (spike timing encodes information)",
+              "Neuromorphic hardware deployment (Intel Loihi, SpiNNaker)",
+              "Real-time sensor processing at <1ms latency",
+            ].map((item) => (
+              <li class="flex items-start gap-2">
+                <span class="text-accent-green text-xs mt-0.5">+</span>
+                <span class="text-xs text-text-secondary">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="reveal glass rounded-xl p-5">
+          <h3 class="text-sm font-medium text-accent-amber mb-3">Current Limitations</h3>
+          <ul class="space-y-2">
+            {[
+              "Best ImageNet accuracy: 82.39% vs ANN 91%",
+              "SNN LLMs max out at ~1.5B parameters",
+              "Training tools less mature than PyTorch/JAX ecosystem",
+              "Limited off-the-shelf pretrained models",
+              "Neuromorphic hardware still in early production",
+            ].map((item) => (
+              <li class="flex items-start gap-2">
+                <span class="text-accent-amber text-xs mt-0.5">~</span>
+                <span class="text-xs text-text-secondary">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div class="reveal glass rounded-xl p-5">
+        <p class="text-xs text-text-secondary leading-relaxed">
+          <span class="text-text-primary font-medium">Our position:</span> OSCEN doesn't compete with LLMs on language benchmarks.
+          We compete on <span class="text-accent-blue">continual learning</span>, <span class="text-accent-green">energy efficiency</span>,
+          and <span class="text-accent-cyan">real-time adaptation</span>. The exact capabilities robotics needs and LLMs can't provide.
+        </p>
+      </div>
+    </section>
+
+    <!-- Comparative Analysis -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Competitive landscape
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">How OSCEN compares to transformer-based robotics AI.</p>
+
+      <div class="reveal glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="border-b border-border">
+                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Company</th>
+                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Approach</th>
+                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Learning</th>
+                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Edge</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: "Figure AI", approach: "VLA Transformer", learning: "Static", edge: "No", highlight: false },
+                { name: "Google DeepMind", approach: "Gemini VLA", learning: "Retrain", edge: "Partial", highlight: false },
+                { name: "Physical Intelligence", approach: "3B param VLA", learning: "Static", edge: "Cloud", highlight: false },
+                { name: "OSCEN", approach: "Spiking Neural Net", learning: "Continual", edge: "Yes", highlight: true },
+              ].map((row) => (
+                <tr class={`border-b border-border/50 ${row.highlight ? 'bg-accent-blue/[0.03]' : ''}`}>
+                  <td class={`p-4 ${row.highlight ? 'text-accent-blue font-medium' : 'text-text-primary'}`}>{row.name}</td>
+                  <td class="p-4 text-text-secondary">{row.approach}</td>
+                  <td class={`p-4 ${row.learning === 'Continual' ? 'text-accent-green' : 'text-text-muted'}`}>{row.learning}</td>
+                  <td class={`p-4 ${row.edge === 'Yes' ? 'text-accent-green' : 'text-text-muted'}`}>{row.edge}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Honest Assessment -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Honest assessment
+      </h2>
+
+      <div class="space-y-3">
+        {[
+          {
+            q: "Can OSCEN match GPT-4 at language?",
+            a: "No. And it's not designed to. OSCEN is built for embodied intelligence: real-time sensor processing, motor control, and continuous adaptation. For language, it queries LLMs as tools.",
+          },
+          {
+            q: "Is it training on one server really enough?",
+            a: "For proof of concept, yes. We're demonstrating that a million spiking neurons can learn from raw sensory data. Production deployment on neuromorphic hardware will scale to billions of neurons at a fraction of the power.",
+          },
+          {
+            q: "What about accuracy benchmarks?",
+            a: "We don't yet have published benchmarks on standard tasks. The brain is still in its juvenile developmental phase. Early results show cross-modal association formation and motor pattern learning. Formal benchmarks are planned for Q2 2026.",
+          },
+          {
+            q: "Why not just use transformers for everything?",
+            a: "Transformers excel at static inference. But they can't learn from a single experience, can't run on milliwatt hardware, and can't adapt in real-time. For robotics, those aren't nice-to-haves. They're requirements.",
+          },
+        ].map((item) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center justify-between gap-4">
+              <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{item.q}</h3>
+              <span class="expand-indicator text-text-muted/40 text-sm shrink-0">+</span>
+            </div>
+            <div class="expand-body mt-3">
+              <p class="text-xs text-text-secondary leading-relaxed">{item.a}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Publications & References -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Key references
+      </h2>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="space-y-3 text-xs text-text-secondary">
+          <p><span class="text-text-muted font-mono">STDP</span>. Bi, G.-Q. & Poo, M.-M. (1998). Synaptic modifications in cultured hippocampal neurons. <em>J. Neurosci.</em></p>
+          <p><span class="text-text-muted font-mono">Three-factor</span>. Gerstner, W. et al. (2018). Eligibility traces and plasticity on behavioral time scales. <em>Front. Neural Circuits.</em></p>
+          <p><span class="text-text-muted font-mono">BCM</span>. Bienenstock, E., Cooper, L. & Munro, P. (1982). Theory for the development of neuron selectivity. <em>J. Neurosci.</em></p>
+          <p><span class="text-text-muted font-mono">Reward</span>. Schultz, W. (1998). Predictive reward signal of dopamine neurons. <em>J. Neurophysiol.</em></p>
+          <p><span class="text-text-muted font-mono">Scaling</span>. Turrigiano, G. et al. (1998). Activity-dependent scaling of quantal amplitude in neocortical neurons. <em>Nature.</em></p>
+          <p><span class="text-text-muted font-mono">Critical</span>. Hensch, T. (2005). Critical period plasticity in local cortical circuits. <em>Nature Rev. Neurosci.</em></p>
+          <p><span class="text-text-muted font-mono">Loihi</span>. Intel Labs (2024). Neuromorphic computing benchmarks on Loihi 2. <em>IEEE IJCNN.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Back to home -->
+    <section class="max-w-5xl mx-auto px-6 text-center">
+      <div class="divider max-w-24 mx-auto mb-10"></div>
+      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+    </section>
+  </main>
+</Base>
+
+<script>
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>(".expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>

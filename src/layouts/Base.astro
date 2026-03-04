@@ -1,0 +1,58 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = "A neuromorphic brain that learns like a child, through experience, not training data. Patent pending.",
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="OSCEN" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- Fonts: preconnect then load -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+
+    <!-- GSAP ScrollTrigger animations -->
+    <script>
+      import "../scripts/scroll-animations";
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @import "../styles/global.css";
+</style>

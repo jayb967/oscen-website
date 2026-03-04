@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/*
+ * OSCEN Design System v2
+ * Minimal. Cinematic. Investor-first.
+ * "Simple is powerful."
+ */
+
+/* ─── Theme Tokens ─── */
+@theme {
+  --color-void: #050810;
+  --color-abyss: #0a0e1a;
+  --color-deep: #0f1629;
+  --color-surface: #141c32;
+  --color-elevated: #1a2440;
+  --color-border: rgba(94, 164, 245, 0.06);
+  --color-border-bright: rgba(94, 164, 245, 0.15);
+
+  --color-text-primary: #e2e8f4;
+  --color-text-secondary: #8b95ab;
+  --color-text-muted: #4a5568;
+
+  --color-accent-blue: #5ea4f5;
+  --color-accent-cyan: #22d3ee;
+  --color-accent-green: #38d97a;
+  --color-accent-amber: #f5a623;
+  --color-accent-pink: #f472b6;
+  --color-accent-purple: #a78bfa;
+  --color-accent-red: #ef4444;
+
+  --font-display: "Instrument Serif", "Georgia", serif;
+  --font-body: "Outfit", "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+}
+
+/* ─── Base ─── */
+html {
+  scroll-behavior: smooth;
+  background: var(--color-abyss);
+}
+
+body {
+  background: var(--color-abyss);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Film grain — extremely subtle texture */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-elevated); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-accent-blue); }
+
+::selection {
+  background: rgba(94, 164, 245, 0.2);
+  color: #fff;
+}
+
+/* ─── Section Layout ─── */
+.section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rem 1.5rem;
+  overflow: hidden;
+}
+
+/* ─── Glass Surfaces ─── */
+.glass {
+  background: rgba(10, 14, 26, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-bright {
+  background: rgba(20, 28, 50, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border-bright);
+}
+
+/* ─── Typography Utilities ─── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border-bright), transparent);
+}
+
+/* ─── Flip Card ─── */
+.flip-card {
+  perspective: 800px;
+  cursor: pointer;
+}
+.flip-inner {
+  position: relative;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+.flip-card:hover .flip-inner,
+.flip-card:focus-within .flip-inner {
+  transform: rotateY(180deg);
+}
+.flip-front,
+.flip-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+/* ─── Expand Card ─── */
+.expand-card .expand-body {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.3s ease,
+              filter 0.3s ease;
+  filter: blur(4px);
+}
+.expand-card:hover .expand-body,
+.expand-card.expanded .expand-body {
+  max-height: 200px;
+  opacity: 1;
+  filter: blur(0);
+}
+.expand-card .expand-indicator {
+  transition: transform 0.3s ease;
+}
+.expand-card:hover .expand-indicator,
+.expand-card.expanded .expand-indicator {
+  transform: rotate(45deg);
+}
+
+/* ─── Scroll Reveal (GSAP takes over, CSS fallback) ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Ghost/Emergence Text ─── */
+.ghost-text {
+  opacity: 0.08;
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ghost-text.emerged {
+  opacity: 1;
+}
+
+/* ─── Accessibility ─── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .ghost-text { opacity: 1; transition: none; }
+  .flip-inner { transition: none; }
+  .expand-card .expand-body { max-height: none; opacity: 1; filter: none; transition: none; }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
