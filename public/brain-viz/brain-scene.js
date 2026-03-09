@@ -97,9 +97,7 @@ class BrainScene {
     _detectLiveWsUrl() {
         const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const host = window.location.hostname;
-        // Default: Hetzner dashboard via SSH tunnel on port 8080
-        // The local dashboard (8081) connects to local Docker NATS which has no brain.
-        // Port 8080 is the SSH tunnel to the Hetzner server running the actual brain.
+        // WebSocket connection to live brain data
         return `${proto}//${host}:8080/ws`;
     }
 
