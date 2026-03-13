@@ -17,12 +17,12 @@
       aria-hidden="true"
       style="pointer-events: none;"
     ></iframe>
-    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 20%, var(--color-abyss) 100%);"></div>
+    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(5,8,16,0.55) 0%, var(--color-abyss) 100%);"></div>
     <div class="absolute bottom-0 left-0 right-0 h-64 pointer-events-none" style="background: linear-gradient(to top, var(--color-abyss), transparent);"></div>
   </div>
 
   <!-- Content — deliberately sparse -->
-  <div class="relative z-10 text-center max-w-4xl mx-auto px-6">
+  <div class="relative z-10 text-center max-w-4xl mx-auto px-6 hero-backdrop">
     <h1 id="hero-title" class="font-display text-[clamp(3.5rem,9vw,9rem)] leading-[0.85] tracking-tight hero-text-shadow">
       <span class="block text-text-primary">Intelligence</span>
       <span
@@ -32,12 +32,12 @@
     </h1>
 
     <!-- Minimal stat line — whisper-quiet -->
-    <div id="hero-stats" class="mt-16 flex items-center justify-center gap-6 text-text-muted hero-text-shadow">
-      <span class="text-[11px] font-mono tracking-wider">1.0M neurons</span>
-      <span class="text-text-muted/20">&middot;</span>
-      <span class="text-[11px] font-mono tracking-wider">1.19B synapses</span>
-      <span class="text-text-muted/20">&middot;</span>
-      <span class="text-[11px] font-mono tracking-wider text-accent-green/70">Live</span>
+    <div id="hero-stats" class="mt-16 flex items-center justify-center gap-6 text-text-secondary hero-text-shadow">
+      <span class="text-[12px] font-mono tracking-wider">1.0M neurons</span>
+      <span class="text-text-secondary/30">&middot;</span>
+      <span class="text-[12px] font-mono tracking-wider">1.19B synapses</span>
+      <span class="text-text-secondary/30">&middot;</span>
+      <span class="text-[12px] font-mono tracking-wider text-accent-green">Live</span>
     </div>
   </div>
 
@@ -49,7 +49,16 @@
 
 <style>
   .hero-text-shadow {
-    text-shadow: 0 2px 30px rgba(5, 8, 16, 0.9), 0 4px 60px rgba(5, 8, 16, 0.6);
+    text-shadow:
+      0 2px 20px rgba(5, 8, 16, 1),
+      0 4px 40px rgba(5, 8, 16, 0.95),
+      0 8px 80px rgba(5, 8, 16, 0.8),
+      0 0 120px rgba(5, 8, 16, 0.6);
+  }
+  .hero-backdrop {
+    background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(5, 8, 16, 0.7) 0%, rgba(5, 8, 16, 0.3) 50%, transparent 80%);
+    padding: 3rem 2rem;
+    border-radius: 2rem;
   }
 </style>
 
