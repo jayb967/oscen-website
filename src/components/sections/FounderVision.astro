@@ -1,0 +1,86 @@
+---
+/**
+ * Section: Founder's Vision — The three-phase roadmap.
+ * License brain → Build robots → Elevate human life.
+ * This is the emotional close before the CTA.
+ */
+const phases = [
+  {
+    phase: "Now",
+    title: "The universal robot brain",
+    desc: "License OSCEN to robotics companies worldwide. Your robots, our brain. Every manufacturer gets adaptive intelligence that learns on the job, without building their own AI team.",
+    accent: "accent-blue",
+    icon: "◎",
+  },
+  {
+    phase: "Next",
+    title: "Our own robots",
+    desc: "Build integrated robots with OSCEN at the core. Purpose-built hardware running on neuromorphic silicon. Robots that learn from day one and never stop improving.",
+    accent: "accent-cyan",
+    icon: "◈",
+  },
+  {
+    phase: "Future",
+    title: "Elevate human life",
+    desc: "Free humans from labor that machines can do better. Not to replace people, but to give them back their time. A world where intelligence handles the work, and humans choose how to live.",
+    accent: "accent-purple",
+    icon: "◇",
+  },
+];
+---
+
+<section id="founder-vision" class="section relative">
+  <div class="max-w-4xl mx-auto w-full">
+    <div class="text-center mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Bigger Picture</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        Brain for robotics.<br />
+        <span class="italic gradient-text">No more labor.</span>
+      </h2>
+    </div>
+
+    <!-- Three-phase timeline -->
+    <div class="relative">
+      <!-- Vertical line connecting phases -->
+      <div class="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-accent-blue/20 via-accent-cyan/20 to-accent-purple/20 hidden md:block"></div>
+
+      <div class="space-y-4">
+        {phases.map((p) => (
+          <div class="expand-card reveal glass rounded-xl p-6 cursor-pointer group md:ml-16 relative" tabindex="0">
+            <!-- Timeline dot -->
+            <div class={`hidden md:block absolute -left-[calc(4rem+5px)] top-7 w-2.5 h-2.5 rounded-full bg-${p.accent}/40 group-hover:bg-${p.accent} transition-colors duration-300 ring-4 ring-abyss`}></div>
+
+            <div class="flex items-center gap-4">
+              <span class={`text-xl text-${p.accent}/40 group-hover:text-${p.accent} transition-colors duration-300`}>{p.icon}</span>
+              <div>
+                <span class={`text-[10px] font-mono text-${p.accent} uppercase tracking-wider`}>{p.phase}</span>
+                <h3 class="text-lg font-medium text-text-primary group-hover:text-white transition-colors">{p.title}</h3>
+              </div>
+              <span class={`expand-indicator text-${p.accent}/40 text-sm ml-auto`}>+</span>
+            </div>
+            <div class="expand-body mt-3 ml-10">
+              <p class="text-sm text-text-secondary leading-relaxed">{p.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Founder gut-punch -->
+    <div class="text-center mt-20">
+      <div class="divider max-w-24 mx-auto mb-14"></div>
+      <p id="bigger-picture" class="ghost-text font-display text-[clamp(1.5rem,3.5vw,2.5rem)] text-text-primary leading-snug">
+        The question isn't whether robots will think.<br />
+        <span class="italic text-text-secondary">It's whether they'll learn.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>("#founder-vision .expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>

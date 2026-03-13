@@ -1,0 +1,88 @@
+---
+/**
+ * Section: How It Works — 5-step processing pipeline.
+ * Sense → Encode → Think → Act → Learn. Clean, linear flow.
+ */
+const steps = [
+  {
+    num: "01",
+    title: "Sense",
+    desc: "Camera, microphone, IMU, touch, serial. Any sensor feeds raw data into the brain through a universal message bus.",
+    accent: "accent-cyan",
+  },
+  {
+    num: "02",
+    title: "Encode",
+    desc: "200K sensory neurons encode input into spike trains. Feature layers extract edges, phonemes, and textures. No preprocessing. No hand-engineering.",
+    accent: "accent-blue",
+  },
+  {
+    num: "03",
+    title: "Think",
+    desc: "500K association neurons bind cross-modal signals through spike-timing coincidence. Concepts emerge. Predictions form. Working memory holds context.",
+    accent: "accent-purple",
+  },
+  {
+    num: "04",
+    title: "Act",
+    desc: "100K motor neurons fire across 6 sub-ranges: locomotion, manipulation, head, speech, expression, and cognitive action. The body moves.",
+    accent: "accent-green",
+  },
+  {
+    num: "05",
+    title: "Learn",
+    desc: "Proprioceptive feedback returns. R-STDP adjusts motor pathways. Eligibility traces consolidate. The brain is different than it was one step ago.",
+    accent: "accent-amber",
+  },
+];
+---
+
+<section id="how-it-works" class="section relative">
+  <div class="max-w-4xl mx-auto w-full">
+    <div class="text-center mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">How It Works</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        Five steps.<br />
+        <span class="italic gradient-text">Every millisecond.</span>
+      </h2>
+    </div>
+
+    <!-- Pipeline flow -->
+    <div class="space-y-3">
+      {steps.map((s, i) => (
+        <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+          <div class="flex items-center gap-5">
+            <span class={`text-2xl font-mono text-${s.accent}/40 group-hover:text-${s.accent} transition-colors duration-300 w-10`}>{s.num}</span>
+            <h3 class={`text-lg font-medium text-${s.accent} group-hover:text-text-primary transition-colors duration-300`}>
+              {s.title}
+            </h3>
+            {i < steps.length - 1 && (
+              <span class="hidden md:inline text-text-muted/20 ml-auto mr-2">→</span>
+            )}
+            <span class={`expand-indicator text-${s.accent}/40 text-sm ${i < steps.length - 1 ? '' : 'ml-auto'}`}>+</span>
+          </div>
+          <div class="expand-body mt-3 ml-[3.75rem]">
+            <p class="text-sm text-text-secondary leading-relaxed">{s.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Cycle indicator -->
+    <div class="reveal text-center mt-12">
+      <div class="inline-flex items-center gap-3 text-[10px] font-mono text-text-muted">
+        <span class="w-8 h-px bg-gradient-to-r from-transparent to-text-muted/30"></span>
+        <span>This loop runs continuously. The brain never stops learning.</span>
+        <span class="w-8 h-px bg-gradient-to-l from-transparent to-text-muted/30"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>("#how-it-works .expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>
