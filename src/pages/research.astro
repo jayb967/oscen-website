@@ -198,6 +198,7 @@ import Nav from "../components/Nav.astro";
             </thead>
             <tbody>
               {[
+                { name: "AMI Labs (LeCun)", approach: "JEPA World Models", learning: "Retrain", edge: "No", highlight: false },
                 { name: "Figure AI", approach: "VLA Transformer", learning: "Static", edge: "No", highlight: false },
                 { name: "Google DeepMind", approach: "Gemini VLA", learning: "Retrain", edge: "Partial", highlight: false },
                 { name: "Physical Intelligence", approach: "3B param VLA", learning: "Static", edge: "Cloud", highlight: false },
@@ -235,6 +236,10 @@ import Nav from "../components/Nav.astro";
           {
             q: "What about accuracy benchmarks?",
             a: "We don't yet have published benchmarks on standard tasks. The brain is still in its juvenile developmental phase. Early results show cross-modal association formation and motor pattern learning. Formal benchmarks are planned for Q2 2026.",
+          },
+          {
+            q: "What about LeCun's AMI Labs and JEPA world models?",
+            a: "AMI validates our thesis: the future of robotics AI is beyond LLMs. But JEPA still relies on GPU-scale pretraining on millions of hours of video, then deploys a frozen model. It can't learn continuously on-device, can't run on milliwatts, and has no solution for catastrophic forgetting. OSCEN and JEPA are different bets: top-down (train big, deploy frozen) vs. bottom-up (learn continuously, adapt forever).",
           },
           {
             q: "Why not just use transformers for everything?",

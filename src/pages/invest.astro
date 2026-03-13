@@ -64,6 +64,51 @@ import Nav from "../components/Nav.astro";
       </div>
     </section>
 
+    <!-- Why Now — AMI validates the thesis -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Why now
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The market is moving beyond LLMs. The biggest names in AI agree — but their solutions still have the same old problems.</p>
+
+      <div class="reveal glass-bright rounded-2xl p-6 md:p-8 mb-6">
+        <div class="flex items-start gap-4 mb-4">
+          <span class="px-3 py-1 rounded-full bg-accent-amber/10 border border-accent-amber/20 text-accent-amber text-[10px] font-mono uppercase tracking-wider shrink-0">March 2026</span>
+          <div>
+            <p class="text-sm text-text-primary font-medium">Yann LeCun's AMI Labs raises $1.03B for "world models"</p>
+            <p class="text-xs text-text-secondary mt-1 leading-relaxed">The Turing Award winner left Meta to build JEPA — world models that go beyond LLMs. Nvidia, Toyota, Samsung, Jeff Bezos invested. This validates the core thesis: <span class="text-text-primary">LLMs are not enough for robots.</span></p>
+          </div>
+        </div>
+        <div class="divider mb-4"></div>
+        <p class="text-xs text-text-secondary leading-relaxed">But AMI still trains on GPU clusters, still deploys frozen models, still can't learn on-device, and still has no answer for catastrophic forgetting. <span class="text-accent-blue">OSCEN solves all four.</span></p>
+      </div>
+
+      <div class="reveal glass rounded-xl p-5">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div>
+            <div class="text-sm font-mono text-text-primary">AMI (JEPA)</div>
+            <div class="text-[10px] text-text-muted mt-1">GPU pretraining</div>
+            <div class="text-[10px] text-accent-red mt-0.5">No continual learning</div>
+          </div>
+          <div>
+            <div class="text-sm font-mono text-text-primary">Figure / π</div>
+            <div class="text-[10px] text-text-muted mt-1">Transformer VLA</div>
+            <div class="text-[10px] text-accent-red mt-0.5">Static, 50–200W</div>
+          </div>
+          <div>
+            <div class="text-sm font-mono text-text-primary">Google</div>
+            <div class="text-[10px] text-text-muted mt-1">Gemini VLA</div>
+            <div class="text-[10px] text-accent-amber mt-0.5">Retrain to update</div>
+          </div>
+          <div>
+            <div class="text-sm font-mono text-accent-blue font-medium">OSCEN</div>
+            <div class="text-[10px] text-text-muted mt-1">Spiking Neural Net</div>
+            <div class="text-[10px] text-accent-green mt-0.5">Continual, &lt;5W</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Energy Problem -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
