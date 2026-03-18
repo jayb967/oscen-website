@@ -1,0 +1,272 @@
+---
+/**
+ * Investor Pitch — Team & Hiring
+ * What one person built. What a team will do.
+ * Founder profile, build velocity, hiring plan.
+ */
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import PitchNav from "../../components/PitchNav.astro";
+import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
+---
+
+<Base title="Team | OSCEN Investor Pitch" description="One founder built the full OSCEN architecture in 7 months. Here's what a team of 12 will do.">
+  <Nav />
+  <PitchNav current="team" />
+
+  <main class="pt-8 pb-24">
+
+    <!-- Header -->
+    <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Team</p>
+      <h1 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-[0.9]">
+        One person built this.<br />
+        <span class="italic gradient-text">Imagine what a team does.</span>
+      </h1>
+    </section>
+
+    <!-- Founder -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <div class="reveal glass-bright rounded-2xl p-8 md:p-10">
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-purple/20 border border-border-bright flex items-center justify-center shrink-0">
+            <span class="text-3xl font-display text-text-primary">RB</span>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-xl text-text-primary font-medium">Rio Bold</h2>
+            <p class="text-xs text-text-muted font-mono mt-1">Founder & Architect</p>
+            <div class="flex items-center gap-4 mt-3">
+              <a href="mailto:info@oscen.ai" class="text-[11px] font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">info@oscen.ai</a>
+              <a href="https://linkedin.com/in/rio-bold" target="_blank" rel="noopener" class="text-[11px] font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">LinkedIn</a>
+            </div>
+            <div class="mt-6 space-y-3 text-sm text-text-secondary leading-relaxed">
+              <p>
+                Nearly a decade of research at the intersection of computational neuroscience, distributed systems, and real-time sensor fusion.
+                Then 7 months of focused build to bring the complete OSCEN architecture from concept to 1M-neuron deployment.
+              </p>
+              <p>
+                Every architectural decision. Every learning mechanism. Every line of code.
+                Sensory gateway, brain simulation, motor output, cognitive action channel, speech motor, developmental phases,
+                persistence layer, monitoring pipeline, and 350+ tests.
+              </p>
+              <p class="text-text-primary font-medium">
+                The depth of cross-disciplinary knowledge — computational neuroscience, sparse linear algebra, real-time distributed systems,
+                neuromorphic hardware constraints — is what makes this architecture possible. This isn't something that can be assembled from parts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What 1 person built -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        What one person built
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">In 7 months, solo, bootstrapped.</p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        {[
+          { value: KEY_STATS.neurons, label: "Spiking neurons", color: "text-accent-blue" },
+          { value: KEY_STATS.synapses, label: "Synapses", color: "text-accent-cyan" },
+          { value: "24", label: "Synapse groups", color: "text-accent-green" },
+          { value: "11", label: "Brain regions", color: "text-accent-amber" },
+          { value: "6", label: "Learning rules (patented)", color: "text-accent-purple" },
+          { value: "5", label: "Developmental phases", color: "text-accent-pink" },
+          { value: "350+", label: "Automated tests", color: "text-accent-blue" },
+          { value: "24/7", label: "Continuous training", color: "text-accent-green" },
+        ].map((s) => (
+          <div class="reveal glass rounded-xl p-4 text-center">
+            <div class={`text-lg font-mono font-bold ${s.color}`}>{s.value}</div>
+            <div class="text-[9px] text-text-muted mt-1 uppercase tracking-wider">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div class="reveal glass rounded-xl p-5">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">Systems Built</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+          {[
+            "Spiking neural network core (NumPy/SciPy, CSR sparse)",
+            "6-mechanism learning system (all running simultaneously)",
+            "5-phase developmental lifecycle",
+            "Sensory gateway (camera, mic, video, serial sensors)",
+            "Motor cortex with 6 sub-ranges",
+            "Cognitive action channel (emergent LLM queries)",
+            "Speech motor system (256-token vocabulary)",
+            "Motor feedback loop (R-STDP proprioception)",
+            "Auditory short-term memory module",
+            "CNN visual preprocessor (ONNX, shared singleton)",
+            "Hybrid SQLite + .npy persistence (1.19B synapses)",
+            "Fork-based background save (zero training pause)",
+            "NATS event bus (observation aggregation, 99.7% reduction)",
+            "Video curation pipeline (Gemini API classification)",
+            "Dashboard (FastAPI + vanilla JS, self-contained)",
+            "Patent application (6 claims, 14 embodiments)",
+          ].map((item) => (
+            <div class="flex items-start gap-2 py-1">
+              <span class="text-accent-blue/40 text-[10px] mt-0.5 shrink-0">—</span>
+              <span class="text-[11px] text-text-secondary">{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- LLM-Augmented Development -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <div class="reveal glass-bright rounded-2xl p-8">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">Build Velocity</p>
+        <h3 class="font-display text-xl text-text-primary mb-4">LLM-augmented engineering</h3>
+        <p class="text-sm text-text-secondary leading-relaxed max-w-2xl mb-6">
+          OSCEN was built with AI-assisted development tooling — not as a replacement for expertise,
+          but as a force multiplier. The architectural decisions, learning mechanism design, and patent claims
+          all come from a decade of neuroscience research. The implementation velocity comes from treating
+          AI as a pair programmer.
+        </p>
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div class="text-xl font-mono font-bold text-accent-green">10x</div>
+            <div class="text-[9px] text-text-muted mt-1">Implementation velocity</div>
+          </div>
+          <div>
+            <div class="text-xl font-mono font-bold text-accent-blue">1 = 5</div>
+            <div class="text-[9px] text-text-muted mt-1">Person-equivalent output</div>
+          </div>
+          <div>
+            <div class="text-xl font-mono font-bold text-accent-purple">350+</div>
+            <div class="text-[9px] text-text-muted mt-1">Tests (zero skipped)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hiring Plan -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        First 5 hires
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">
+        Each hire unlocks a specific capability. Priority 1 hires within 60 days of funding.
+      </p>
+
+      <div class="space-y-3">
+        {HIRING_PLAN.map((role) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+            <div class="flex items-center gap-4">
+              <span class:list={[
+                "px-2 py-0.5 rounded-full text-[9px] font-mono",
+                role.priority === 1 ? "bg-accent-green/10 text-accent-green" : role.priority === 2 ? "bg-accent-blue/10 text-accent-blue" : "bg-accent-amber/10 text-accent-amber",
+              ]}>
+                P{role.priority}
+              </span>
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{role.title}</h3>
+                <span class="text-[10px] text-text-muted font-mono">{role.timing}</span>
+              </div>
+              <span class="expand-indicator text-text-muted/40 text-sm">+</span>
+            </div>
+            <div class="expand-body mt-3 ml-14">
+              <p class="text-[11px] text-text-secondary leading-relaxed">{role.rationale}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Team growth -->
+      <div class="reveal glass rounded-xl p-5 mt-8">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">Team Growth</p>
+        <div class="flex items-center gap-2">
+          {[
+            { label: "Now", count: "1", color: "bg-accent-blue" },
+            { label: "6 mo", count: "5", color: "bg-accent-cyan" },
+            { label: "12 mo", count: "8", color: "bg-accent-green" },
+            { label: "18 mo", count: "10", color: "bg-accent-amber" },
+            { label: "24 mo", count: "12", color: "bg-accent-purple" },
+          ].map((t) => (
+            <div class="flex-1 text-center">
+              <div class={`h-2 rounded-full ${t.color}/50 mb-2`}></div>
+              <div class="text-sm font-mono text-text-primary font-bold">{t.count}</div>
+              <div class="text-[8px] text-text-muted">{t.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Advisory (Planned) -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Advisory board
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">Planned advisory positions. Open to introductions.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          {
+            role: "Neuromorphic Hardware",
+            need: "Intel INRC, SpiNNaker, or BrainChip ecosystem expertise. Hardware-software co-design for deployment on silicon.",
+            status: "Open",
+          },
+          {
+            role: "Robotics Go-to-Market",
+            need: "Commercial robotics deployment experience. OEM relationships. Understanding of robot brain market dynamics.",
+            status: "Open",
+          },
+          {
+            role: "Defense / Government",
+            need: "DARPA program management, DoD autonomous systems, SBIR/STTR navigation. De-risks non-dilutive funding path.",
+            status: "Open",
+          },
+        ].map((a) => (
+          <div class="reveal glass rounded-xl p-5">
+            <h3 class="text-sm text-text-primary font-medium mb-2">{a.role}</h3>
+            <p class="text-[11px] text-text-secondary leading-relaxed mb-3">{a.need}</p>
+            <span class="text-[9px] font-mono text-accent-amber">{a.status}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Solo founder narrative -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <div class="reveal glass rounded-2xl p-8 text-center">
+        <p class="ghost-text font-display text-[clamp(1.2rem,3vw,2rem)] text-text-primary leading-snug">
+          Solo founder does not mean solo company.<br />
+          <span class="italic text-text-secondary">It means one person who can do what teams can't.</span>
+        </p>
+        <p class="text-sm text-text-muted mt-6 max-w-xl mx-auto">
+          The cross-disciplinary expertise — neuroscience, distributed systems, sparse algebra, hardware constraints —
+          is concentrated in one person by design. The team scales the execution. The vision stays coherent.
+        </p>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="mailto:info@oscen.ai?subject=OSCEN%20Pre-Seed%20Investment"
+          class="px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
+        >
+          Schedule a conversation
+        </a>
+        <a
+          href="/investor-pitch"
+          class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+        >
+          ← Back to overview
+        </a>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>(".expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>

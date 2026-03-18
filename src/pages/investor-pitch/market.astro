@@ -1,0 +1,282 @@
+---
+/**
+ * Investor Pitch — Market Opportunity
+ * TAM/SAM/SOM, competitor landscape, energy costs, timing.
+ * Every number is sourced.
+ */
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import PitchNav from "../../components/PitchNav.astro";
+import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
+---
+
+<Base title="Market Opportunity | OSCEN Investor Pitch" description="Neuromorphic computing market: $1.3B–$20.3B by 2030. Humanoid robotics: $38B by 2035. Zero SNN competitors in robotics software.">
+  <Nav />
+  <PitchNav current="market" />
+
+  <main class="pt-8 pb-24">
+
+    <!-- Header -->
+    <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Market Opportunity</p>
+      <h1 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-[0.9]">
+        The markets are<br />
+        <span class="italic gradient-text">converging.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-6 max-w-2xl leading-relaxed">
+        Three markets are colliding: neuromorphic computing, edge AI, and humanoid robotics.
+        OSCEN sits at the intersection of all three.
+      </p>
+    </section>
+
+    <!-- TAM/SAM/SOM -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Total addressable market
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">All figures from published analyst reports. Links below each figure.</p>
+
+      <div class="space-y-3">
+        {MARKETS.map((m) => (
+          <div class="reveal glass rounded-xl p-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-medium text-text-primary">{m.name}</h3>
+                <p class="text-[10px] text-text-muted mt-0.5">{m.current}</p>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-right">
+                  <div class="text-xl font-mono font-bold text-accent-blue">{m.projected}</div>
+                  <div class="text-[9px] text-text-muted">by {m.year}</div>
+                </div>
+                {m.cagr !== "—" && (
+                  <span class="px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green text-[10px] font-mono">
+                    {m.cagr} CAGR
+                  </span>
+                )}
+              </div>
+            </div>
+            <div class="mt-2">
+              <a href={m.sourceUrl} target="_blank" rel="noopener" class="text-[9px] font-mono text-accent-blue/50 hover:text-accent-blue transition-colors">
+                Source: {m.source} →
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- TAM Summary -->
+      <div class="reveal glass-bright rounded-2xl p-6 mt-8">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-2">TAM</div>
+            <div class="text-2xl font-mono font-bold text-accent-blue">$115B+</div>
+            <div class="text-[9px] text-text-muted mt-1">Combined by 2030–35</div>
+          </div>
+          <div>
+            <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-2">SAM</div>
+            <div class="text-2xl font-mono font-bold text-accent-cyan">$20B+</div>
+            <div class="text-[9px] text-text-muted mt-1">Neuromorphic + robot brain</div>
+          </div>
+          <div>
+            <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-2">SOM (Year 5)</div>
+            <div class="text-2xl font-mono font-bold text-accent-green">$50M–200M</div>
+            <div class="text-[9px] text-text-muted mt-1">Licensing + royalties</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Competitor Landscape -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Competitive landscape
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">$4.5B+ in competitor funding. All GPU-dependent.</p>
+
+      <!-- Table (desktop) -->
+      <div class="reveal hidden md:block glass rounded-xl overflow-hidden">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-border">
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Company</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Raised</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Valuation</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Focus</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider text-center">GPU?</th>
+            </tr>
+          </thead>
+          <tbody>
+            {COMPETITORS.map((c) => (
+              <tr class="border-b border-border/50 hover:bg-white/[0.02] transition-colors">
+                <td class="px-5 py-3 text-sm text-text-primary font-medium">{c.name}</td>
+                <td class="px-5 py-3 text-sm font-mono text-accent-amber">{c.raised}</td>
+                <td class="px-5 py-3 text-sm font-mono text-text-secondary">{c.valuation}</td>
+                <td class="px-5 py-3 text-[11px] text-text-secondary">{c.focus}</td>
+                <td class="px-5 py-3 text-center">
+                  {c.gpuDependent ? (
+                    <span class="text-accent-red text-xs font-mono">Yes</span>
+                  ) : (
+                    <span class="text-accent-green text-xs font-mono">No</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cards (mobile) -->
+      <div class="md:hidden space-y-3">
+        {COMPETITORS.map((c) => (
+          <div class="reveal glass rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-text-primary font-medium">{c.name}</span>
+              {c.gpuDependent ? (
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-accent-red/10 text-accent-red">GPU</span>
+              ) : (
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green">No GPU</span>
+              )}
+            </div>
+            <div class="flex items-center gap-4 text-[11px]">
+              <span class="font-mono text-accent-amber">{c.raised}</span>
+              <span class="text-text-muted">{c.valuation}</span>
+            </div>
+            <p class="text-[10px] text-text-secondary mt-1">{c.focus}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- OSCEN positioning -->
+      <div class="reveal glass-bright rounded-2xl p-6 mt-8">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">OSCEN's Position</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div>
+            <div class="text-accent-green text-lg font-mono font-bold">No GPU</div>
+            <div class="text-[9px] text-text-muted mt-1">Neuromorphic native</div>
+          </div>
+          <div>
+            <div class="text-accent-blue text-lg font-mono font-bold">Continual</div>
+            <div class="text-[9px] text-text-muted mt-1">Learns after deployment</div>
+          </div>
+          <div>
+            <div class="text-accent-purple text-lg font-mono font-bold">Patented</div>
+            <div class="text-[9px] text-text-muted mt-1">6 claims, 20 CIPs</div>
+          </div>
+          <div>
+            <div class="text-accent-cyan text-lg font-mono font-bold">&lt;5W</div>
+            <div class="text-[9px] text-text-muted mt-1">Edge-native</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Energy Problem -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        The energy equation
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">
+        Robots run on batteries. Current AI burns through them. Data center energy costs up 267% since 2020.
+      </p>
+
+      <div class="reveal glass rounded-xl p-6">
+        <div class="space-y-5">
+          {ENERGY_DATA.map((item) => (
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div>
+                  <span class="text-sm text-text-primary">{item.system}</span>
+                  <span class="text-[9px] font-mono text-text-muted ml-2">{item.source}</span>
+                </div>
+                <span class={`text-sm font-mono font-bold text-${item.color}`}>{item.power}</span>
+              </div>
+              <div class="h-2 rounded-full bg-elevated overflow-hidden">
+                <div
+                  class={`h-full rounded-full bg-${item.color}/60 transition-all duration-1000`}
+                  style={`width: ${Math.max(item.barWidth, 1)}%`}
+                ></div>
+              </div>
+              <p class="text-[9px] text-text-muted mt-1">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="reveal grid grid-cols-2 gap-3 mt-6">
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-xl font-mono text-accent-blue font-bold">75–200x</div>
+          <div class="text-[9px] text-text-muted mt-1">Less energy vs GPU</div>
+          <div class="text-[8px] text-text-muted/60">Intel Loihi benchmarks, IEEE 2024</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-xl font-mono text-accent-amber font-bold">536 TWh</div>
+          <div class="text-[9px] text-text-muted mt-1">Global data center energy 2025</div>
+          <div class="text-[8px] text-text-muted/60">IEA — projected 1,065 TWh by 2030</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Now -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Why now
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[
+          {
+            title: "Hardware wave is here",
+            desc: "Intel Loihi 2, SpiNNaker 2, BrainChip Akida, Innatera Pulsar — purpose-built neuromorphic silicon is shipping. OSCEN's software architecture is ready for the hardware.",
+            stat: "4 chips",
+            color: "accent-cyan",
+          },
+          {
+            title: "VC appetite is proven",
+            desc: "$475M to Unconventional AI (Dec 2025). $25M to BrainChip. $43M to Innatera. Neuromorphic VC investment up 3x from 2024.",
+            stat: "$543M+",
+            color: "accent-amber",
+          },
+          {
+            title: "AI energy crisis is mainstream",
+            desc: "Data center energy projected to double by 2030. Robot fleets will need efficient on-device intelligence. The GPU path is hitting a wall.",
+            stat: "2x by 2030",
+            color: "accent-red",
+          },
+          {
+            title: "42% of seed goes to AI",
+            desc: "$15B+ in AI seed funding in 2025. 700+ seed rounds over $10M. Investors are actively seeking differentiated AI plays beyond transformers.",
+            stat: KEY_STATS.seedFundingAI2025,
+            color: "accent-green",
+          },
+        ].map((item) => (
+          <div class="reveal glass rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+              <span class={`text-lg font-mono font-bold text-${item.color}`}>{item.stat}</span>
+            </div>
+            <h3 class="text-sm font-medium text-text-primary mb-2">{item.title}</h3>
+            <p class="text-[11px] text-text-secondary leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Nav -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/investor-pitch/demo"
+          class="px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
+        >
+          See the live demo →
+        </a>
+        <a
+          href="/investor-pitch"
+          class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+        >
+          ← Back to overview
+        </a>
+      </div>
+    </section>
+  </main>
+</Base>

@@ -1,0 +1,180 @@
+---
+/**
+ * Investor Pitch — Hub / Landing
+ * The elevator pitch. 60 seconds to hook them, then sub-pages for depth.
+ */
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import PitchNav from "../../components/PitchNav.astro";
+import { KEY_STATS, TOTAL_COMPETITOR_FUNDING } from "../../data/pitch";
+---
+
+<Base title="Investor Pitch | OSCEN" description="OSCEN pre-seed: $50M to build the brain for every robot. Patent-protected neuromorphic architecture. 1M neurons training live.">
+  <Nav />
+  <PitchNav current="overview" />
+
+  <main class="pt-8 pb-24">
+
+    <!-- Hero -->
+    <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Pre-Seed — Confidential</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,7vw,5rem)] text-text-primary leading-[0.85]">
+        The brain for<br />
+        <span class="italic gradient-text">every robot.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        A patent-protected neuromorphic architecture that learns from experience, runs on milliwatts,
+        and grows through developmental phases — like a biological brain. No one else is building this.
+      </p>
+    </section>
+
+    <!-- Key stats strip -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <div class="reveal grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { value: KEY_STATS.neurons, label: "Spiking neurons", sub: "Training live 24/7", color: "text-accent-blue" },
+          { value: "Patent Pending", label: "US 63/986,737", sub: "6 claims, 0 prior art overlap", color: "text-accent-purple" },
+          { value: `${KEY_STATS.trainingVideos}`, label: "Training videos", sub: "Multimodal curriculum", color: "text-accent-cyan" },
+          { value: "<5W", label: "Target power", sub: "vs 200–700W GPU", color: "text-accent-green" },
+        ].map((stat) => (
+          <div class="glass-bright rounded-xl p-4 text-center">
+            <div class={`text-lg md:text-xl font-mono font-bold ${stat.color}`}>{stat.value}</div>
+            <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">{stat.label}</div>
+            <div class="text-[9px] text-text-muted/60 mt-0.5">{stat.sub}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- The 60-second pitch -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <div class="reveal glass-bright rounded-2xl p-8 md:p-12">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-8">The Pitch</p>
+        <div class="space-y-6 text-lg text-text-secondary leading-relaxed max-w-3xl">
+          <p>
+            <span class="text-text-primary font-medium">Every robot will need a brain.</span> Today, {TOTAL_COMPETITOR_FUNDING} has been poured into robot AI —
+            and every dollar depends on GPUs that burn 200–700 watts, can't learn after deployment, and need cloud connectivity to function.
+          </p>
+          <p>
+            <span class="text-text-primary font-medium">We built the alternative.</span> OSCEN is a spiking neural network with
+            <span class="text-accent-blue">6 patented learning mechanisms</span> that runs on <span class="text-accent-green">&lt;5 watts</span> of neuromorphic silicon.
+            It learns continuously from experience — no retraining, no cloud, no GPUs. It grows through 5 developmental phases, just like a biological brain.
+          </p>
+          <p>
+            <span class="text-text-primary font-medium">It's not a paper.</span> A brain with {KEY_STATS.neurons} neurons and {KEY_STATS.synapses} synapses
+            is training right now on a {KEY_STATS.trainingVideos}-video multimodal curriculum. It entered the juvenile developmental phase at step 1.13M.
+          </p>
+          <p>
+            <span class="text-text-primary font-medium">We're raising $50M</span> to hire the team, deploy on neuromorphic hardware, and integrate with physical robots.
+            The patent is filed. The architecture works. The market is {TOTAL_COMPETITOR_FUNDING}+ and growing.
+            <span class="text-accent-blue">No one else has a commercial SNN software stack for robotics.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation cards to sub-pages -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Deep dive
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">Each section is built to stand on its own.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[
+          {
+            href: "/investor-pitch/market",
+            title: "Market Opportunity",
+            desc: "TAM/SAM/SOM with sourced numbers. Competitor landscape. Why the timing is now.",
+            accent: "accent-amber",
+            num: "$38B+",
+          },
+          {
+            href: "/investor-pitch/demo",
+            title: "Live Demo",
+            desc: "The brain is running. 3D visualization, training stats, architecture walkthrough.",
+            accent: "accent-cyan",
+            num: "1M neurons",
+          },
+          {
+            href: "/investor-pitch/ask",
+            title: "The Ask",
+            desc: "$50M pre-seed. Use of funds, milestones, revenue model, valuation rationale.",
+            accent: "accent-blue",
+            num: "$50M",
+          },
+          {
+            href: "/investor-pitch/team",
+            title: "Team & Hiring",
+            desc: "What one person built. What a team of 12 will do. First 5 hires and why.",
+            accent: "accent-green",
+            num: "1 → 12",
+          },
+          {
+            href: "/architecture",
+            title: "Architecture",
+            desc: "11 brain regions, 24 synapse pathways, 6 learning rules, 5 developmental phases. Full technical deep-dive.",
+            accent: "accent-purple",
+            num: "11 regions",
+          },
+          {
+            href: "/research",
+            title: "Research & Benchmarks",
+            desc: "Neuroscience citations, energy benchmarks, honest capability assessment, competitive comparison.",
+            accent: "accent-pink",
+            num: "6 mechanisms",
+          },
+        ].map((card) => (
+          <a href={card.href} class="reveal glass rounded-xl p-5 group hover:border-border-bright transition-all duration-300 block">
+            <div class="flex items-center justify-between mb-3">
+              <span class={`text-xl font-mono font-bold text-${card.accent}`}>{card.num}</span>
+              <span class="text-text-muted/30 group-hover:text-text-muted group-hover:translate-x-1 transition-all duration-300 text-sm">→</span>
+            </div>
+            <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{card.title}</h3>
+            <p class="text-[11px] text-text-secondary mt-1.5 leading-relaxed">{card.desc}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Why not GPUs -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <div class="reveal glass rounded-2xl p-8 md:p-12 text-center">
+        <p class="ghost-text font-display text-[clamp(1.5rem,4vw,3rem)] text-text-primary leading-snug">
+          Everyone else needs GPUs.<br />
+          <span class="italic text-text-secondary">We don't.</span>
+        </p>
+        <p class="text-sm text-text-muted mt-6 max-w-xl mx-auto">
+          {TOTAL_COMPETITOR_FUNDING} in competitor funding — all GPU-dependent, all frozen after training, all requiring cloud or high-wattage edge compute.
+          OSCEN runs on neuromorphic silicon at &lt;5W and keeps learning.
+        </p>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="reveal text-center">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a
+            href="mailto:info@oscen.ai?subject=OSCEN%20Pre-Seed%20Investment"
+            class="px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
+          >
+            Schedule a conversation
+          </a>
+          <a
+            href="/investor-pitch/ask"
+            class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+          >
+            See the ask
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Back -->
+    <section class="max-w-5xl mx-auto px-6 text-center">
+      <div class="divider max-w-24 mx-auto mb-10"></div>
+      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to oscen.ai</a>
+    </section>
+  </main>
+</Base>

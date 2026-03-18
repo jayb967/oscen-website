@@ -1,0 +1,292 @@
+---
+/**
+ * Investor Pitch — The Ask
+ * $50M at $150M pre-money. Use of funds, milestones, revenue model, valuation rationale.
+ */
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import PitchNav from "../../components/PitchNav.astro";
+import {
+  RAISE_AMOUNT, PRE_MONEY_VALUATION, POST_MONEY_VALUATION,
+  FOUNDER_OWNERSHIP_POST, INVESTOR_OWNERSHIP,
+  USE_OF_FUNDS, MILESTONES, REVENUE_MODEL, COMPARABLES, NON_DILUTIVE,
+} from "../../data/pitch";
+---
+
+<Base title="The Ask | OSCEN Investor Pitch" description="OSCEN pre-seed: $50M at $150M pre-money valuation. Use of funds, 24-month milestones, revenue model, and valuation rationale.">
+  <Nav />
+  <PitchNav current="ask" />
+
+  <main class="pt-8 pb-24">
+
+    <!-- Header -->
+    <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Ask</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.85]">
+        <span class="gradient-text">{RAISE_AMOUNT}</span> pre-seed.
+      </h1>
+      <p class="reveal text-text-secondary mt-6 max-w-2xl leading-relaxed">
+        To hire the team, deploy on neuromorphic hardware, integrate with physical robots, and get to first revenue within 18 months.
+      </p>
+    </section>
+
+    <!-- Deal Terms -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <div class="reveal glass-bright rounded-2xl p-8 md:p-10">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-8">Deal Structure</p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mb-8">
+          <div>
+            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-blue">{RAISE_AMOUNT}</div>
+            <div class="text-[10px] text-text-muted mt-1">Raise</div>
+          </div>
+          <div>
+            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-purple">{PRE_MONEY_VALUATION}</div>
+            <div class="text-[10px] text-text-muted mt-1">Pre-money valuation</div>
+          </div>
+          <div>
+            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-cyan">{POST_MONEY_VALUATION}</div>
+            <div class="text-[10px] text-text-muted mt-1">Post-money valuation</div>
+          </div>
+          <div>
+            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-green">{FOUNDER_OWNERSHIP_POST}</div>
+            <div class="text-[10px] text-text-muted mt-1">Founder retains</div>
+          </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 text-center">
+          <p class="text-sm text-text-secondary">
+            Priced equity round. {INVESTOR_OWNERSHIP} to investors. Structured as two closes:
+            <span class="text-text-primary">$20–25M initial close</span> (immediate execution),
+            <span class="text-text-primary">$25–30M second close</span> (within 6 months, same terms).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Use of Funds -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Use of funds
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">24-month deployment plan. Every dollar mapped to a milestone.</p>
+
+      <!-- Visual bar chart -->
+      <div class="reveal glass rounded-xl p-6 mb-6">
+        <div class="space-y-3">
+          {USE_OF_FUNDS.map((item) => (
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-3">
+                  <span class="text-[10px] font-mono text-text-muted">{item.icon}</span>
+                  <span class="text-sm text-text-primary">{item.category}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class={`text-sm font-mono font-bold text-${item.color}`}>{item.amount}</span>
+                  <span class="text-[9px] text-text-muted">{item.percentage}</span>
+                </div>
+              </div>
+              <div class="h-2 rounded-full bg-elevated overflow-hidden ml-8">
+                <div
+                  class={`h-full rounded-full bg-${item.color}/50`}
+                  style={`width: ${item.amountNum * 2}%`}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Expand details -->
+      <div class="space-y-2">
+        {USE_OF_FUNDS.map((item) => (
+          <div class="expand-card reveal glass rounded-xl p-4 cursor-pointer group" tabindex="0">
+            <div class="flex items-center gap-3">
+              <span class={`text-sm font-mono font-bold text-${item.color}`}>{item.amount}</span>
+              <span class="text-sm text-text-primary">{item.category}</span>
+              <span class="expand-indicator text-text-muted/40 text-sm ml-auto">+</span>
+            </div>
+            <div class="expand-body mt-3 ml-16">
+              <p class="text-[11px] text-text-secondary leading-relaxed">{item.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 24-Month Milestones -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        24-month milestones
+      </h2>
+
+      <div class="reveal glass-bright rounded-2xl p-6">
+        <div class="space-y-0">
+          {MILESTONES.map((m, i) => (
+            <div class="flex gap-4 items-start py-4 border-b border-border/50 last:border-0">
+              <div class="shrink-0 w-16">
+                <span class="text-[10px] font-mono text-accent-blue uppercase">{m.quarter}</span>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-text-primary">{m.title}</h3>
+                <p class="text-[11px] text-text-secondary mt-1 leading-relaxed">{m.description}</p>
+              </div>
+              <div class="shrink-0 text-right">
+                <span class="px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green text-[9px] font-mono">
+                  {m.metric}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Revenue Model -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Path to revenue
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">IP licensing model — capital-light, high-margin, scalable.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {REVENUE_MODEL.map((phase) => (
+          <div class="reveal glass rounded-xl p-5">
+            <span class="text-[10px] font-mono text-text-muted uppercase tracking-wider">{phase.year}</span>
+            <div class="text-xl font-mono font-bold text-accent-amber mt-2">{phase.range}</div>
+            <h3 class="text-sm text-text-primary font-medium mt-2">{phase.model}</h3>
+            <p class="text-[11px] text-text-secondary mt-2 leading-relaxed">{phase.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Valuation Rationale -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Valuation rationale
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">$150M is conservative relative to comparable seed rounds in AI.</p>
+
+      <div class="reveal glass rounded-xl overflow-hidden">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-border">
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase">Company</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase">Valuation</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase">Raised</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase hidden md:table-cell">Product?</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase hidden md:table-cell">Patent?</th>
+            </tr>
+          </thead>
+          <tbody>
+            {COMPARABLES.map((c) => (
+              <tr class:list={[
+                "border-b border-border/50",
+                c.company === "OSCEN" ? "bg-accent-blue/5" : "hover:bg-white/[0.02]",
+              ]}>
+                <td class="px-5 py-3">
+                  <span class:list={[
+                    "text-sm font-medium",
+                    c.company === "OSCEN" ? "text-accent-blue" : "text-text-primary",
+                  ]}>{c.company}</span>
+                  <span class="text-[9px] text-text-muted block mt-0.5">{c.stage}</span>
+                </td>
+                <td class="px-5 py-3 text-sm font-mono text-accent-amber">{c.valuation}</td>
+                <td class="px-5 py-3 text-sm font-mono text-text-secondary">{c.raised}</td>
+                <td class="px-5 py-3 text-center hidden md:table-cell">
+                  {c.hadProduct ? (
+                    <span class="text-accent-green text-xs font-mono">Yes</span>
+                  ) : (
+                    <span class="text-accent-red text-xs font-mono">No</span>
+                  )}
+                </td>
+                <td class="px-5 py-3 text-center hidden md:table-cell">
+                  {c.hadPatent ? (
+                    <span class="text-accent-green text-xs font-mono">Yes</span>
+                  ) : (
+                    <span class="text-accent-red text-xs font-mono">No</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="reveal glass rounded-xl p-4 mt-4">
+        <p class="text-[11px] text-text-secondary text-center leading-relaxed">
+          OSCEN asks for <span class="text-accent-blue font-medium">$50M at $150M</span> —
+          with a working product and filed patent.
+          Unconventional AI raised <span class="text-text-primary">$475M at $4.5B</span> with neither.
+          AMI Labs raised <span class="text-text-primary">$1.03B at $3.5B</span> at 4 months old.
+        </p>
+      </div>
+    </section>
+
+    <!-- Non-Dilutive De-Risk -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Non-dilutive de-risk
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">Government and institutional grants that reduce investor risk.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {NON_DILUTIVE.map((nd) => (
+          <div class="reveal glass rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-text-primary font-medium">{nd.source}</span>
+              <span class="text-sm font-mono text-accent-green font-bold">{nd.amount}</span>
+            </div>
+            <div class="flex items-center gap-3 text-[10px]">
+              <span class="text-text-muted">{nd.timeline}</span>
+              <span class="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue font-mono">{nd.status}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="reveal glass-bright rounded-2xl p-8 text-center">
+        <p class="ghost-text font-display text-[clamp(1.5rem,3.5vw,2.5rem)] text-text-primary leading-snug mb-6">
+          The brain is built. The patent is filed.<br />
+          <span class="italic text-text-secondary">The market is $115B+ and growing.</span>
+        </p>
+        <a
+          href="mailto:info@oscen.ai?subject=OSCEN%20Pre-Seed%20—%20$50M%20Round"
+          class="inline-block px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
+        >
+          Let's talk
+        </a>
+      </div>
+    </section>
+
+    <!-- Nav -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/investor-pitch/team"
+          class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+        >
+          Meet the team →
+        </a>
+        <a
+          href="/investor-pitch/demo"
+          class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+        >
+          ← Back to demo
+        </a>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>(".expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>
