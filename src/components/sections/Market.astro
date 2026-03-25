@@ -11,6 +11,41 @@ const competitors = [
   { name: "OSCEN", approach: "Spiking Neural Net", learning: "Continual", edge: "Yes", energy: "<5W*", funding: "Bootstrapped" },
 ];
 
+const vlaLimits = [
+  {
+    icon: "&#x26A0;",
+    label: "Frozen at birth",
+    stat: "0",
+    statLabel: "new skills learned after deployment",
+    body: "VLAs are trained on millions of demonstrations, then deployed static. They can only do what they've already seen. A new door handle, an unexpected obstacle, a different lighting condition — anything outside training data is a failure. Retraining costs hundreds of thousands of dollars and weeks of GPU time.",
+    accent: "accent-red",
+  },
+  {
+    icon: "&#x26A1;",
+    label: "GPU-hungry",
+    stat: "50–200W",
+    statLabel: "per inference, every 100ms",
+    body: "Every robot action requires a full forward pass through billions of parameters. At 10Hz control rate, that's 30 billion matrix multiplications per second, continuously. A warehouse fleet of 100 robots consumes 5–20kW just thinking. OSCEN targets under 5W total on neuromorphic hardware — the same power as an LED bulb.",
+    accent: "accent-amber",
+  },
+  {
+    icon: "&#x2601;",
+    label: "Tethered to the cloud",
+    stat: "50–500ms",
+    statLabel: "round-trip latency on cloud inference",
+    body: "Most VLAs are too large to run on-device efficiently. Physical Intelligence requires cloud. When your robot arm is holding a baby or a surgical tool, 200ms of network latency isn't an engineering tradeoff — it's a liability. OSCEN runs entirely on-edge. No internet, no latency, no data leaving the device.",
+    accent: "accent-purple",
+  },
+  {
+    icon: "&#x1F9F1;",
+    label: "Catastrophic forgetting",
+    stat: "100%",
+    statLabel: "of old skills at risk when fine-tuning",
+    body: "Fine-tune a VLA on new tasks and it forgets old ones. This is a fundamental limitation of gradient-based learning in large models. OSCEN's homeostatic synaptic scaling, myelination, and identity tagging (Patent Claim 6) explicitly solve this — learned skills are preserved even as new ones are acquired.",
+    accent: "accent-pink",
+  },
+];
+
 const stats = [
   { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
   { value: "$200M+", label: "Neuromorphic VC in 2025", sub: "3x increase from 2024", color: "text-accent-amber" },
@@ -77,8 +112,75 @@ const stats = [
       </div>
     </div>
 
-    <p class="reveal text-[10px] text-text-muted text-center font-mono">
+    <p class="reveal text-[10px] text-text-muted text-center font-mono mb-24">
       * On neuromorphic hardware (Intel Loihi target). Currently training on CPU at ~45W.
     </p>
+
+    <!-- VLA ceiling explainer -->
+    <div class="text-center mb-12">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The VLA ceiling</p>
+      <h3 class="reveal font-display text-[clamp(1.5rem,4vw,2.5rem)] text-text-primary leading-tight">
+        Every competitor uses the same playbook.<br />
+        <span class="italic gradient-text">It has the same four flaws.</span>
+      </h3>
+      <p class="reveal text-sm text-text-secondary mt-6 max-w-2xl mx-auto leading-relaxed">
+        Vision-Language-Action models are the dominant approach in robotics AI. They work today — but they carry fundamental limitations that no amount of scale can fix.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+      {vlaLimits.map((item) => (
+        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group" tabindex="0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class={`text-xl text-${item.accent}`} set:html={item.icon} />
+              <h4 class={`text-base font-medium text-${item.accent} group-hover:text-text-primary transition-colors duration-300`}>
+                {item.label}
+              </h4>
+            </div>
+            <span class={`expand-indicator text-${item.accent}/40 text-lg`}>+</span>
+          </div>
+          <div class="flex items-baseline gap-2 mt-3">
+            <span class={`text-2xl font-mono font-bold text-${item.accent}`}>{item.stat}</span>
+            <span class="text-[10px] text-text-muted uppercase tracking-wider">{item.statLabel}</span>
+          </div>
+          <div class="expand-body mt-4">
+            <p class="text-sm text-text-secondary leading-relaxed">{item.body}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- OSCEN answer strip -->
+    <div class="reveal glass-bright rounded-2xl p-8 text-center">
+      <p class="text-[10px] font-mono text-accent-blue/60 uppercase tracking-[0.3em] mb-4">The OSCEN difference</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div>
+          <div class="text-xl font-mono font-bold text-accent-green">Continual</div>
+          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Learns forever</div>
+        </div>
+        <div>
+          <div class="text-xl font-mono font-bold text-accent-green">&lt;5W</div>
+          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Total power</div>
+        </div>
+        <div>
+          <div class="text-xl font-mono font-bold text-accent-green">0ms</div>
+          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Cloud latency</div>
+        </div>
+        <div>
+          <div class="text-xl font-mono font-bold text-accent-green">6 patents</div>
+          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Anti-forgetting</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+
+<script>
+  // Mobile: tap to toggle expanded state (hover doesn't exist on touch)
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>("#market .expand-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("expanded"));
+    });
+  }
+</script>
