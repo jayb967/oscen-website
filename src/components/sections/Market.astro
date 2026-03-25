@@ -1,13 +1,13 @@
 ---
 /**
- * Section: Market — Competitive landscape and market opportunity.
+ * Section: Market - Competitive landscape and market opportunity.
  * Numbers-first. Comparison table. The "why now" case.
  */
 const competitors = [
-  { name: "AMI Labs (LeCun)", approach: "JEPA World Models", learning: "Retrain", edge: "No", energy: "50–200W", funding: "$1.03B" },
-  { name: "Figure AI", approach: "VLA Transformer (Helix)", learning: "Static", edge: "No", energy: "50–200W", funding: "$1.9B" },
-  { name: "Google DeepMind", approach: "Gemini Robotics VLA", learning: "Retrain", edge: "Partial", energy: "50–200W", funding: "Internal" },
-  { name: "Physical Intelligence", approach: "3B param VLA", learning: "Static", edge: "Cloud", energy: "50–200W", funding: "$1.1B" },
+  { name: "AMI Labs (LeCun)", approach: "JEPA World Models", learning: "Retrain", edge: "No", energy: "50-200W", funding: "$1.03B" },
+  { name: "Figure AI", approach: "VLA Transformer (Helix)", learning: "Static", edge: "No", energy: "50-200W", funding: "$1.9B" },
+  { name: "Google DeepMind", approach: "Gemini Robotics VLA", learning: "Retrain", edge: "Partial", energy: "50-200W", funding: "Internal" },
+  { name: "Physical Intelligence", approach: "3B param VLA", learning: "Static", edge: "Cloud", energy: "50-200W", funding: "$1.1B" },
   { name: "OSCEN", approach: "Spiking Neural Net", learning: "Continual", edge: "Yes", energy: "<5W*", funding: "Bootstrapped" },
 ];
 
@@ -17,23 +17,23 @@ const vlaLimits = [
     label: "Frozen at birth",
     stat: "0",
     statLabel: "new skills learned after deployment",
-    body: "VLAs are trained on millions of demonstrations, then deployed static. They can only do what they've already seen. A new door handle, an unexpected obstacle, a different lighting condition — anything outside training data is a failure. Retraining costs hundreds of thousands of dollars and weeks of GPU time.",
+    body: "VLAs are trained on millions of demonstrations, then deployed static. They can only do what they've already seen. A new door handle, an unexpected obstacle, a different lighting condition. Anything outside training data is a failure. Retraining costs hundreds of thousands of dollars and weeks of GPU time.",
     accent: "accent-red",
   },
   {
     icon: "&#x26A1;",
     label: "GPU-hungry",
-    stat: "50–200W",
+    stat: "50-200W",
     statLabel: "per inference, every 100ms",
-    body: "Every robot action requires a full forward pass through billions of parameters. At 10Hz control rate, that's 30 billion matrix multiplications per second, continuously. A warehouse fleet of 100 robots consumes 5–20kW just thinking. OSCEN targets under 5W total on neuromorphic hardware — the same power as an LED bulb.",
+    body: "Every robot action requires a full forward pass through billions of parameters. At 10Hz control rate, that's 30 billion matrix multiplications per second, continuously. A warehouse fleet of 100 robots consumes 5-20kW just thinking. OSCEN targets under 5W total on neuromorphic hardware. The same power as an LED bulb.",
     accent: "accent-amber",
   },
   {
     icon: "&#x2601;",
     label: "Tethered to the cloud",
-    stat: "50–500ms",
+    stat: "50-500ms",
     statLabel: "round-trip latency on cloud inference",
-    body: "Most VLAs are too large to run on-device efficiently. Physical Intelligence requires cloud. When your robot arm is holding a baby or a surgical tool, 200ms of network latency isn't an engineering tradeoff — it's a liability. OSCEN runs entirely on-edge. No internet, no latency, no data leaving the device.",
+    body: "Most VLAs are too large to run on-device efficiently. Physical Intelligence requires cloud. When your robot arm is holding a baby or a surgical tool, 200ms of network latency isn't an engineering tradeoff. It's a liability. OSCEN runs entirely on-edge. No internet, no latency, no data leaving the device.",
     accent: "accent-purple",
   },
   {
@@ -41,7 +41,7 @@ const vlaLimits = [
     label: "Catastrophic forgetting",
     stat: "100%",
     statLabel: "of old skills at risk when fine-tuning",
-    body: "Fine-tune a VLA on new tasks and it forgets old ones. This is a fundamental limitation of gradient-based learning in large models. OSCEN's homeostatic synaptic scaling, myelination, and identity tagging (Patent Claim 6) explicitly solve this — learned skills are preserved even as new ones are acquired.",
+    body: "Fine-tune a VLA on new tasks and it forgets old ones. This is a fundamental limitation of gradient-based learning in large models. OSCEN's homeostatic synaptic scaling, myelination, and identity tagging (Patent Claim 6) explicitly solve this. Learned skills are preserved even as new ones are acquired.",
     accent: "accent-pink",
   },
 ];
@@ -49,7 +49,7 @@ const vlaLimits = [
 const stats = [
   { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
   { value: "$200M+", label: "Neuromorphic VC in 2025", sub: "3x increase from 2024", color: "text-accent-amber" },
-  { value: "73–109×", label: "Energy advantage on neuromorphic HW", sub: "Intel Loihi benchmarks", color: "text-accent-green" },
+  { value: "73-109x", label: "Energy advantage on neuromorphic HW", sub: "Intel Loihi benchmarks", color: "text-accent-green" },
   { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
 ];
 ---
@@ -124,7 +124,7 @@ const stats = [
         <span class="italic gradient-text">It has the same four flaws.</span>
       </h3>
       <p class="reveal text-sm text-text-secondary mt-6 max-w-2xl mx-auto leading-relaxed">
-        Vision-Language-Action models are the dominant approach in robotics AI. They work today — but they carry fundamental limitations that no amount of scale can fix.
+        Vision-Language-Action models are the dominant approach in robotics AI. They work today, but they carry fundamental limitations that no amount of scale can fix.
       </p>
     </div>
 
