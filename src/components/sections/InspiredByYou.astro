@@ -1,0 +1,147 @@
+---
+/**
+ * Section: Inspired by YOU — bridge between Solution and How It Works.
+ * Flip cards comparing the viewer's brain to OSCEN's architecture.
+ * Sequential glow hints at tap/hover interaction on mobile.
+ */
+const comparisons = [
+  {
+    yours: "Your neurons fire in spikes",
+    detail: "Not continuous signals. Discrete electrical pulses, timed to the millisecond.",
+    oscen: "So do ours",
+    mirror: "1 million spiking neurons communicate through the same spike-timing mechanism your brain uses right now.",
+    accent: "accent-cyan",
+  },
+  {
+    yours: "You grew through phases",
+    detail: "Infant, toddler, child, adolescent, adult. Each stage rewired your brain differently.",
+    oscen: "So does OSCEN",
+    mirror: "Five developmental phases prune, myelinate, and consolidate. The same trajectory, compressed into simulation.",
+    accent: "accent-purple",
+  },
+  {
+    yours: "You learned by doing",
+    detail: "You fell before you walked. Missed before you caught. Every failure was a lesson.",
+    oscen: "So does OSCEN",
+    mirror: "Motor feedback loops and eligibility traces let the brain learn from outcomes, not curated datasets.",
+    accent: "accent-green",
+  },
+  {
+    yours: "Your senses merge seamlessly",
+    detail: "Sight, sound, touch, balance. Your brain binds them into one unified experience.",
+    oscen: "So do OSCEN's",
+    mirror: "Cross-modal binding through spike-timing coincidence. Any sensor combination, unified by temporal correlation.",
+    accent: "accent-amber",
+  },
+];
+---
+
+<section id="inspired" class="section relative">
+  <div class="max-w-4xl mx-auto w-full">
+    <div class="text-center mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Blueprint</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        Inspired by <span class="gradient-text-warm italic">you.</span>
+      </h2>
+      <p class="reveal text-text-secondary text-sm mt-6 max-w-md mx-auto leading-relaxed">
+        Not metaphorically. The brain you're using to read this sentence
+        is the architecture we followed.
+      </p>
+    </div>
+
+    <!-- Flip cards with sequential glow -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {comparisons.map((c, i) => (
+        <div
+          class={`flip-card inspired-card reveal h-52`}
+          tabindex="0"
+          role="button"
+          aria-label={`${c.yours}. Tap for details.`}
+          style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${c.accent});`}
+        >
+          <div class="flip-inner w-full h-full">
+            {/* Front: YOUR biology */}
+            <div class="flip-front w-full h-full glass-bright rounded-2xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+              <div class="inspired-glow"></div>
+              <p class={`text-[10px] font-mono text-${c.accent}/60 uppercase tracking-[0.25em] mb-3`}>Your brain</p>
+              <h3 class={`text-lg md:text-xl font-display text-text-primary leading-snug`}>{c.yours}</h3>
+              <p class="text-xs text-text-muted mt-3 max-w-[240px] leading-relaxed">{c.detail}</p>
+            </div>
+            {/* Back: OSCEN mirrors it */}
+            <div class="flip-back w-full h-full glass rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+              <p class={`text-[10px] font-mono text-${c.accent}/60 uppercase tracking-[0.25em] mb-3`}>OSCEN's brain</p>
+              <h3 class={`text-lg font-display text-${c.accent} leading-snug mb-3`}>{c.oscen}</h3>
+              <p class="text-sm text-text-secondary leading-relaxed max-w-[280px]">{c.mirror}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Closing line -->
+    <div class="reveal text-center mt-16">
+      <p class="text-text-muted text-xs font-mono tracking-wide">
+        We didn't reinvent intelligence. We studied the original.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Warm gradient for "you" */
+  .gradient-text-warm {
+    background: linear-gradient(135deg, var(--color-accent-amber), var(--color-accent-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Sequential glow pulse on card edges */
+  .inspired-glow {
+    position: absolute;
+    inset: -1px;
+    border-radius: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow:
+      0 0 20px 2px var(--glow-color),
+      inset 0 0 20px 2px var(--glow-color);
+    animation: card-glow 6s ease-in-out var(--glow-delay) infinite;
+  }
+
+  @keyframes card-glow {
+    0%, 20%, 100% { opacity: 0; }
+    8%, 12% { opacity: 0.35; }
+  }
+
+  /* Pause glow when user has interacted (hovered or flipped) */
+  .flip-card:hover .inspired-glow,
+  .flip-card:focus-within .inspired-glow {
+    animation: none;
+    opacity: 0;
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .inspired-glow {
+      animation: none;
+      opacity: 0.15;
+    }
+  }
+</style>
+
+<script>
+  // Mobile: tap to flip
+  if ("ontouchstart" in window) {
+    document.querySelectorAll<HTMLElement>("#inspired .flip-card").forEach((card) => {
+      card.addEventListener("click", () => card.classList.toggle("flipped"));
+    });
+  }
+</script>
+
+<style>
+  /* Mobile tap-to-flip */
+  .flip-card.flipped .flip-inner {
+    transform: rotateY(180deg);
+  }
+</style>
