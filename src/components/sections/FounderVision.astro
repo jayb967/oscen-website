@@ -45,8 +45,8 @@ const phases = [
       <div class="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-accent-blue/20 via-accent-cyan/20 to-accent-purple/20 hidden md:block"></div>
 
       <div class="space-y-4">
-        {phases.map((p) => (
-          <div class="expand-card reveal glass rounded-xl p-6 cursor-pointer group md:ml-16 relative" tabindex="0">
+        {phases.map((p, i) => (
+          <div class="expand-card reveal glass rounded-xl p-6 cursor-pointer group md:ml-16 relative" tabindex="0" style={`--glow-delay: ${i * 2}s; --glow-color: var(--color-${p.accent});`}>
             <!-- Timeline dot -->
             <div class={`hidden md:block absolute -left-[calc(4rem+5px)] top-7 w-2.5 h-2.5 rounded-full bg-${p.accent}/40 group-hover:bg-${p.accent} transition-colors duration-300 ring-4 ring-abyss`}></div>
 

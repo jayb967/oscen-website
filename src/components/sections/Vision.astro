@@ -37,8 +37,8 @@ const pillars = [
 
     <!-- Three pillars -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
-      {pillars.map((p) => (
-        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group text-center" tabindex="0">
+      {pillars.map((p, i) => (
+        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group text-center" tabindex="0" style={`--glow-delay: ${i * 2}s; --glow-color: var(--color-${p.accent});`}>
           <span class={`text-2xl text-${p.accent}/50 group-hover:text-${p.accent} transition-colors duration-300`}>{p.icon}</span>
           <h3 class="text-text-primary font-medium mt-3">{p.title}</h3>
           <span class={`expand-indicator inline-block mt-2 text-${p.accent}/30 text-sm`}>+</span>

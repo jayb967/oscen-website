@@ -66,8 +66,8 @@ const stats = [
 
     <!-- Market stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
-      {stats.map((s) => (
-        <div class="flip-card reveal h-36" tabindex="0" role="button" aria-label={`${s.value}: ${s.label}`}>
+      {stats.map((s, i) => (
+        <div class="flip-card reveal h-36" tabindex="0" role="button" aria-label={`${s.value}: ${s.label}`} style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${s.color.replace('text-', '')});`}>
           <div class="flip-inner w-full h-full">
             <div class="flip-front w-full h-full glass-bright rounded-xl p-4 flex flex-col items-center justify-center text-center">
               <div class={`text-xl md:text-2xl font-mono font-bold ${s.color}`}>{s.value}</div>
@@ -129,8 +129,8 @@ const stats = [
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
-      {vlaLimits.map((item) => (
-        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group" tabindex="0">
+      {vlaLimits.map((item, i) => (
+        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${item.accent});`}>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class={`text-xl text-${item.accent}`} set:html={item.icon} />

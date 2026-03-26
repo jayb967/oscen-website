@@ -48,8 +48,8 @@ const features = [
 
     <!-- Expand cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {features.map((f) => (
-        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group" tabindex="0">
+      {features.map((f, i) => (
+        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${f.accent});`}>
           <div class="flex items-center justify-between">
             <h3 class={`text-lg font-medium text-${f.accent} group-hover:text-text-primary transition-colors duration-300`}>
               {f.title}

@@ -62,7 +62,6 @@ const comparisons = [
           <div class="flip-inner w-full h-full">
             {/* Front: YOUR biology */}
             <div class="flip-front w-full h-full glass-bright rounded-2xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
-              <div class="inspired-glow"></div>
               <p class={`text-[10px] font-mono text-${c.accent}/60 uppercase tracking-[0.25em] mb-3`}>Your brain</p>
               <h3 class={`text-lg md:text-xl font-display text-text-primary leading-snug`}>{c.yours}</h3>
               <p class="text-xs text-text-muted mt-3 max-w-[240px] leading-relaxed">{c.detail}</p>
@@ -88,45 +87,11 @@ const comparisons = [
 </section>
 
 <style>
-  /* Warm gradient for "you" */
   .gradient-text-warm {
     background: linear-gradient(135deg, var(--color-accent-amber), var(--color-accent-pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  /* Sequential glow pulse on card edges */
-  .inspired-glow {
-    position: absolute;
-    inset: -1px;
-    border-radius: 1rem;
-    opacity: 0;
-    pointer-events: none;
-    box-shadow:
-      0 0 20px 2px var(--glow-color),
-      inset 0 0 20px 2px var(--glow-color);
-    animation: card-glow 6s ease-in-out var(--glow-delay) infinite;
-  }
-
-  @keyframes card-glow {
-    0%, 20%, 100% { opacity: 0; }
-    8%, 12% { opacity: 0.35; }
-  }
-
-  /* Pause glow when user has interacted (hovered or flipped) */
-  .flip-card:hover .inspired-glow,
-  .flip-card:focus-within .inspired-glow {
-    animation: none;
-    opacity: 0;
-  }
-
-  /* Respect reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .inspired-glow {
-      animation: none;
-      opacity: 0.15;
-    }
   }
 </style>
 

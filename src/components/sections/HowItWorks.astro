@@ -50,7 +50,7 @@ const steps = [
     <!-- Pipeline flow -->
     <div class="space-y-3">
       {steps.map((s, i) => (
-        <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.2}s; --glow-color: var(--color-${s.accent});`}>
           <div class="flex items-center gap-5">
             <span class={`text-2xl font-mono text-${s.accent}/40 group-hover:text-${s.accent} transition-colors duration-300 w-10`}>{s.num}</span>
             <h3 class={`text-lg font-medium text-${s.accent} group-hover:text-text-primary transition-colors duration-300`}>

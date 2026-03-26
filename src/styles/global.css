@@ -158,6 +158,46 @@ body::after {
   transform: rotate(45deg);
 }
 
+/* ─── Card Glow Hint (scroll-triggered, sequential) ─── */
+@keyframes card-glow {
+  0%, 20%, 100% { opacity: 0; }
+  8%, 12% { opacity: 0.35; }
+}
+
+.flip-card,
+.expand-card {
+  position: relative;
+}
+
+.flip-card::after,
+.expand-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow:
+    0 0 20px 2px var(--glow-color, var(--color-accent-blue)),
+    inset 0 0 20px 2px var(--glow-color, var(--color-accent-blue));
+}
+
+.flip-card.reveal.visible::after,
+.expand-card.reveal.visible::after {
+  animation: card-glow 6s ease-in-out var(--glow-delay, 0s) infinite;
+}
+
+.flip-card:hover::after,
+.flip-card:focus-within::after,
+.flip-card.flipped::after,
+.expand-card:hover::after,
+.expand-card:focus-within::after,
+.expand-card.expanded::after {
+  animation: none;
+  opacity: 0;
+}
+
 /* ─── Scroll Reveal (GSAP takes over, CSS fallback) ─── */
 .reveal {
   opacity: 0;
@@ -186,6 +226,7 @@ body::after {
   .ghost-text { opacity: 1; transition: none; }
   .flip-inner { transition: none; }
   .expand-card .expand-body { max-height: none; opacity: 1; filter: none; transition: none; }
+  .flip-card::after, .expand-card::after { animation: none; opacity: 0.15; }
   html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

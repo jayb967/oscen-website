@@ -41,8 +41,8 @@ const stats = [
 
     <!-- Flip cards — hover reveals depth -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
-      {stats.map((s) => (
-        <div class="flip-card reveal h-44" tabindex="0" role="button" aria-label={`${s.value} ${s.label}. Hover for details.`}>
+      {stats.map((s, i) => (
+        <div class="flip-card reveal h-44" tabindex="0" role="button" aria-label={`${s.value} ${s.label}. Hover for details.`} style={`--glow-delay: ${i * 2}s; --glow-color: var(--color-${s.color.replace('text-', '')});`}>
           <div class="flip-inner w-full h-full">
             <!-- Front -->
             <div class="flip-front w-full h-full glass-bright rounded-2xl p-6 flex flex-col items-center justify-center text-center">
