@@ -51,7 +51,8 @@ const paths = [
 
     <!-- Email capture — one field, maximum conversion -->
     <div class="reveal max-w-md mx-auto">
-      <form id="email-form" class="flex gap-2" action="/api/subscribe" method="POST">
+      <form id="email-form" class="flex gap-2" action="https://formspree.io/f/xpqorqnw" method="POST">
+        <input type="hidden" name="_subject" value="New subscriber from oscen.ai" />
         <input
           type="email"
           name="email"
@@ -61,16 +62,55 @@ const paths = [
         />
         <button
           type="submit"
+          id="subscribe-submit"
           class="px-6 py-2.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-sm font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300 cursor-pointer whitespace-nowrap"
         >
           Stay informed
         </button>
         <!-- Honeypot -->
         <div class="hidden" aria-hidden="true">
-          <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
         </div>
       </form>
+      <p id="subscribe-status" class="text-center text-sm font-mono mt-3 hidden"></p>
     </div>
+
+    <script>
+      const form = document.getElementById('email-form') as HTMLFormElement;
+      const btn = document.getElementById('subscribe-submit') as HTMLButtonElement;
+      const status = document.getElementById('subscribe-status') as HTMLElement;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        status.classList.add('hidden');
+
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+
+          if (res.ok) {
+            form.reset();
+            status.textContent = "You're on the list. We'll keep you posted.";
+            status.className = 'text-center text-sm font-mono mt-3 text-accent-blue';
+          } else {
+            const data = await res.json();
+            status.textContent = data?.errors?.[0]?.message || 'Something went wrong. Please try again.';
+            status.className = 'text-center text-sm font-mono mt-3 text-red-400';
+          }
+        } catch {
+          status.textContent = 'Network error. Please try again.';
+          status.className = 'text-center text-sm font-mono mt-3 text-red-400';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Stay informed';
+        }
+      });
+    </script>
 
     <!-- Footer — one line -->
     <footer class="mt-28 text-center">
