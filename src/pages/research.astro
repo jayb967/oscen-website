@@ -68,8 +68,8 @@ import Nav from "../components/Nav.astro";
             note: "Experience-dependent windows of heightened plasticity. Our adolescent phase models the reminiscence bump: a period of rapid pruning, myelination, and identity formation.",
             accent: "accent-purple",
           },
-        ].map((item) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        ].map((item, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${item.accent});`}>
             <div class="flex items-center justify-between">
               <h3 class={`text-sm font-medium text-${item.accent} group-hover:text-text-primary transition-colors`}>{item.mechanism}</h3>
               <span class={`expand-indicator text-${item.accent}/40 text-sm`}>+</span>
@@ -245,8 +245,8 @@ import Nav from "../components/Nav.astro";
             q: "Why not just use transformers for everything?",
             a: "Transformers excel at static inference. But they can't learn from a single experience, can't run on milliwatt hardware, and can't adapt in real-time. For robotics, those aren't nice-to-haves. They're requirements.",
           },
-        ].map((item) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        ].map((item, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
             <div class="flex items-center justify-between gap-4">
               <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{item.q}</h3>
               <span class="expand-indicator text-text-muted/40 text-sm shrink-0">+</span>

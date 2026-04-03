@@ -188,12 +188,12 @@ body::after {
   animation: card-glow 6s ease-in-out var(--glow-delay, 0s) infinite;
 }
 
-.flip-card:hover::after,
-.flip-card:focus-within::after,
-.flip-card.flipped::after,
-.expand-card:hover::after,
-.expand-card:focus-within::after,
-.expand-card.expanded::after {
+.flip-card.reveal.visible:hover::after,
+.flip-card.reveal.visible:focus-within::after,
+.flip-card.reveal.visible.flipped::after,
+.expand-card.reveal.visible:hover::after,
+.expand-card.reveal.visible:focus-within::after,
+.expand-card.reveal.visible.expanded::after {
   animation: none;
   opacity: 0;
 }

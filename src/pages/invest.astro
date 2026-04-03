@@ -48,8 +48,8 @@ import Nav from "../components/Nav.astro";
           { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs estimate", color: "text-accent-blue" },
           { value: "73–109×", label: "Energy advantage", sub: "SNN vs GPU on neuromorphic HW", color: "text-accent-green" },
           { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
-        ].map((stat) => (
-          <div class="flip-card reveal h-40" tabindex="0" role="button" aria-label={`${stat.value}: ${stat.label}`}>
+        ].map((stat, i) => (
+          <div class="flip-card reveal h-40" tabindex="0" role="button" aria-label={`${stat.value}: ${stat.label}`} style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${stat.color.replace('text-', '')});`}>
             <div class="flip-inner w-full h-full">
               <div class="flip-front w-full h-full glass-bright rounded-xl p-4 flex flex-col items-center justify-center text-center">
                 <div class={`text-xl md:text-2xl font-mono font-bold ${stat.color}`}>{stat.value}</div>
@@ -69,14 +69,14 @@ import Nav from "../components/Nav.astro";
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         Why now
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The market is moving beyond LLMs. The biggest names in AI agree — but their solutions still have the same old problems.</p>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The market is moving beyond LLMs. The biggest names in AI agree, but their solutions still have the same old problems.</p>
 
       <div class="reveal glass-bright rounded-2xl p-6 md:p-8 mb-6">
         <div class="flex items-start gap-4 mb-4">
           <span class="px-3 py-1 rounded-full bg-accent-amber/10 border border-accent-amber/20 text-accent-amber text-[10px] font-mono uppercase tracking-wider shrink-0">March 2026</span>
           <div>
             <p class="text-sm text-text-primary font-medium">Yann LeCun's AMI Labs raises $1.03B for "world models"</p>
-            <p class="text-xs text-text-secondary mt-1 leading-relaxed">The Turing Award winner left Meta to build JEPA — world models that go beyond LLMs. Nvidia, Toyota, Samsung, Jeff Bezos invested. This validates the core thesis: <span class="text-text-primary">LLMs are not enough for robots.</span></p>
+            <p class="text-xs text-text-secondary mt-1 leading-relaxed">The Turing Award winner left Meta to build JEPA, world models that go beyond LLMs. Nvidia, Toyota, Samsung, Jeff Bezos invested. This validates the core thesis: <span class="text-text-primary">LLMs are not enough for robots.</span></p>
           </div>
         </div>
         <div class="divider mb-4"></div>
@@ -122,7 +122,7 @@ import Nav from "../components/Nav.astro";
             { label: "GPT-4o", value: "~0.3 Wh per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
             { label: "Gemini", value: "~0.24 Wh per prompt", source: "Google official", bar: 80, color: "accent-amber" },
             { label: "GPU Robot Brain", value: "50–200W continuous", source: "Industry standard", bar: 90, color: "accent-pink" },
-            { label: "OSCEN (Loihi target)", value: "<5W continuous", source: "Intel benchmarks", bar: 5, color: "accent-green" },
+            { label: "OSCEN (custom silicon)", value: "<5W continuous", source: "Neuromorphic benchmarks", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -210,8 +210,8 @@ import Nav from "../components/Nav.astro";
           { stat: "24/7", label: "Continuous training", desc: "Enterprise-grade dedicated server. Processing a multimodal video and audio curriculum around the clock. Currently entering the juvenile developmental phase." },
           { stat: "6", label: "Learning rules", desc: "All running simultaneously every simulation step. STDP, eligibility traces, BCM, neuromodulation, homeostatic scaling, R-STDP." },
           { stat: "5", label: "Developmental phases", desc: "Infant → Toddler → Juvenile → Adolescent → Mature. Phase transitions are experience-dependent, not hardcoded." },
-        ].map((item) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        ].map((item, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
             <div class="flex items-center justify-between">
               <div>
                 <span class="text-lg font-mono text-accent-blue font-bold">{item.stat}</span>
@@ -277,13 +277,13 @@ import Nav from "../components/Nav.astro";
 
       <div class="space-y-2">
         {[
-          { priority: "01", item: "Neuromorphic hardware", desc: "Intel Loihi 2 or SpiNNaker2 deployment. Move from CPU simulation to purpose-built silicon. 73–109× energy reduction." },
+          { priority: "01", item: "Neuromorphic hardware", desc: "Custom neuromorphic chip development for edge deployment. Move from CPU simulation to purpose-built silicon. 73-109x energy reduction." },
           { priority: "02", item: "Robotics integration", desc: "Physical robot body. Camera, servos, touch sensors. Close the full sensorimotor loop with real-world feedback." },
           { priority: "03", item: "Team expansion", desc: "Computational neuroscientist, robotics engineer, hardware specialist. Three hires transform timeline from solo → production." },
           { priority: "04", item: "Patent portfolio", desc: "Non-provisional filing by Feb 2027. 20 continuation patents covering hardware mapping, fleet learning, safety architecture." },
           { priority: "05", item: "Benchmarks & papers", desc: "Formal evaluation on standard robotics tasks. Published results for academic credibility and partnership conversations." },
-        ].map((item) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        ].map((item, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
             <div class="flex items-center gap-4">
               <span class="text-[10px] font-mono text-text-muted">{item.priority}</span>
               <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{item.item}</h3>

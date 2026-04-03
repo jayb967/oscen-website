@@ -49,7 +49,7 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
                   <div class="text-xl font-mono font-bold text-accent-blue">{m.projected}</div>
                   <div class="text-[9px] text-text-muted">by {m.year}</div>
                 </div>
-                {m.cagr !== "—" && (
+                {m.cagr !== "N/A" && (
                   <span class="px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green text-[10px] font-mono">
                     {m.cagr} CAGR
                   </span>
@@ -212,7 +212,7 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
         <div class="glass rounded-xl p-4 text-center">
           <div class="text-xl font-mono text-accent-amber font-bold">536 TWh</div>
           <div class="text-[9px] text-text-muted mt-1">Global data center energy 2025</div>
-          <div class="text-[8px] text-text-muted/60">IEA — projected 1,065 TWh by 2030</div>
+          <div class="text-[8px] text-text-muted/60">IEA, projected 1,065 TWh by 2030</div>
         </div>
       </div>
     </section>
@@ -227,7 +227,7 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
         {[
           {
             title: "Hardware wave is here",
-            desc: "Intel Loihi 2, SpiNNaker 2, BrainChip Akida, Innatera Pulsar — purpose-built neuromorphic silicon is shipping. OSCEN's software architecture is ready for the hardware.",
+            desc: "Intel Loihi 2, SpiNNaker 2, BrainChip Akida, Innatera Pulsar: purpose-built neuromorphic silicon is shipping. OSCEN's software architecture is ready for the hardware.",
             stat: "4 chips",
             color: "accent-cyan",
           },

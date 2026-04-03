@@ -58,7 +58,7 @@ export const MARKETS: MarketData[] = [
     current: "$2.9B (2025)",
     projected: "$5T",
     year: 2050,
-    cagr: "—",
+    cagr: "N/A",
     source: "Morgan Stanley",
     sourceUrl: "https://www.morganstanley.com/insights/articles/humanoid-robot-market-5-trillion-by-2050",
   },
@@ -125,7 +125,7 @@ export const COMPETITORS: Competitor[] = [
   {
     name: "Innatera",
     raised: "$43M",
-    valuation: "—",
+    valuation: "N/A",
     date: "2024",
     focus: "Pulsar spiking processor",
     gpuDependent: false,

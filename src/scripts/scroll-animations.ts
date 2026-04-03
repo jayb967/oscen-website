@@ -107,6 +107,7 @@ function animateReveals() {
 
   ScrollTrigger.batch(reveals, {
     onEnter: (batch) => {
+      batch.forEach((el) => el.classList.add("visible"));
       gsap.to(batch, {
         opacity: 1,
         y: 0,

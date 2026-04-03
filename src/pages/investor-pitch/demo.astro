@@ -54,7 +54,7 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
       <div class="reveal glass-bright rounded-2xl p-6 mb-6">
         <div class="flex items-center gap-3 mb-6">
           <span class="w-2 h-2 rounded-full bg-accent-green animate-pulse"></span>
-          <span class="text-sm font-mono text-accent-green">Active — Training 24/7</span>
+          <span class="text-sm font-mono text-accent-green">Active | Training 24/7</span>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -105,7 +105,7 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
         </div>
         <p class="text-[10px] text-text-secondary">
           Currently in <span class="text-accent-green font-medium">juvenile phase</span>.
-          Adolescent entry is experience-dependent — requires concept differentiation, sensory stability,
+          Adolescent entry is experience-dependent: requires concept differentiation, sensory stability,
           and feature STDP decline. Not hardcoded by step count.
         </p>
       </div>
@@ -122,8 +122,8 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {REGIONS.map((r) => (
-          <div class="expand-card reveal glass rounded-xl p-4 cursor-pointer group" tabindex="0">
+        {REGIONS.map((r, i) => (
+          <div class="expand-card reveal glass rounded-xl p-4 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.2}s; --glow-color: var(--color-accent-blue);`}>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <span

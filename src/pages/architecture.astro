@@ -97,8 +97,8 @@ const motorRanges = [
       <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Each region has a distinct computational role. Together they form a unified mind through {BRAIN_STATS.synapseGroups} synapse pathways.</p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {REGIONS.map((r) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        {REGIONS.map((r, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.2}s; --glow-color: var(--color-accent-blue);`}>
             <div class="flex items-center gap-3">
               <span class="w-2.5 h-2.5 rounded-full shrink-0" style={`background: ${rgbToHex(r.color)}`}></span>
               <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{r.label}</h3>
@@ -133,8 +133,8 @@ const motorRanges = [
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {learningRules.map((rule) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        {learningRules.map((rule, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${rule.accent});`}>
             <div class="flex items-center justify-between">
               <div>
                 <h3 class={`text-sm font-medium text-${rule.accent} group-hover:text-text-primary transition-colors`}>{rule.name}</h3>
@@ -208,7 +208,7 @@ const motorRanges = [
 
       <div class="space-y-2">
         {phases.map((p, i) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-purple);`}>
             <div class="flex items-center gap-4">
               <span class="text-[10px] font-mono text-text-muted w-6">{String(i + 1).padStart(2, '0')}</span>
               <h3 class="text-sm font-medium text-text-primary">{p.name}</h3>

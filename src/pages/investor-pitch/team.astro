@@ -50,8 +50,8 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
                 persistence layer, monitoring pipeline, and 350+ tests.
               </p>
               <p class="text-text-primary font-medium">
-                The depth of cross-disciplinary knowledge — computational neuroscience, sparse linear algebra, real-time distributed systems,
-                neuromorphic hardware constraints — is what makes this architecture possible. This isn't something that can be assembled from parts.
+                The depth of cross-disciplinary knowledge (computational neuroscience, sparse linear algebra, real-time distributed systems,
+                neuromorphic hardware constraints) is what makes this architecture possible. This isn't something that can be assembled from parts.
               </p>
             </div>
           </div>
@@ -106,7 +106,7 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
             "Patent application (6 claims, 14 embodiments)",
           ].map((item) => (
             <div class="flex items-start gap-2 py-1">
-              <span class="text-accent-blue/40 text-[10px] mt-0.5 shrink-0">—</span>
+              <span class="text-accent-blue/40 text-[10px] mt-0.5 shrink-0">&#x2022;</span>
               <span class="text-[11px] text-text-secondary">{item}</span>
             </div>
           ))}
@@ -120,7 +120,7 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
         <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">Build Velocity</p>
         <h3 class="font-display text-xl text-text-primary mb-4">LLM-augmented engineering</h3>
         <p class="text-sm text-text-secondary leading-relaxed max-w-2xl mb-6">
-          OSCEN was built with AI-assisted development tooling — not as a replacement for expertise,
+          OSCEN was built with AI-assisted development tooling, not as a replacement for expertise,
           but as a force multiplier. The architectural decisions, learning mechanism design, and patent claims
           all come from a decade of neuroscience research. The implementation velocity comes from treating
           AI as a pair programmer.
@@ -152,8 +152,8 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
       </p>
 
       <div class="space-y-3">
-        {HIRING_PLAN.map((role) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0">
+        {HIRING_PLAN.map((role, i) => (
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
             <div class="flex items-center gap-4">
               <span class:list={[
                 "px-2 py-0.5 rounded-full text-[9px] font-mono",
@@ -237,7 +237,7 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
           <span class="italic text-text-secondary">It means one person who can do what teams can't.</span>
         </p>
         <p class="text-sm text-text-muted mt-6 max-w-xl mx-auto">
-          The cross-disciplinary expertise — neuroscience, distributed systems, sparse algebra, hardware constraints —
+          The cross-disciplinary expertise (neuroscience, distributed systems, sparse algebra, hardware constraints)
           is concentrated in one person by design. The team scales the execution. The vision stays coherent.
         </p>
       </div>
