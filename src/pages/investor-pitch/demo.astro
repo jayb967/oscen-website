@@ -11,7 +11,7 @@ import { KEY_STATS } from "../../data/pitch";
 import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain";
 ---
 
-<Base title="Live Demo | OSCEN Investor Pitch" description="1,001,800 spiking neurons training live. 3D brain visualization. Real architecture, real training, real results.">
+<Base title="Live Demo | OSCEN Investor Pitch" description="1,056,800 spiking neurons training live. 3D brain visualization. Real architecture, real training, real results.">
   <Nav />
   <PitchNav current="demo" />
 
@@ -25,7 +25,7 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
         <span class="italic gradient-text">The brain is running.</span>
       </h1>
       <p class="reveal text-text-secondary mt-6 max-w-2xl leading-relaxed">
-        Right now, on a dedicated server, 1,001,800 spiking neurons are processing a multimodal video curriculum
+        Right now, on a dedicated server, 1,056,800 spiking neurons are processing a multimodal video curriculum
         and learning through 6 simultaneous mechanisms.
       </p>
     </section>
@@ -83,8 +83,8 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
           {[
             { phase: "Infant", width: "6%", active: false },
             { phase: "Toddler", width: "24%", active: false },
-            { phase: "Juvenile", width: "20%", active: true },
-            { phase: "Adolescent", width: "25%", active: false },
+            { phase: "Juvenile", width: "20%", active: false },
+            { phase: "Adolescent", width: "25%", active: true },
             { phase: "Mature", width: "25%", active: false },
           ].map((p) => (
             <div class="flex-1 flex flex-col items-center gap-1.5">
@@ -94,6 +94,7 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
                   p.active ? "bg-accent-green" : "bg-elevated",
                   !p.active && p.phase === "Infant" && "bg-accent-blue/30",
                   !p.active && p.phase === "Toddler" && "bg-accent-blue/30",
+                  !p.active && p.phase === "Juvenile" && "bg-accent-blue/30",
                 ]}
               ></div>
               <span class:list={[
@@ -104,8 +105,8 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
           ))}
         </div>
         <p class="text-[10px] text-text-secondary">
-          Currently in <span class="text-accent-green font-medium">juvenile phase</span>.
-          Adolescent entry is experience-dependent: requires concept differentiation, sensory stability,
+          Currently in <span class="text-accent-green font-medium">adolescent phase</span>.
+          Adolescent entry was experience-dependent: required concept differentiation, sensory stability,
           and feature STDP decline. Not hardcoded by step count.
         </p>
       </div>

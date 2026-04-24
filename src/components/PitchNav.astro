@@ -19,12 +19,12 @@ const tabs = [
 ---
 
 <div class="sticky top-[72px] z-50 glass border-b border-border">
-  <div class="max-w-5xl mx-auto px-6 py-3 flex items-center gap-1 overflow-x-auto scrollbar-hide">
+  <div class="max-w-5xl mx-auto px-3 sm:px-6 py-3 flex items-center gap-1 overflow-x-auto scrollbar-hide">
     {tabs.map((tab) => (
       <a
         href={tab.href}
         class:list={[
-          "px-4 py-1.5 text-[11px] font-mono tracking-wide rounded-full whitespace-nowrap transition-all duration-300",
+          "px-3 sm:px-4 py-1.5 text-[11px] font-mono tracking-wide rounded-full whitespace-nowrap transition-all duration-300",
           current === tab.id
             ? "bg-accent-blue/10 border border-accent-blue/30 text-accent-blue"
             : "text-text-muted hover:text-text-primary hover:bg-white/[0.03]",

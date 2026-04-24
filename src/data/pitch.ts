@@ -391,15 +391,15 @@ export const COMPARABLES: Comparable[] = [
 // ─── Key Stats ───
 
 export const KEY_STATS = {
-  neurons: "1,001,800",
-  synapses: "1.19B",
+  neurons: "1,056,800",
+  synapses: "1.31B",
   trainingVideos: 688,
-  trainingPhase: "Juvenile",
-  trainingSteps: "1.3M+",
+  trainingPhase: "Adolescent",
+  trainingSteps: "2.89M+",
   stepsPerSec: 0.76,
-  serverCost: "$130/mo",
-  brainRegions: 11,
-  synapseGroups: 24,
+  serverCost: "$220/mo",
+  brainRegions: 13,
+  synapseGroups: 48,
   learningRules: 6,
   devPhases: 5,
   patentClaims: 6,
