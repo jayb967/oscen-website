@@ -1,7 +1,7 @@
 ---
 /**
  * Investor Pitch — The Ask
- * $50M at $150M pre-money. Use of funds, milestones, revenue model, valuation rationale.
+ * Staged raise: seed now, Series A after proof.
  */
 import Base from "../../layouts/Base.astro";
 import Nav from "../../components/Nav.astro";
@@ -9,11 +9,12 @@ import PitchNav from "../../components/PitchNav.astro";
 import {
   RAISE_AMOUNT, PRE_MONEY_VALUATION, POST_MONEY_VALUATION,
   FOUNDER_OWNERSHIP_POST, INVESTOR_OWNERSHIP,
+  SERIES_A_TARGET, SERIES_A_VALUATION,
   USE_OF_FUNDS, MILESTONES, REVENUE_MODEL, COMPARABLES, NON_DILUTIVE,
 } from "../../data/pitch";
 ---
 
-<Base title="The Ask | OSCEN Investor Pitch" description="OSCEN pre-seed: $50M at $150M pre-money valuation. Use of funds, 24-month milestones, revenue model, and valuation rationale.">
+<Base title="The Ask | OSCEN Investor Pitch" description="OSCEN seed round: staged de-risking. Use of funds, 18-month milestones, revenue model, and Series A path.">
   <Nav />
   <PitchNav current="ask" />
 
@@ -23,44 +24,66 @@ import {
     <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
       <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Ask</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.85]">
-        <span class="gradient-text">{RAISE_AMOUNT}</span> pre-seed.
+        <span class="gradient-text">{RAISE_AMOUNT}</span> seed.
       </h1>
       <p class="reveal text-text-secondary mt-6 max-w-2xl leading-relaxed">
-        To hire the team, deploy on neuromorphic hardware, integrate with physical robots, and get to first revenue within 18 months.
+        To hire 5 elite engineers, deploy on neuromorphic hardware, build the first robot demo, and get to paid pilots within 18 months.
+        Series A follows after hardware validation.
       </p>
     </section>
 
-    <!-- Deal Terms -->
+    <!-- Two-Round Strategy -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <div class="reveal glass-bright rounded-2xl p-8 md:p-10">
-        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-8">Deal Structure</p>
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-8">Staged De-Risking</p>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div class="glass rounded-xl p-6 border border-accent-blue/20">
+            <span class="text-[9px] font-mono text-accent-blue uppercase tracking-wider">Now</span>
+            <div class="text-3xl font-mono font-bold text-accent-blue mt-2">{RAISE_AMOUNT}</div>
+            <div class="text-sm text-text-primary font-medium mt-1">Seed Round</div>
+            <div class="text-[11px] text-text-secondary mt-3 leading-relaxed space-y-1">
+              <p>5 elite hires</p>
+              <p>Neuromorphic hardware deployment</p>
+              <p>First physical robot demo</p>
+              <p>First paid pilots</p>
+            </div>
+          </div>
+          <div class="glass rounded-xl p-6 border border-border/50 opacity-70">
+            <span class="text-[9px] font-mono text-text-muted uppercase tracking-wider">After proof</span>
+            <div class="text-3xl font-mono font-bold text-text-secondary mt-2">{SERIES_A_TARGET}</div>
+            <div class="text-sm text-text-primary font-medium mt-1">Series A</div>
+            <div class="text-[11px] text-text-secondary mt-3 leading-relaxed space-y-1">
+              <p>Scale to 10M+ neurons</p>
+              <p>Multiple robot form factors</p>
+              <p>IP portfolio at 8+ patents</p>
+              <p>Revenue from OEM licensing</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
-            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-blue">{RAISE_AMOUNT}</div>
-            <div class="text-[10px] text-text-muted mt-1">Raise</div>
+            <div class="text-xl md:text-2xl font-mono font-bold text-accent-blue">{RAISE_AMOUNT}</div>
+            <div class="text-[10px] text-text-muted mt-1">Seed raise</div>
           </div>
           <div>
-            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-purple">{PRE_MONEY_VALUATION}</div>
+            <div class="text-xl md:text-2xl font-mono font-bold text-accent-purple">{PRE_MONEY_VALUATION}</div>
             <div class="text-[10px] text-text-muted mt-1">Pre-money valuation</div>
           </div>
           <div>
-            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-cyan">{POST_MONEY_VALUATION}</div>
-            <div class="text-[10px] text-text-muted mt-1">Post-money valuation</div>
+            <div class="text-xl md:text-2xl font-mono font-bold text-accent-cyan">{FOUNDER_OWNERSHIP_POST}</div>
+            <div class="text-[10px] text-text-muted mt-1">Founder retains</div>
           </div>
           <div>
-            <div class="text-2xl md:text-3xl font-mono font-bold text-accent-green">{FOUNDER_OWNERSHIP_POST}</div>
-            <div class="text-[10px] text-text-muted mt-1">Founder retains</div>
+            <div class="text-xl md:text-2xl font-mono font-bold text-accent-green">{INVESTOR_OWNERSHIP}</div>
+            <div class="text-[10px] text-text-muted mt-1">Investor equity</div>
           </div>
         </div>
 
-        <div class="glass rounded-xl p-4 text-center">
-          <p class="text-sm text-text-secondary">
-            Priced equity round. {INVESTOR_OWNERSHIP} to investors. Structured as two closes:
-            <span class="text-text-primary">$20–25M initial close</span> (immediate execution),
-            <span class="text-text-primary">$25–30M second close</span> (within 6 months, same terms).
-          </p>
-        </div>
+        <p class="text-[10px] text-text-muted text-center mt-6">
+          Priced equity round. Investors prefer staged de-risking. Seed proves the technology, Series A scales the business.
+        </p>
       </div>
     </section>
 
@@ -69,7 +92,7 @@ import {
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         Use of funds
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12">24-month deployment plan. Every dollar mapped to a milestone.</p>
+      <p class="reveal text-sm text-text-muted mb-12">18-month deployment plan. Every dollar mapped to a milestone.</p>
 
       <!-- Visual bar chart -->
       <div class="reveal glass rounded-xl p-6 mb-6">
@@ -117,7 +140,7 @@ import {
     <!-- 24-Month Milestones -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        24-month milestones
+        18-month milestones
       </h2>
 
       <div class="reveal glass-bright rounded-2xl p-6">
@@ -164,9 +187,9 @@ import {
     <!-- Valuation Rationale -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        Valuation rationale
+        Valuation context
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12">$150M is conservative relative to comparable seed rounds in AI.</p>
+      <p class="reveal text-sm text-text-muted mb-12">How OSCEN compares to recent AI seed rounds.</p>
 
       <div class="reveal glass rounded-xl overflow-hidden">
         <table class="w-full text-left">
@@ -216,10 +239,8 @@ import {
 
       <div class="reveal glass rounded-xl p-4 mt-4">
         <p class="text-[11px] text-text-secondary text-center leading-relaxed">
-          OSCEN asks for <span class="text-accent-blue font-medium">$50M at $150M</span>,
-          with a working product and filed patent.
-          Unconventional AI raised <span class="text-text-primary">$475M at $4.5B</span> with neither.
-          AMI Labs raised <span class="text-text-primary">$1.03B at $3.5B</span> at 4 months old.
+          OSCEN's seed raise is a fraction of comparable rounds, with a working product and filed patent that most lack.
+          This is a capital-efficient entry point into a market where others have raised billions.
         </p>
       </div>
     </section>
@@ -250,12 +271,15 @@ import {
     <!-- CTA -->
     <section class="max-w-5xl mx-auto px-6 mb-16">
       <div class="reveal glass-bright rounded-2xl p-8 text-center">
-        <p class="ghost-text font-display text-[clamp(1.5rem,3.5vw,2.5rem)] text-text-primary leading-snug mb-6">
-          The brain is built. The patent is filed.<br />
+        <p class="ghost-text font-display text-[clamp(1.5rem,3.5vw,2.5rem)] text-text-primary leading-snug mb-4">
+          The architecture is running. The patent is filed.<br />
           <span class="italic text-text-secondary">The market is $115B+ and growing.</span>
         </p>
+        <p class="text-sm text-text-muted mb-6 max-w-lg mx-auto">
+          We know what remains to be proven. This raise is to validate commercially and technically.
+        </p>
         <a
-          href="mailto:info@oscen.ai?subject=OSCEN%20Pre-Seed%20$50M%20Round"
+          href="mailto:info@oscen.ai?subject=OSCEN%20Seed%20Round"
           class="inline-block px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
         >
           Let's talk

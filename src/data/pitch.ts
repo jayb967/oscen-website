@@ -183,11 +183,13 @@ export const ENERGY_DATA: EnergyComparison[] = [
 
 // ─── The Ask ───
 
-export const RAISE_AMOUNT = "$50M";
-export const PRE_MONEY_VALUATION = "$150M";
-export const POST_MONEY_VALUATION = "$200M";
-export const FOUNDER_OWNERSHIP_POST = "75%";
-export const INVESTOR_OWNERSHIP = "25%";
+export const RAISE_AMOUNT = "$5M–$12M";
+export const PRE_MONEY_VALUATION = "$25M–$40M";
+export const POST_MONEY_VALUATION = "$30M–$52M";
+export const FOUNDER_OWNERSHIP_POST = "77–83%";
+export const INVESTOR_OWNERSHIP = "17–23%";
+export const SERIES_A_TARGET = "$25M–$50M";
+export const SERIES_A_VALUATION = "$150M–$300M";
 
 export interface FundAllocation {
   category: string;
@@ -202,64 +204,64 @@ export interface FundAllocation {
 export const USE_OF_FUNDS: FundAllocation[] = [
   {
     category: "Team",
-    amount: "$18M",
-    amountNum: 18,
-    percentage: "36%",
-    description: "8–12 hires over 24 months. Computational neuroscientist, robotics engineers, hardware specialist, ML researchers. Competitive Bay Area / remote salaries.",
+    amount: "$3.5M",
+    amountNum: 3.5,
+    percentage: "40%",
+    description: "5 elite hires over 18 months. Computational neuroscientist, 2 robotics engineers, neuromorphic hardware specialist, ML research engineer. Competitive remote salaries.",
     icon: "01",
     color: "accent-blue",
   },
   {
     category: "Neuromorphic Hardware",
-    amount: "$10M",
-    amountNum: 10,
-    percentage: "20%",
-    description: "Intel Loihi 2 or SpiNNaker2 development cluster. Move from CPU simulation to purpose-built silicon. 75–200x energy reduction, real-time inference.",
+    amount: "$1.5M",
+    amountNum: 1.5,
+    percentage: "17%",
+    description: "Intel Loihi 2 or SpiNNaker2 development kit. Move from CPU simulation to purpose-built silicon. Validate sub-5W inference on real hardware.",
     icon: "02",
     color: "accent-cyan",
   },
   {
-    category: "Robotics Integration",
-    amount: "$8M",
-    amountNum: 8,
-    percentage: "16%",
-    description: "Physical robot bodies with full sensor suites. Camera, LIDAR, IMU, force sensors, proprioception. Close the sensorimotor loop with real-world feedback.",
+    category: "Robot Integration",
+    amount: "$1.2M",
+    amountNum: 1.2,
+    percentage: "14%",
+    description: "First physical robot body with full sensor suite. Camera, IMU, force sensors, proprioception. Close the sensorimotor loop on real hardware.",
     icon: "03",
     color: "accent-green",
   },
   {
     category: "Compute & Infrastructure",
-    amount: "$6M",
-    amountNum: 6,
-    percentage: "12%",
-    description: "Dedicated training infrastructure. Scale from 1M to 10M+ neurons. Multi-server deployment for parallel brain instances. CI/CD pipeline.",
+    amount: "$1M",
+    amountNum: 1,
+    percentage: "11%",
+    description: "Scale training from 1M to 10M neurons. Multi-server deployment. CI/CD pipeline. Monitoring and observability.",
     icon: "04",
     color: "accent-amber",
   },
   {
     category: "IP & Legal",
-    amount: "$4M",
-    amountNum: 4,
-    percentage: "8%",
-    description: "Non-provisional patent filing by Feb 2027. 20 continuation-in-part patents. International PCT filing. Patent attorney retainer. Trademark registration.",
+    amount: "$600K",
+    amountNum: 0.6,
+    percentage: "7%",
+    description: "Non-provisional patent filing by Feb 2027. First continuation-in-part patents. International PCT filing. Patent attorney retainer.",
     icon: "05",
     color: "accent-purple",
   },
   {
     category: "R&D & Benchmarks",
-    amount: "$2.5M",
-    amountNum: 2.5,
-    percentage: "5%",
-    description: "Formal evaluation on standard robotics tasks. Published papers for academic credibility. Conference submissions (NeurIPS, ICRA, CoRL). Partnership pilots.",
+    amount: "$500K",
+    amountNum: 0.5,
+    percentage: "6%",
+    description: "Formal evaluation on standard robotics tasks. Published papers for academic credibility. Conference submissions (NeurIPS, ICRA, CoRL).",
     icon: "06",
     color: "accent-pink",
   },
   {
     category: "Working Capital",
-    amount: "$1.5M",
-    amountNum: 1.5,
-    percentage: "3%",
-    description: "18-month runway buffer. Office space, insurance, accounting, legal ops, travel for investor/partner meetings.",
+    amount: "$400K",
+    amountNum: 0.4,
+    percentage: "5%",
+    description: "18-month runway buffer. Insurance, accounting, legal ops, travel for investor and partner meetings.",
     icon: "07",
     color: "accent-red",
   },
@@ -278,32 +280,32 @@ export const MILESTONES: Milestone[] = [
   {
     quarter: "Q1–Q2",
     title: "Team & Hardware",
-    description: "First 5 hires. Neuromorphic dev kits ordered. 10M neuron simulation running.",
+    description: "First 5 hires. Neuromorphic dev kit ordered. 10M neuron simulation running. First benchmarks published.",
     metric: "5 hires, 10M neurons",
   },
   {
     quarter: "Q3",
-    title: "Robot Integration",
-    description: "First physical robot body with OSCEN brain. Closed sensorimotor loop on real hardware.",
+    title: "Robot Demo",
+    description: "First physical robot body with OSCEN brain. Closed sensorimotor loop on real hardware. Video demo published.",
     metric: "1st robot demo",
   },
   {
     quarter: "Q4",
-    title: "Loihi 2 Deployment",
+    title: "Hardware Deployment",
     description: "Brain running on neuromorphic silicon. Sub-5W power verified. Real-time inference benchmarks published.",
     metric: "<5W verified",
   },
   {
     quarter: "Q5–Q6",
     title: "Paid Pilots",
-    description: "2–3 paid proof-of-concept contracts with robotics OEMs or defense contractors. First revenue.",
+    description: "2-3 paid proof-of-concept contracts with robotics OEMs or defense integrators. First revenue.",
     metric: "First revenue",
   },
   {
     quarter: "Q7–Q8",
     title: "Series A",
-    description: "Published benchmarks. Multiple robot form factors demonstrated. IP portfolio at 8+ patents filed. Target $150–300M raise at $500M–750M.",
-    metric: "Series A close",
+    description: "Published benchmarks. Robot demo on real hardware. IP portfolio at 5+ patents filed. Raise $25M-$50M at $150M-$300M.",
+    metric: "Series A ready",
   },
 ];
 
@@ -379,12 +381,12 @@ export const COMPARABLES: Comparable[] = [
   },
   {
     company: "OSCEN",
-    valuation: "$150M (proposed)",
-    raised: "$50M (seeking)",
-    stage: "Pre-seed",
+    valuation: "$25M–$40M (proposed)",
+    raised: "$5M–$12M (seeking)",
+    stage: "Seed",
     hadProduct: true,
     hadPatent: true,
-    note: "1M neurons training live. Patent filed. Zero competitors in SNN robotics software.",
+    note: "1M neurons training live. Patent filed. Seed to prove hardware + robot integration.",
   },
 ];
 

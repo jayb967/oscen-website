@@ -179,6 +179,46 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
       </div>
     </section>
 
+    <!-- Benchmark Comparison -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Head-to-head comparison
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">OSCEN on neuromorphic silicon vs. conventional GPU robotics stack.</p>
+
+      <div class="reveal glass-bright rounded-2xl overflow-hidden">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-border">
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Metric</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider text-center">GPU Stack</th>
+              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider text-center">OSCEN</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { metric: "Power draw", gpu: "50-200W", oscen: "<5W", advantage: true },
+              { metric: "Learns after deployment", gpu: "No", oscen: "Yes", advantage: true },
+              { metric: "Cloud required", gpu: "Often", oscen: "No", advantage: true },
+              { metric: "Adaptation to new tasks", gpu: "Retrain (hours-days)", oscen: "Continuous (minutes)", advantage: true },
+              { metric: "Edge-native", gpu: "Limited", oscen: "Designed for it", advantage: true },
+              { metric: "Catastrophic forgetting", gpu: "Yes (without replay)", oscen: "Protected (homeostatic)", advantage: true },
+            ].map((row) => (
+              <tr class="border-b border-border/50">
+                <td class="px-5 py-3 text-sm text-text-primary">{row.metric}</td>
+                <td class="px-5 py-3 text-sm font-mono text-accent-red/70 text-center">{row.gpu}</td>
+                <td class="px-5 py-3 text-sm font-mono text-accent-green text-center font-medium">{row.oscen}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="reveal text-[9px] text-text-muted text-center mt-3 font-mono">
+        Power and adaptation claims are design targets based on Intel Loihi 2 benchmarks. Hardware validation is a seed milestone.
+      </p>
+    </section>
+
     <!-- What this means -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <div class="reveal glass rounded-2xl p-8 text-center">
