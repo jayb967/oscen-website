@@ -10,11 +10,11 @@ import {
   RAISE_AMOUNT, PRE_MONEY_VALUATION, POST_MONEY_VALUATION,
   FOUNDER_OWNERSHIP_POST, INVESTOR_OWNERSHIP,
   SERIES_A_TARGET, SERIES_A_VALUATION,
-  USE_OF_FUNDS, MILESTONES, REVENUE_MODEL, COMPARABLES, NON_DILUTIVE,
+  USE_OF_FUNDS, MILESTONES, REVENUE_MODEL, REVENUE_SOURCES, COMPARABLES, NON_DILUTIVE,
 } from "../../data/pitch";
 ---
 
-<Base title="The Ask | OSCEN Investor Pitch" description="OSCEN seed round: staged de-risking. Use of funds, 18-month milestones, revenue model, and Series A path.">
+<Base title="The Ask | OSCEN Investor Pitch" description="OSCEN seed: $10M at $30M pre-money. Use of funds, 18-month milestones, business model, and Series A path.">
   <Nav />
   <PitchNav current="ask" />
 
@@ -27,8 +27,8 @@ import {
         <span class="gradient-text">{RAISE_AMOUNT}</span> seed.
       </h1>
       <p class="reveal text-text-secondary mt-6 max-w-2xl leading-relaxed">
-        To hire 5 elite engineers, deploy on neuromorphic hardware, build the first robot demo, and get to paid pilots within 18 months.
-        Series A follows after hardware validation.
+        To hire 5 elite engineers, deploy on neuromorphic hardware, build the first robot demo, and reach paid pilots within 18 months.
+        A {SERIES_A_TARGET} Series A follows after hardware validation and first revenue.
       </p>
     </section>
 
@@ -170,7 +170,7 @@ import {
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         Path to revenue
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12">IP licensing model: capital-light, high-margin, scalable.</p>
+      <p class="reveal text-sm text-text-muted mb-12">Multiple revenue streams reduce risk. Government validates, BaaS scales, IP licensing compounds.</p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         {REVENUE_MODEL.map((phase) => (
@@ -181,6 +181,35 @@ import {
             <p class="text-[11px] text-text-secondary mt-2 leading-relaxed">{phase.description}</p>
           </div>
         ))}
+      </div>
+    </section>
+
+    <!-- Business Model -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Business model
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12">Four revenue streams, executing in parallel. Different customers, different sales cycles, same brain infrastructure.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {REVENUE_SOURCES.map((src) => (
+          <div class="reveal glass rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+              <span class={`text-sm font-mono font-bold text-${src.color}`}>{src.timeline}</span>
+              <h3 class="text-sm font-medium text-text-primary">{src.name}</h3>
+            </div>
+            <p class="text-[11px] text-text-secondary leading-relaxed">{src.description}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="reveal glass-bright rounded-xl p-5 mt-6">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-3">Core Model</p>
+        <p class="text-sm text-text-secondary leading-relaxed">
+          <span class="text-text-primary font-medium">Brain-as-a-Service is the annuity.</span> Hardware is sold once; the brain is rented monthly.
+          At $700/robot/month average, 93% gross margin, and $25K+ lifetime value per robot, the economics compound with every OEM partnership.
+          Government contracts fund early R&D without dilution. IP licensing creates a long-tail royalty stream. This is the ARM model applied to neuromorphic robotics.
+        </p>
       </div>
     </section>
 

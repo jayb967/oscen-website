@@ -183,13 +183,13 @@ export const ENERGY_DATA: EnergyComparison[] = [
 
 // ─── The Ask ───
 
-export const RAISE_AMOUNT = "$5M–$12M";
-export const PRE_MONEY_VALUATION = "$25M–$40M";
-export const POST_MONEY_VALUATION = "$30M–$52M";
-export const FOUNDER_OWNERSHIP_POST = "77–83%";
-export const INVESTOR_OWNERSHIP = "17–23%";
-export const SERIES_A_TARGET = "$25M–$50M";
-export const SERIES_A_VALUATION = "$150M–$300M";
+export const RAISE_AMOUNT = "$10M";
+export const PRE_MONEY_VALUATION = "$30M";
+export const POST_MONEY_VALUATION = "$40M";
+export const FOUNDER_OWNERSHIP_POST = "75%";
+export const INVESTOR_OWNERSHIP = "25%";
+export const SERIES_A_TARGET = "$50M";
+export const SERIES_A_VALUATION = "$200M";
 
 export interface FundAllocation {
   category: string;
@@ -201,11 +201,12 @@ export interface FundAllocation {
   color: string;
 }
 
+// Total: $10M
 export const USE_OF_FUNDS: FundAllocation[] = [
   {
     category: "Team",
-    amount: "$3.5M",
-    amountNum: 3.5,
+    amount: "$4M",
+    amountNum: 4,
     percentage: "40%",
     description: "5 elite hires over 18 months. Computational neuroscientist, 2 robotics engineers, neuromorphic hardware specialist, ML research engineer. Competitive remote salaries.",
     icon: "01",
@@ -213,35 +214,35 @@ export const USE_OF_FUNDS: FundAllocation[] = [
   },
   {
     category: "Neuromorphic Hardware",
-    amount: "$1.5M",
-    amountNum: 1.5,
-    percentage: "17%",
-    description: "Intel Loihi 2 or SpiNNaker2 development kit. Move from CPU simulation to purpose-built silicon. Validate sub-5W inference on real hardware.",
+    amount: "$1.8M",
+    amountNum: 1.8,
+    percentage: "18%",
+    description: "Intel Loihi 2 or SpiNNaker2 development cluster. Move from CPU simulation to purpose-built silicon. Validate sub-5W inference on real hardware.",
     icon: "02",
     color: "accent-cyan",
   },
   {
     category: "Robot Integration",
-    amount: "$1.2M",
-    amountNum: 1.2,
-    percentage: "14%",
+    amount: "$1.5M",
+    amountNum: 1.5,
+    percentage: "15%",
     description: "First physical robot body with full sensor suite. Camera, IMU, force sensors, proprioception. Close the sensorimotor loop on real hardware.",
     icon: "03",
     color: "accent-green",
   },
   {
     category: "Compute & Infrastructure",
-    amount: "$1M",
-    amountNum: 1,
-    percentage: "11%",
+    amount: "$1.2M",
+    amountNum: 1.2,
+    percentage: "12%",
     description: "Scale training from 1M to 10M neurons. Multi-server deployment. CI/CD pipeline. Monitoring and observability.",
     icon: "04",
     color: "accent-amber",
   },
   {
     category: "IP & Legal",
-    amount: "$600K",
-    amountNum: 0.6,
+    amount: "$700K",
+    amountNum: 0.7,
     percentage: "7%",
     description: "Non-provisional patent filing by Feb 2027. First continuation-in-part patents. International PCT filing. Patent attorney retainer.",
     icon: "05",
@@ -251,16 +252,16 @@ export const USE_OF_FUNDS: FundAllocation[] = [
     category: "R&D & Benchmarks",
     amount: "$500K",
     amountNum: 0.5,
-    percentage: "6%",
+    percentage: "5%",
     description: "Formal evaluation on standard robotics tasks. Published papers for academic credibility. Conference submissions (NeurIPS, ICRA, CoRL).",
     icon: "06",
     color: "accent-pink",
   },
   {
     category: "Working Capital",
-    amount: "$400K",
-    amountNum: 0.4,
-    percentage: "5%",
+    amount: "$300K",
+    amountNum: 0.3,
+    percentage: "3%",
     description: "18-month runway buffer. Insurance, accounting, legal ops, travel for investor and partner meetings.",
     icon: "07",
     color: "accent-red",
@@ -304,7 +305,7 @@ export const MILESTONES: Milestone[] = [
   {
     quarter: "Q7–Q8",
     title: "Series A",
-    description: "Published benchmarks. Robot demo on real hardware. IP portfolio at 5+ patents filed. Raise $25M-$50M at $150M-$300M.",
+    description: "Published benchmarks. Robot demo on real hardware. IP portfolio at 5+ patents filed. Raise $50M Series A at $200M pre-money.",
     metric: "Series A ready",
   },
 ];
@@ -321,21 +322,57 @@ export interface RevenuePhase {
 export const REVENUE_MODEL: RevenuePhase[] = [
   {
     year: "Year 1",
-    model: "Paid POCs",
-    range: "$0–500K",
-    description: "Proof-of-concept contracts with robotics companies and defense integrators. Paid engineering engagements.",
+    model: "Government + POCs",
+    range: "$275K–$600K",
+    description: "DARPA/SBIR contracts (non-dilutive), paid proof-of-concept engagements with defense integrators. SDVOSB veteran-owned status enables sole-source contracts up to $5M.",
   },
   {
     year: "Year 2",
-    model: "IP Licensing",
-    range: "$500K–$5M",
-    description: "License the OSCEN brain architecture to OEMs. Upfront fees $100–500K per licensee. SDK access + integration support.",
+    model: "BaaS + Verticals",
+    range: "$2M–$5M",
+    description: "Brain-as-a-Service licensing to robot OEMs ($499–$999/robot/month). Vertical brain packs for defense and construction. Government Phase II contracts.",
   },
   {
-    year: "Year 3–5",
-    model: "Royalties + SaaS",
-    range: "$5M–$50M",
-    description: "Per-unit royalties as licensees ship products. Cloud training platform for brain customization. Fleet learning services.",
+    year: "Year 3",
+    model: "Scale + IP Licensing",
+    range: "$10M–$30M",
+    description: "BaaS at scale (500+ robots). IP licensing to neuromorphic chip makers (ARM model). Per-unit royalties. Fleet management platform.",
+  },
+];
+
+// ─── Revenue Sources (for business model section) ───
+
+export interface RevenueSource {
+  name: string;
+  description: string;
+  timeline: string;
+  color: string;
+}
+
+export const REVENUE_SOURCES: RevenueSource[] = [
+  {
+    name: "Government Contracts",
+    description: "DARPA, SBIR, ONR, and defense integrator contracts. Non-dilutive funding that validates technology credibility. SDVOSB status (veteran-owned) unlocks sole-source contracts up to $5M.",
+    timeline: "Now",
+    color: "accent-blue",
+  },
+  {
+    name: "Brain-as-a-Service (BaaS)",
+    description: "License the OSCEN brain to robot manufacturers as a per-robot monthly subscription. $499-$5,000/month depending on capability tier. 93% gross margin. Like ARM for neuromorphic robotics.",
+    timeline: "Year 2",
+    color: "accent-cyan",
+  },
+  {
+    name: "Vertical Brain Packs",
+    description: "Industry-specific pre-trained brains for defense, construction, and medical rehabilitation. $25K-$100K upfront license per OEM plus per-device subscriptions.",
+    timeline: "Year 2",
+    color: "accent-green",
+  },
+  {
+    name: "IP Licensing",
+    description: "License core learning stack to neuromorphic chip makers (Intel, BrainChip, SpiNNcloud). $500K-$5M upfront plus 1-3% per-chip royalty. Follows the ARM licensing model.",
+    timeline: "Year 3",
+    color: "accent-purple",
   },
 ];
 
@@ -381,8 +418,8 @@ export const COMPARABLES: Comparable[] = [
   },
   {
     company: "OSCEN",
-    valuation: "$25M–$40M (proposed)",
-    raised: "$5M–$12M (seeking)",
+    valuation: "$30M (proposed)",
+    raised: "$10M (seeking)",
     stage: "Seed",
     hadProduct: true,
     hadPatent: true,
