@@ -469,27 +469,27 @@ export interface NonDilutive {
 
 export const NON_DILUTIVE: NonDilutive[] = [
   {
-    source: "DARPA (Young Faculty Award)",
+    source: "DARPA (BTO + DSO)",
     amount: "$1.5–5M",
     timeline: "6–12 months",
-    status: "Proposal ready",
+    status: "Submitted",
   },
   {
-    source: "Intel INRC (Loihi 2 Access)",
-    amount: "Hardware grant",
-    timeline: "3–6 months",
-    status: "Application ready",
+    source: "In-Q-Tel",
+    amount: "Strategic investment",
+    timeline: "6–12 months",
+    status: "Submitted",
   },
   {
-    source: "NSF SBIR Phase I",
-    amount: "$275K",
+    source: "Navy SBIR",
+    amount: "$275K–$1.5M",
     timeline: "6–9 months",
-    status: "Eligible",
+    status: "In progress",
   },
   {
     source: "ONR (Office of Naval Research)",
     amount: "$1–3M",
     timeline: "12 months",
-    status: "Eligible",
+    status: "Contact established",
   },
 ];

@@ -196,40 +196,6 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
       </div>
     </section>
 
-    <!-- Advisory (Planned) -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        Advisory board
-      </h2>
-      <p class="reveal text-sm text-text-muted mb-12">Planned advisory positions. Open to introductions.</p>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          {
-            role: "Neuromorphic Hardware",
-            need: "Intel INRC, SpiNNaker, or BrainChip ecosystem expertise. Hardware-software co-design for deployment on silicon.",
-            status: "Open",
-          },
-          {
-            role: "Robotics Go-to-Market",
-            need: "Commercial robotics deployment experience. OEM relationships. Understanding of robot brain market dynamics.",
-            status: "Open",
-          },
-          {
-            role: "Defense / Government",
-            need: "DARPA program management, DoD autonomous systems, SBIR/STTR navigation. De-risks non-dilutive funding path.",
-            status: "Open",
-          },
-        ].map((a) => (
-          <div class="reveal glass rounded-xl p-5">
-            <h3 class="text-sm text-text-primary font-medium mb-2">{a.role}</h3>
-            <p class="text-[11px] text-text-secondary leading-relaxed mb-3">{a.need}</p>
-            <span class="text-[9px] font-mono text-accent-amber">{a.status}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-
     <!-- Solo founder narrative -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <div class="reveal glass rounded-2xl p-8 text-center">
