@@ -397,7 +397,7 @@ export const KEY_STATS = {
   trainingPhase: "Adolescent",
   trainingSteps: "2.89M+",
   stepsPerSec: 0.76,
-  serverCost: "$220/mo",
+  serverCost: "$320/mo",
   brainRegions: 13,
   synapseGroups: 48,
   learningRules: 6,
