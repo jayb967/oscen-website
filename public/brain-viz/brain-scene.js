@@ -9,15 +9,24 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-import { DataBridge, REGIONS } from './data-bridge.js?v=3';
+import { DataBridge, REGIONS } from './data-bridge.js?v=5';
 import { BrainRegions } from './brain-regions.js';
 import { BrainSynapses } from './brain-synapses.js';
+import { BrainPulses } from './brain-pulses.js';
 
 class BrainScene {
     constructor() {
         this.container = document.getElementById('canvas-container');
         this.clock = new THREE.Clock();
         this._lastMetrics = null;
+
+        // Parse URL params early -- bloom and component init depend on them
+        const params = new URLSearchParams(window.location.search);
+        this._liveWsUrl = params.get('ws') || this._detectLiveWsUrl();
+        this.embedMode = params.get('embed') === 'true';
+        this.showLabels = params.get('labels') !== 'false';
+        // Pulses are the default; pass ?pulses=false to revert to lightning bolts
+        this.usePulses = params.get('pulses') !== 'false';
 
         this._initRenderer();
         this._initScene();
@@ -31,17 +40,14 @@ class BrainScene {
 
         // Build brain components
         this.brainRegions = new BrainRegions(this.scene);
-        this.brainSynapses = new BrainSynapses(this.scene, this.brainRegions);
+        this.brainSynapses = this.usePulses
+            ? new BrainPulses(this.scene, this.brainRegions)
+            : new BrainSynapses(this.scene, this.brainRegions);
 
         // Data bridge
         this.dataBridge = new DataBridge();
         this.dataBridge.onMetrics((m) => this._onMetrics(m));
-
-        // Parse URL params for configuration
-        const params = new URLSearchParams(window.location.search);
-        this._liveWsUrl = params.get('ws') || this._detectLiveWsUrl();
-        this.embedMode = params.get('embed') === 'true';
-        this.showLabels = params.get('labels') !== 'false';
+        this.dataBridge.onBenchmark((b) => this._onBenchmark(b));
 
         // Embed mode: hide HUD for clean iframe embedding
         if (this.embedMode) {
@@ -57,11 +63,11 @@ class BrainScene {
             statusBtn.addEventListener('click', () => this._toggleMode());
         }
 
-        // Always start in simulated mode (instant animation)
-        if (params.get('live') === 'true' && this._liveWsUrl) {
-            this.dataBridge.startLive(this._liveWsUrl);
-        } else {
+        // Default to live mode — fall back to simulated if connection fails
+        if (params.get('mode') === 'sim') {
             this.dataBridge.startSimulated();
+        } else {
+            this.dataBridge.startLive(this._liveWsUrl);
         }
 
         // Region labels (HTML overlay)
@@ -70,26 +76,6 @@ class BrainScene {
         // Handle resize
         window.addEventListener('resize', () => this._onResize());
 
-        // Accept commands from parent window (scroll zoom + mouse parallax)
-        this._targetZoomDist = null;
-        this._targetMouse = { x: 0, y: 0 };
-        this._smoothMouse = { x: 0, y: 0 };
-        this._baseAutoRotateSpeed = 0.3;
-
-        window.addEventListener('message', (e) => {
-            if (!e.data) return;
-            if (typeof e.data.zoom === 'number') {
-                const t = Math.max(0, Math.min(1, e.data.zoom));
-                const far = 14;
-                const near = 6;
-                this._targetZoomDist = far + (near - far) * t;
-            }
-            if (e.data.mouse) {
-                this._targetMouse.x = e.data.mouse.x || 0;
-                this._targetMouse.y = e.data.mouse.y || 0;
-            }
-        });
-
         // Start render loop
         this._animate();
     }
@@ -97,7 +83,11 @@ class BrainScene {
     _detectLiveWsUrl() {
         const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const host = window.location.hostname;
-        // WebSocket connection to live brain data
+        // demo.oscen.ai: nginx on standard port proxies /ws to dashboard
+        if (host === 'demo.oscen.ai') {
+            return `${proto}//${host}/ws`;
+        }
+        // Direct access: dashboard on port 8080
         return `${proto}//${host}:8080/ws`;
     }
 
@@ -157,7 +147,7 @@ class BrainScene {
         this.scene.add(this.rimLight);
 
         // Smoothed neuromodulation for scene effects
-        this._smoothNm = { da: 1.2, ach: 1.2, ne: 1.2, serotonin: 1.0 };
+        this._smoothNm = { da: 1.2, ach: 1.2, ne: 1.2, serotonin: 1.0, oxytocin: 0.8 };
     }
 
     _initPostProcessing() {
@@ -166,12 +156,15 @@ class BrainScene {
         const renderPass = new RenderPass(this.scene, this.camera);
         this.composer.addPass(renderPass);
 
-        // Bloom — tuned for lightning bolt glow
+        // Bloom settings differ: pulses want softer, wider glow; bolts want sharper corona
+        const bloomStrength = this.usePulses ? 1.0 : 0.8;
+        const bloomRadius   = this.usePulses ? 0.7 : 0.5;
+        const bloomThresh   = this.usePulses ? 0.5 : 0.7;
         this.bloomPass = new UnrealBloomPass(
             new THREE.Vector2(window.innerWidth, window.innerHeight),
-            0.8,    // strength — stronger for lightning corona
-            0.5,    // radius — wider spread for electrical glow
-            0.7,    // threshold — lower to catch bolt brightness
+            bloomStrength,
+            bloomRadius,
+            bloomThresh,
         );
         this.composer.addPass(this.bloomPass);
     }
@@ -210,6 +203,7 @@ class BrainScene {
 
     _createRegionLabels() {
         this.regionLabels = {};
+        if (!this.showLabels) return;
         const labelContainer = document.createElement('div');
         labelContainer.style.position = 'absolute';
         labelContainer.style.top = '0';
@@ -218,7 +212,6 @@ class BrainScene {
         labelContainer.style.height = '100%';
         labelContainer.style.pointerEvents = 'none';
         labelContainer.style.overflow = 'visible';
-        if (!this.showLabels) labelContainer.style.display = 'none';
         document.body.appendChild(labelContainer);
 
         for (const region of REGIONS) {
@@ -344,6 +337,14 @@ class BrainScene {
         if (nm.da !== undefined) this._targetNm = nm;
     }
 
+    /** Apply benchmark retention colors to synapse pathways (pulse mode only) */
+    _onBenchmark(benchmarkData) {
+        if (!benchmarkData || !benchmarkData.retention) return;
+        if (this.brainSynapses.setRetentionColors) {
+            this.brainSynapses.setRetentionColors(benchmarkData.retention);
+        }
+    }
+
     /** Scene-wide neuromodulation visual effects */
     _updateNeuromodEffects(dt) {
         if (!this._targetNm) return;
@@ -354,6 +355,7 @@ class BrainScene {
         nm.da += (( target.da || 1.2) - nm.da) * lerp;
         nm.ne += ((target.ne || 1.2) - nm.ne) * lerp;
         nm.serotonin += ((target.serotonin || 1.0) - nm.serotonin) * lerp;
+        nm.oxytocin += ((target.oxytocin || 0.8) - nm.oxytocin) * lerp;
 
         // DA → warm shift on key light (high DA = more orange/yellow)
         const daWarm = Math.max(0, (nm.da - 0.8) * 0.3);
@@ -365,14 +367,19 @@ class BrainScene {
 
         // NE → increase bloom strength slightly (arousal = more glow)
         const neBoost = Math.max(0, (nm.ne - 0.8) * 0.15);
-        this.bloomPass.strength = 0.8 + neBoost;
+        const baseBloom = this.usePulses ? 1.0 : 0.8;
+        this.bloomPass.strength = baseBloom + neBoost;
 
         // 5-HT → cool ambient shift (high serotonin = calmer, bluer)
         const shtCalm = Math.max(0, (nm.serotonin - 0.5) * 0.15);
+
+        // OT -> pink social-warmth tint on ambient (bonding/empathy)
+        const otWarm = Math.max(0, (nm.oxytocin || 0) - 0.5) * 0.08;
+
         this.ambientLight.color.setRGB(
-            0.1 - shtCalm * 0.03,
+            0.1 - shtCalm * 0.03 + otWarm * 0.04,
             0.16 + shtCalm * 0.02,
-            0.29 + shtCalm * 0.05,
+            0.29 + shtCalm * 0.05 + otWarm * 0.02,
         );
     }
 
@@ -380,7 +387,7 @@ class BrainScene {
         const el = (id) => document.getElementById(id);
 
         el('hud-neurons').textContent = this._formatNum(m.totalNeurons);
-        el('hud-synapses').textContent = '1.19B';
+        el('hud-synapses').textContent = '1.31B';
         el('hud-step').textContent = this._formatNum(m.step);
         el('hud-rate').textContent = m.stepsPerSec.toFixed(2);
 
@@ -397,6 +404,7 @@ class BrainScene {
         this._setBarHeight('nm-ach', (nm.ach || 0) / maxNm);
         this._setBarHeight('nm-ne', (nm.ne || 0) / maxNm);
         this._setBarHeight('nm-sht', (nm.serotonin || 0) / maxNm);
+        this._setBarHeight('nm-ot', (nm.oxytocin || 0) / maxNm);
     }
 
     _setBarHeight(id, pct) {
@@ -423,28 +431,6 @@ class BrainScene {
     _animate() {
         requestAnimationFrame(() => this._animate());
         const dt = Math.min(this.clock.getDelta(), 0.05); // Cap dt to avoid jumps
-
-        // Smooth zoom from parent scroll
-        if (this._targetZoomDist !== null) {
-            const pos = this.camera.position;
-            const dir = pos.clone().sub(this.controls.target).normalize();
-            const currentDist = pos.distanceTo(this.controls.target);
-            const newDist = currentDist + (this._targetZoomDist - currentDist) * Math.min(1, dt * 6);
-            pos.copy(this.controls.target).addScaledVector(dir, newDist);
-        }
-
-        // Mouse parallax: gently orbit the camera based on cursor position
-        const mLerp = Math.min(1, dt * 3);
-        this._smoothMouse.x += (this._targetMouse.x - this._smoothMouse.x) * mLerp;
-        this._smoothMouse.y += (this._targetMouse.y - this._smoothMouse.y) * mLerp;
-        const mouseStrength = 0.4;  // radians of max offset
-        const azimuthOffset = this._smoothMouse.x * mouseStrength;
-        const polarOffset = this._smoothMouse.y * mouseStrength * 0.5;
-        this.controls.autoRotateSpeed = this._baseAutoRotateSpeed + azimuthOffset * 2;
-
-        // Nudge the camera vertically based on mouse Y
-        const targetY = 4 - polarOffset * 3;
-        this.camera.position.y += (targetY - this.camera.position.y) * mLerp;
 
         // Update components
         this.controls.update();

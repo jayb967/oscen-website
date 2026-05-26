@@ -99,6 +99,7 @@
         .nm-fill.ach { background: #22d3ee; }
         .nm-fill.ne { background: #f44; }
         .nm-fill.sht { background: #a78bfa; }
+        .nm-fill.ot { background: #f472b6; }
 
         /* Connection status toggle button */
         #connection-status {
@@ -251,6 +252,49 @@
             font-size: 9px;
             color: rgba(200, 208, 224, 0.5);
         }
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .region-label {
+                font-size: 8px;
+                padding: 2px 5px;
+                letter-spacing: 0.5px;
+                touch-action: manipulation;
+            }
+            .region-label .rate {
+                font-size: 7px;
+            }
+            .region-tooltip {
+                width: 200px;
+                padding: 8px 10px;
+            }
+            .region-tooltip .tt-name {
+                font-size: 10px;
+            }
+            .region-tooltip .tt-desc {
+                font-size: 9px;
+            }
+            #hud {
+                top: 12px;
+                left: 12px;
+            }
+            .hud-title {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+            .hud-stat {
+                font-size: 10px;
+            }
+            .nm-track {
+                height: 30px;
+            }
+            #connection-status {
+                top: 12px;
+                right: 12px;
+                font-size: 10px;
+                padding: 4px 8px;
+                touch-action: manipulation;
+            }
+        }
     </style>
 </head>
 <body>
@@ -282,12 +326,16 @@
                 <div class="nm-track"><div class="nm-fill sht" id="nm-sht" style="height:40%"></div></div>
                 <span class="nm-label">5HT</span>
             </div>
+            <div class="nm-bar">
+                <div class="nm-track"><div class="nm-fill ot" id="nm-ot" style="height:20%"></div></div>
+                <span class="nm-label">OT</span>
+            </div>
         </div>
     </div>
 
-    <div id="connection-status" class="status-simulated" title="Click to toggle Live / Simulated">
+    <div id="connection-status" class="status-connecting" title="Click to toggle Live / Simulated">
         <span class="status-dot"></span>
-        <span class="status-text">SIMULATED</span>
+        <span class="status-text">CONNECTING...</span>
     </div>
 
     <script type="importmap">
@@ -305,6 +353,6 @@
     }
     </script>
 
-    <script type="module" src="./brain-scene.js?v=4"></script>
+    <script type="module" src="./brain-scene.js?v=6"></script>
 </body>
 </html>

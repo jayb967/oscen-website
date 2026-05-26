@@ -10,7 +10,7 @@ export const REGIONS = [
         connections: 'Feeds sensory cortex and motor cortex',
     },
     {
-        id: 'reflex_arc', label: 'Reflex Arc', neurons: 1000, color: [1.0, 0.6, 0.2],
+        id: 'reflex_arc', label: 'Reflex Arc', neurons: 2000, color: [1.0, 0.6, 0.2],
         description: 'Ultra-fast sensory-to-motor pathway that bypasses higher cognition. Handles immediate danger responses in under 10ms — like pulling away from heat.',
         connections: 'Receives from sensory cortex, drives motor cortex',
     },
@@ -59,6 +59,26 @@ export const REGIONS = [
         description: 'Top-level executive control — modulates attention, gates learning, and coordinates global brain state. The closest analog to conscious decision-making.',
         connections: 'Modulates association and motor cortex',
     },
+    {
+        id: 'pattern_separator', label: 'Pattern Sep.', neurons: 50000, color: [0.6, 0.9, 0.5],
+        description: 'Dentate gyrus analog — sparse expansion via k-WTA. Separates similar inputs into distinct representations to prevent interference during memory formation.',
+        connections: 'Receives from sensory cortex, feeds concept layer',
+    },
+    {
+        id: 'global_workspace', label: 'Workspace', neurons: 5000, color: [1.0, 1.0, 0.8],
+        description: 'Global Neuronal Workspace — ignition-based broadcast for conscious access. When activity exceeds threshold, signals are broadcast to all cortical regions simultaneously.',
+        connections: 'Receives from concept and meta, broadcasts to all',
+    },
+    {
+        id: 'acc', label: 'ACC', neurons: 50000, color: [0.96, 0.55, 0.35],
+        description: 'Anterior Cingulate Cortex - monitors for conflicts between competing motor plans, detects prediction errors, evaluates effort/reward. Contains Von Economo (spindle) neurons for rapid broadcast of urgency signals.',
+        connections: 'Receives from association, predictive, workspace, FI. Sends to motor, workspace, meta, FI',
+    },
+    {
+        id: 'fi', label: 'Frontoinsular', neurons: 50000, color: [0.85, 0.45, 0.75],
+        description: 'Frontoinsular Cortex - integrates interoceptive body-state signals with external social cues to build emotional representations. Contains Von Economo (spindle) neurons for rapid emotional broadcast. Triggers oxytocin release during social bonding.',
+        connections: 'Receives from brainstem, sensory, association, predictive, ACC. Sends to ACC, workspace, motor, meta',
+    },
 ];
 
 // 3D positions — anatomically-inspired sagittal brain layout
@@ -77,57 +97,122 @@ export const REGION_POSITIONS = {
     feature_layer:      [ 0.0,  1.0, -3.0],   // secondary visual/auditory
     concept_layer:      [ 0.0, -0.5, -0.5],   // temporal lobe
     meta_controller:    [ 0.0,  4.5,  1.0],   // dorsomedial prefrontal (top-front)
+    pattern_separator:  [ 0.0, -1.5, -2.0],   // hippocampal (medial temporal, near concept_layer)
+    global_workspace:   [ 0.0,  3.5,  3.0],   // anterior prefrontal (near working memory)
+    acc:                [ 0.0,  3.0,  0.5],   // medial frontal, near motor/predictive
+    fi:                 [ 1.5,  0.5,  1.5],   // lateral insular cortex
 };
 
 // Per-region shape configuration for anatomically-shaped particle clouds
 // shape: 'ellipsoid' (default), 'shell' (cortical surface), 'cylinder' (brainstem)
 export const REGION_SHAPES = {
-    brainstem:          { spread: [0.4, 0.8, 0.4], shape: 'cylinder' },
-    reflex_arc:         { spread: [0.5, 0.5, 0.5], shape: 'ellipsoid' },
-    sensory_cortex:     { spread: [1.5, 1.8, 1.0], shape: 'shell', shellRadius: 3.0, shellThickness: 0.3 },
-    motor_cortex:       { spread: [1.2, 1.8, 0.6], shape: 'shell', shellRadius: 3.5, shellThickness: 0.3 },
-    cerebellum:         { spread: [1.5, 0.8, 1.2], shape: 'ellipsoid' },
-    association_cortex: { spread: [1.8, 1.5, 2.5], shape: 'ellipsoid' },
-    predictive_layer:   { spread: [1.2, 1.0, 0.8], shape: 'shell', shellRadius: 2.5, shellThickness: 0.3 },
-    working_memory:     { spread: [0.8, 0.6, 0.7], shape: 'ellipsoid' },
-    feature_layer:      { spread: [1.0, 0.8, 0.5], shape: 'ellipsoid' },
-    concept_layer:      { spread: [0.8, 0.7, 0.8], shape: 'ellipsoid' },
-    meta_controller:    { spread: [0.7, 0.4, 0.6], shape: 'ellipsoid' },
+    brainstem:          { spread: [0.6, 0.8, 0.4], shape: 'cylinder' },
+    reflex_arc:         { spread: [0.7, 0.5, 0.5], shape: 'ellipsoid' },
+    sensory_cortex:     { spread: [2.1, 1.8, 1.0], shape: 'shell', shellRadius: 3.0, shellThickness: 0.3 },
+    motor_cortex:       { spread: [1.7, 1.8, 0.6], shape: 'shell', shellRadius: 3.5, shellThickness: 0.3 },
+    cerebellum:         { spread: [2.1, 0.8, 1.2], shape: 'ellipsoid' },
+    association_cortex: { spread: [2.5, 1.5, 2.5], shape: 'ellipsoid' },
+    predictive_layer:   { spread: [1.7, 1.0, 0.8], shape: 'shell', shellRadius: 2.5, shellThickness: 0.3 },
+    working_memory:     { spread: [1.1, 0.6, 0.7], shape: 'ellipsoid' },
+    feature_layer:      { spread: [1.4, 0.8, 0.5], shape: 'ellipsoid' },
+    concept_layer:      { spread: [1.1, 0.7, 0.8], shape: 'ellipsoid' },
+    meta_controller:    { spread: [1.0, 0.4, 0.6], shape: 'ellipsoid' },
+    pattern_separator:  { spread: [1.4, 0.6, 0.8], shape: 'ellipsoid' },
+    global_workspace:   { spread: [0.8, 0.5, 0.6], shape: 'ellipsoid' },
+    acc:                { spread: [1.0, 0.8, 0.6], shape: 'ellipsoid' },
+    fi:                 { spread: [0.8, 1.0, 0.7], shape: 'shell', shellRadius: 2.0, shellThickness: 0.3 },
 };
 
-// 24 synapse pathway definitions (source → target)
+// Synapse pathway definitions (source -> target) for 3D visualization.
+// Matches the real neuromorphic network's 64 synapse groups from network.py.
 export const SYNAPSE_PATHWAYS = [
+    // Brainstem arousal fan-out (reticular activating system -- tonic excitation to all regions)
     { id: 'brainstem_sensory',       src: 'brainstem',         dst: 'sensory_cortex' },
+    { id: 'brainstem_motor',         src: 'brainstem',         dst: 'motor_cortex' },
+    { id: 'brainstem_association',   src: 'brainstem',         dst: 'association_cortex' },
+    { id: 'brainstem_cerebellum',    src: 'brainstem',         dst: 'cerebellum' },
+    { id: 'brainstem_working',       src: 'brainstem',         dst: 'working_memory' },
+    { id: 'brainstem_predictive',    src: 'brainstem',         dst: 'predictive_layer' },
+    { id: 'brainstem_feature',       src: 'brainstem',         dst: 'feature_layer' },
+    { id: 'brainstem_concept',       src: 'brainstem',         dst: 'concept_layer' },
+    { id: 'brainstem_dg',            src: 'brainstem',         dst: 'pattern_separator' },
+    { id: 'brainstem_workspace',     src: 'brainstem',         dst: 'global_workspace' },
+    // Reflex arc
     { id: 'sensory_reflex',          src: 'sensory_cortex',    dst: 'reflex_arc' },
+    { id: 'reflex_motor',            src: 'reflex_arc',        dst: 'motor_cortex' },
+    // Sensory cortex fan-out
     { id: 'sensory_association',     src: 'sensory_cortex',    dst: 'association_cortex' },
     { id: 'sensory_motor',           src: 'sensory_cortex',    dst: 'motor_cortex' },
     { id: 'sensory_cerebellum',      src: 'sensory_cortex',    dst: 'cerebellum' },
     { id: 'sensory_feature',         src: 'sensory_cortex',    dst: 'feature_layer' },
+    // Feature layer
+    { id: 'feature_association',     src: 'feature_layer',     dst: 'association_cortex' },
+    { id: 'feature_workspace',       src: 'feature_layer',     dst: 'global_workspace' },
+    // Association cortex (hub)
     { id: 'association_lateral',     src: 'association_cortex', dst: 'association_cortex' },
     { id: 'association_predictive',  src: 'association_cortex', dst: 'predictive_layer' },
     { id: 'association_working',     src: 'association_cortex', dst: 'working_memory' },
     { id: 'association_meta',        src: 'association_cortex', dst: 'meta_controller' },
     { id: 'association_concept',     src: 'association_cortex', dst: 'concept_layer' },
+    { id: 'association_dg',          src: 'association_cortex', dst: 'pattern_separator' },
+    { id: 'association_workspace',   src: 'association_cortex', dst: 'global_workspace' },
+    // Predictive layer
     { id: 'predictive_association',  src: 'predictive_layer',  dst: 'association_cortex' },
     { id: 'predictive_recurrent',    src: 'predictive_layer',  dst: 'predictive_layer' },
     { id: 'predictive_concept',      src: 'predictive_layer',  dst: 'concept_layer' },
-    { id: 'reflex_motor',            src: 'reflex_arc',        dst: 'motor_cortex' },
-    { id: 'brainstem_motor',         src: 'brainstem',         dst: 'motor_cortex' },
-    { id: 'cerebellum_motor',        src: 'cerebellum',        dst: 'motor_cortex' },
-    { id: 'working_motor',           src: 'working_memory',    dst: 'motor_cortex' },
-    { id: 'feature_association',     src: 'feature_layer',     dst: 'association_cortex' },
+    { id: 'predictive_workspace',    src: 'predictive_layer',  dst: 'global_workspace' },
+    // Concept layer
     { id: 'concept_lateral',         src: 'concept_layer',     dst: 'concept_layer' },
     { id: 'concept_predictive',      src: 'concept_layer',     dst: 'predictive_layer' },
     { id: 'concept_working',         src: 'concept_layer',     dst: 'working_memory' },
+    { id: 'concept_workspace',       src: 'concept_layer',     dst: 'global_workspace' },
+    // Motor + cerebellum feedback loop
+    { id: 'motor_cerebellum',        src: 'motor_cortex',      dst: 'cerebellum' },
+    { id: 'cerebellum_motor',        src: 'cerebellum',        dst: 'motor_cortex' },
+    // Working memory
+    { id: 'working_motor',           src: 'working_memory',    dst: 'motor_cortex' },
+    { id: 'working_recurrent',       src: 'working_memory',    dst: 'working_memory' },
+    { id: 'working_workspace',       src: 'working_memory',    dst: 'global_workspace' },
+    // Meta controller
     { id: 'meta_association',        src: 'meta_controller',   dst: 'association_cortex' },
-    { id: 'meta_motor',             src: 'meta_controller',   dst: 'motor_cortex' },
+    { id: 'meta_motor',              src: 'meta_controller',   dst: 'motor_cortex' },
+    { id: 'meta_workspace',          src: 'meta_controller',   dst: 'global_workspace' },
+    // Pattern separator (dentate gyrus)
+    { id: 'dg_concept',              src: 'pattern_separator', dst: 'concept_layer' },
+    // Global workspace broadcast
+    { id: 'workspace_association',   src: 'global_workspace',  dst: 'association_cortex' },
+    { id: 'workspace_predictive',    src: 'global_workspace',  dst: 'predictive_layer' },
+    { id: 'workspace_working',       src: 'global_workspace',  dst: 'working_memory' },
+    { id: 'workspace_motor',         src: 'global_workspace',  dst: 'motor_cortex' },
+    { id: 'workspace_concept',       src: 'global_workspace',  dst: 'concept_layer' },
+    { id: 'workspace_feature',       src: 'global_workspace',  dst: 'feature_layer' },
+    { id: 'workspace_lateral',       src: 'global_workspace',  dst: 'global_workspace' },
+    // ACC connections (social-emotional processing with VEN spindle neurons)
+    { id: 'association_acc',  src: 'association_cortex', dst: 'acc' },
+    { id: 'predictive_acc',   src: 'predictive_layer',  dst: 'acc' },
+    { id: 'workspace_acc',    src: 'global_workspace',  dst: 'acc' },
+    { id: 'fi_acc',           src: 'fi',                dst: 'acc' },
+    { id: 'brainstem_acc',    src: 'brainstem',          dst: 'acc' },
+    { id: 'acc_motor',        src: 'acc',               dst: 'motor_cortex' },
+    { id: 'acc_workspace',    src: 'acc',               dst: 'global_workspace' },
+    { id: 'acc_meta',         src: 'acc',               dst: 'meta_controller' },
+    { id: 'acc_fi',           src: 'acc',               dst: 'fi' },
+    // FI connections (interoceptive-emotional integration with VEN spindle neurons)
+    { id: 'brainstem_fi',     src: 'brainstem',          dst: 'fi' },
+    { id: 'sensory_fi',       src: 'sensory_cortex',    dst: 'fi' },
+    { id: 'association_fi',   src: 'association_cortex', dst: 'fi' },
+    { id: 'predictive_fi',    src: 'predictive_layer',  dst: 'fi' },
+    { id: 'fi_workspace',     src: 'fi',                dst: 'global_workspace' },
+    { id: 'fi_motor',         src: 'fi',                dst: 'motor_cortex' },
+    { id: 'fi_meta',          src: 'fi',                dst: 'meta_controller' },
 ];
 
 export class DataBridge {
     constructor() {
-        this.mode = 'simulated'; // 'live' or 'simulated'
+        this.mode = 'live'; // 'live' or 'simulated'
         this.ws = null;
         this.listeners = [];
+        this.benchmarkListeners = [];
         this.lastMetrics = null;
         this.lastStep = 0;
         this.lastStepTime = 0;
@@ -136,11 +221,20 @@ export class DataBridge {
         this._simRunning = false;
         this._simPhaseOffsets = REGIONS.map(() => Math.random() * Math.PI * 2);
         this._wsUrl = null;
+        this._demoOverride = null; // External firing rate override from parent frame
+
+        // Listen for postMessage from parent (demo pages)
+        window.addEventListener('message', (e) => this._handlePostMessage(e));
     }
 
     /** Register a callback for metrics updates: fn(metrics) */
     onMetrics(fn) {
         this.listeners.push(fn);
+    }
+
+    /** Register a callback for benchmark data: fn({ retention: { pathwayId: float } }) */
+    onBenchmark(fn) {
+        this.benchmarkListeners.push(fn);
     }
 
     /** Start simulated data mode */
@@ -169,40 +263,60 @@ export class DataBridge {
 
     _connectWs(wsUrl) {
         this._disconnectWs();
+        this.mode = 'connecting';
         this._updateConnectionStatus('connecting');
+        this._reconnectUrl = wsUrl;
         try {
             this.ws = new WebSocket(wsUrl);
             this.ws.onopen = () => {
                 console.log('[DataBridge] Connected to', wsUrl);
-            };
-            this.ws.onmessage = (event) => {
-                try {
-                    const msg = JSON.parse(event.data);
-                    this._handleMessage(msg);
-                } catch (e) { /* ignore parse errors */ }
-            };
-            this.ws.onclose = () => {
-                console.log('[DataBridge] Disconnected');
-                if (this.mode === 'live') {
-                    // Was live, lost connection — fall back
-                    this._updateConnectionStatus('disconnected');
-                    setTimeout(() => {
+                // If we don't get a neuro_update within 15s, start sim alongside
+                // but keep trying to reconnect. 15s accounts for Cloudflare
+                // tunnel latency on initial WebSocket handshake.
+                this._liveTimeout = setTimeout(() => {
+                    if (this.mode === 'connecting') {
+                        console.log('[DataBridge] No brain data yet, showing simulated while waiting');
                         this.mode = 'simulated';
                         this._updateConnectionStatus('simulated');
                         this._startSimLoop();
-                    }, 2000);
+                    }
+                }, 15000);
+            };
+            this.ws.onmessage = (event) => {
+                if (this._liveTimeout) { clearTimeout(this._liveTimeout); this._liveTimeout = null; }
+                try {
+                    const msg = JSON.parse(event.data);
+                    this._handleMessage(msg);
+                } catch (e) { console.warn('[DataBridge] Parse error:', e.message); }
+            };
+            this.ws.onclose = () => {
+                console.log('[DataBridge] Disconnected, reconnecting in 3s...');
+                if (this._liveTimeout) { clearTimeout(this._liveTimeout); this._liveTimeout = null; }
+                this._updateConnectionStatus('disconnected');
+                // Always try to reconnect — never give up on live
+                setTimeout(() => {
+                    if (this._reconnectUrl) {
+                        this._connectWs(this._reconnectUrl);
+                    }
+                }, 3000);
+                // Show simulated data while reconnecting
+                if (!this._simRunning) {
+                    this.mode = 'simulated';
+                    this._startSimLoop();
                 }
             };
             this.ws.onerror = () => {
-                console.log('[DataBridge] Connection failed');
-                this.mode = 'simulated';
-                this._updateConnectionStatus('simulated');
-                this._startSimLoop();
+                console.log('[DataBridge] Connection error, will retry');
+                // onclose will fire after onerror, which handles reconnection
             };
         } catch (e) {
             this.mode = 'simulated';
             this._updateConnectionStatus('simulated');
             this._startSimLoop();
+            // Retry after delay
+            setTimeout(() => {
+                if (this._reconnectUrl) this._connectWs(this._reconnectUrl);
+            }, 5000);
         }
     }
 
@@ -230,12 +344,38 @@ export class DataBridge {
             this.lastStep = data.step_count || 0;
             this.lastStepTime = now;
 
+            const firingRates = data.firing_rates || {};
+            let neuromodulation = data.neuromodulation || {};
+
+            // Apply demo override if active (from parent frame postMessage)
+            // This ensures cascade visuals work even when receiving live data
+            if (this._demoOverride) {
+                const age = Date.now() - this._demoOverride.timestamp;
+                if (age > 5000) {
+                    this._demoOverride = null;
+                } else {
+                    const overrideFR = this._demoOverride.firingRates;
+                    for (const key of Object.keys(overrideFR)) {
+                        if (overrideFR[key] > 0) {
+                            firingRates[key] = Math.max(firingRates[key] || 0, overrideFR[key]);
+                        }
+                    }
+                    const overrideNM = this._demoOverride.neuromodulation;
+                    if (overrideNM) {
+                        neuromodulation = { ...neuromodulation };
+                        for (const key of Object.keys(overrideNM)) {
+                            if (overrideNM[key] !== undefined) neuromodulation[key] = overrideNM[key];
+                        }
+                    }
+                }
+            }
+
             const metrics = {
                 step: data.step_count || 0,
-                totalNeurons: data.total_neurons || 1001800,
+                totalNeurons: data.total_neurons || 1156800,
                 stepsPerSec: this.stepsPerSec,
-                firingRates: data.firing_rates || {},
-                neuromodulation: data.neuromodulation || {},
+                firingRates,
+                neuromodulation,
                 drives: data.drives || {},
                 synapseStats: data.synapse_stats || {},
                 stdpDeltas: data.stdp_deltas || {},
@@ -276,6 +416,29 @@ export class DataBridge {
         }
     }
 
+    /** Handle postMessage from parent frame (demo reaction pages) */
+    _handlePostMessage(event) {
+        const msg = event.data;
+        if (!msg || typeof msg !== 'object') return;
+
+        if (msg.type === 'demo_reaction') {
+            this._demoOverride = {
+                firingRates: msg.firingRates || {},
+                neuromodulation: msg.neuromodulation || {},
+                timestamp: Date.now(),
+            };
+        } else if (msg.type === 'demo_clear') {
+            this._demoOverride = null;
+        } else if (msg.type === 'demo_benchmark') {
+            // Benchmark retention data from parent frame (continual learning page)
+            // msg.retention = { pathwayId: retentionFloat (0-1) }
+            for (const fn of this.benchmarkListeners) {
+                try { fn({ retention: msg.retention || {} }); }
+                catch (e) { console.error('[DataBridge] Benchmark listener error:', e); }
+            }
+        }
+    }
+
     _startSimLoop() {
         if (this._simRunning) return;
         this._simRunning = true;
@@ -310,20 +473,44 @@ export class DataBridge {
         firingRates.association_cortex += sensoryBurst * 0.6 * Math.max(0, Math.sin(t * 0.5 - 0.5));
         firingRates.motor_cortex += sensoryBurst * 0.3 * Math.max(0, Math.sin(t * 0.5 - 1.0));
 
+        let neuromodulation = {
+            phase: 'juvenile',
+            da: 1.2 + 0.1 * Math.sin(t * 0.15),
+            ach: 1.2 + 0.08 * Math.sin(t * 0.12 + 1),
+            ne: 1.2 + 0.15 * Math.sin(t * 0.2 + 2),
+            serotonin: 1.0 + 0.05 * Math.sin(t * 0.1 + 3),
+            oxytocin: 0.8 + 0.1 * Math.sin(t * 0.08 + 4),
+            plasticity_multiplier: 0.48,
+        };
+
+        // Apply demo override if active (from parent frame postMessage)
+        if (this._demoOverride) {
+            const age = Date.now() - this._demoOverride.timestamp;
+            if (age > 5000) {
+                this._demoOverride = null; // Expire after 5 seconds
+            } else {
+                const overrideFR = this._demoOverride.firingRates;
+                for (const key of Object.keys(overrideFR)) {
+                    if (overrideFR[key] > 0) {
+                        firingRates[key] = Math.max(firingRates[key], overrideFR[key]);
+                    }
+                }
+                const overrideNM = this._demoOverride.neuromodulation;
+                if (overrideNM) {
+                    for (const key of Object.keys(overrideNM)) {
+                        if (overrideNM[key] !== undefined) neuromodulation[key] = overrideNM[key];
+                    }
+                }
+            }
+        }
+
         const step = Math.floor(398000 + t * 0.82);
         return {
             step,
-            totalNeurons: 1001800,
+            totalNeurons: 1156800,
             stepsPerSec: 0.82,
             firingRates,
-            neuromodulation: {
-                phase: 'juvenile',
-                da: 1.2 + 0.1 * Math.sin(t * 0.15),
-                ach: 1.2 + 0.08 * Math.sin(t * 0.12 + 1),
-                ne: 1.2 + 0.15 * Math.sin(t * 0.2 + 2),
-                serotonin: 1.0 + 0.05 * Math.sin(t * 0.1 + 3),
-                plasticity_multiplier: 0.48,
-            },
+            neuromodulation,
             drives: {
                 energy: 0.85 + 0.05 * Math.sin(t * 0.05),
                 damage: 0.05,
