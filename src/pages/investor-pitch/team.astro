@@ -1,7 +1,6 @@
 ---
 /**
  * Investor Pitch — Team & Hiring
- * What one person built. What a team will do.
  * Founder profile, build velocity, hiring plan.
  */
 import Base from "../../layouts/Base.astro";
@@ -10,7 +9,7 @@ import PitchNav from "../../components/PitchNav.astro";
 import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
 ---
 
-<Base title="Team | OSCEN Investor Pitch" description="One founder built the full OSCEN architecture in 7 months. Here's what a team of 12 will do.">
+<Base title="Team | OSCEN Investor Pitch" description="The full OSCEN architecture, built in 7 months. Here's what a team of 12 will do.">
   <Nav />
   <PitchNav current="team" />
 
@@ -20,8 +19,8 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
     <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
       <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Team</p>
       <h1 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-[0.9]">
-        One person built this.<br />
-        <span class="italic gradient-text">Imagine what a team does.</span>
+        Built from the ground up.<br />
+        <span class="italic gradient-text">Now scaling with a team.</span>
       </h1>
     </section>
 
@@ -64,19 +63,19 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
       </div>
     </section>
 
-    <!-- What 1 person built -->
+    <!-- What's been built -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        What one person built
+        What's been built
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12">5 years of planning. 7 months of focused build. Solo, bootstrapped.</p>
+      <p class="reveal text-sm text-text-muted mb-12">5 years of planning. 7 months of focused build. Bootstrapped.</p>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         {[
           { value: KEY_STATS.neurons, label: "Spiking neurons", color: "text-accent-blue" },
           { value: KEY_STATS.synapses, label: "Synapses", color: "text-accent-cyan" },
-          { value: "48", label: "Synapse groups", color: "text-accent-green" },
-          { value: "13", label: "Brain regions", color: "text-accent-amber" },
+          { value: String(KEY_STATS.synapseGroups), label: "Synapse groups", color: "text-accent-green" },
+          { value: String(KEY_STATS.brainRegions), label: "Brain regions", color: "text-accent-amber" },
           { value: "6", label: "Learning rules (patented)", color: "text-accent-purple" },
           { value: "5", label: "Developmental phases", color: "text-accent-pink" },
           { value: "660+", label: "Automated tests", color: "text-accent-blue" },
@@ -136,8 +135,8 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
             <div class="text-[9px] text-text-muted mt-1">Implementation velocity</div>
           </div>
           <div>
-            <div class="text-xl font-mono font-bold text-accent-blue">1 = 5</div>
-            <div class="text-[9px] text-text-muted mt-1">Person-equivalent output</div>
+            <div class="text-xl font-mono font-bold text-accent-blue">7 mo</div>
+            <div class="text-[9px] text-text-muted mt-1">Concept to 1M neurons</div>
           </div>
           <div>
             <div class="text-xl font-mono font-bold text-accent-purple">660+</div>
@@ -184,11 +183,11 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
         <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">Team Growth</p>
         <div class="flex items-center gap-2">
           {[
-            { label: "Now", count: "1", color: "bg-accent-blue" },
-            { label: "6 mo", count: "5", color: "bg-accent-cyan" },
-            { label: "12 mo", count: "8", color: "bg-accent-green" },
-            { label: "18 mo", count: "10", color: "bg-accent-amber" },
-            { label: "24 mo", count: "12", color: "bg-accent-purple" },
+            { label: "Now", count: "2", color: "bg-accent-blue" },
+            { label: "6 mo", count: "6", color: "bg-accent-cyan" },
+            { label: "12 mo", count: "9", color: "bg-accent-green" },
+            { label: "18 mo", count: "11", color: "bg-accent-amber" },
+            { label: "24 mo", count: "13", color: "bg-accent-purple" },
           ].map((t) => (
             <div class="flex-1 text-center">
               <div class={`h-2 rounded-full ${t.color}/50 mb-2`}></div>
@@ -200,7 +199,7 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
       </div>
     </section>
 
-    <!-- Solo founder narrative -->
+    <!-- Founding-team narrative -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <div class="reveal glass rounded-2xl p-8 text-center">
         <p class="ghost-text font-display text-[clamp(1.2rem,3vw,2rem)] text-text-primary leading-snug">
@@ -208,7 +207,7 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
           <span class="italic text-text-secondary">robotics AI infrastructure bets in market.</span>
         </p>
         <p class="text-sm text-text-muted mt-6 max-w-xl mx-auto">
-          The cross-disciplinary expertise is concentrated in one person by design. The team scales the execution.
+          Deep cross-disciplinary expertise on the architecture, paired with the operational footing to scale.
           We know what remains to be proven - this raise is to validate commercially and technically.
         </p>
       </div>
