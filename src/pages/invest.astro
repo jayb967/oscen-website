@@ -16,7 +16,6 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
-import ProofStrip from "../components/sections/ProofStrip.astro";
 import { FORMSPREE, SEGMENTS } from "../lib/forms";
 ---
 
@@ -25,7 +24,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
   <main class="pt-32 pb-24">
     <!-- 1. Hook -->
-    <section class="max-w-5xl mx-auto px-6 mb-12">
+    <section class="max-w-5xl mx-auto px-6 mb-10">
       <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Path A · Investors</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
         Everyone is building the body.<br />
@@ -37,7 +36,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 2. Public-safe market signals (no internal numbers) -->
-    <section class="max-w-5xl mx-auto px-6 mb-12">
+    <section class="max-w-5xl mx-auto px-6 mb-10">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
@@ -55,8 +54,8 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 3. Thesis — short, no numbers -->
-    <section class="max-w-5xl mx-auto px-6 mb-12">
-      <div class="reveal glass-bright rounded-2xl p-8 md:p-12">
+    <section class="max-w-5xl mx-auto px-6 mb-10">
+      <div class="reveal glass-bright rounded-2xl p-6 md:p-8">
         <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Investment thesis</p>
         <div class="space-y-4 text-lg text-text-secondary leading-relaxed max-w-3xl">
           <p>Every robot will need a brain. Today's AI is frozen the day it's trained, can't adapt without retraining from scratch, and underneath is just predicting text.</p>
@@ -66,14 +65,12 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
       </div>
     </section>
 
-    <ProofStrip />
-
     <!-- 4. The form — the only conversion on this page -->
-    <section id="investor-form" class="max-w-3xl mx-auto px-6 mt-12 mb-12 scroll-mt-24">
+    <section id="investor-form" class="max-w-3xl mx-auto px-6 mb-10 scroll-mt-24">
       <h2 class="reveal font-display text-[clamp(2rem,4.5vw,3rem)] text-text-primary leading-tight mb-3">
         Start the conversation.
       </h2>
-      <p class="reveal text-sm text-text-secondary mb-10 max-w-xl">
+      <p class="reveal text-sm text-text-secondary mb-8 max-w-xl">
         Tell us who you are. We'll reply within 48 hours with the brief — what we're raising, milestones, and a call link if you're a fit.
       </p>
 
