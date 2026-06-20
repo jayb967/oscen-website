@@ -1,5 +1,5 @@
 /**
- * Investor pitch data — single source of truth for all pitch-related
+ * Investor pitch data. single source of truth for all pitch-related
  * numbers, market data, competitor intelligence, and financial projections.
  * Every number has a source citation.
  */

@@ -20,7 +20,7 @@ if (prefersReduced) {
 }
 
 function initAnimations() {
-  // Kill CSS transitions — GSAP handles everything
+  // Kill CSS transitions. GSAP handles everything
   const style = document.createElement("style");
   style.textContent = `.reveal { transition: none !important; }`;
   document.head.appendChild(style);

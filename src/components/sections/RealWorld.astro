@@ -1,0 +1,57 @@
+---
+/**
+ * "What this means" payoff section.
+ *
+ * Bridges the technical explanation into real-world consequences a
+ * non-technical reader can picture. Today vs. With OSCEN, four pairs.
+ * Plain language. No jargon.
+ */
+const pairs = [
+  {
+    today: "Need a full retrain for every new task",
+    oscen: "Pick it up by watching, like a person",
+  },
+  {
+    today: "Forget old skills when learning new ones",
+    oscen: "Keep every skill they ever learned",
+  },
+  {
+    today: "Need big batteries or a cloud connection",
+    oscen: "All day on a phone-sized battery, no internet",
+  },
+  {
+    today: "Same script in every house",
+    oscen: "Adapt to your home, your stuff, your routine",
+  },
+];
+---
+
+<section id="real-world" class="section relative">
+  <div class="max-w-5xl mx-auto w-full px-6">
+    <div class="text-center mb-12">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">What this means</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        Robots that <span class="italic gradient-text">actually live with us.</span>
+      </h2>
+      <p class="reveal text-text-secondary text-sm mt-6 max-w-xl mx-auto leading-relaxed">
+        The point of all the science is what it lets a robot do in your house, your warehouse, your hospital.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {pairs.map((p) => (
+        <div class="reveal glass-bright rounded-2xl p-6">
+          <div>
+            <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-red/70">Today</p>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">{p.today}</p>
+          </div>
+          <div class="divider my-4"></div>
+          <div>
+            <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-green/80">With OSCEN</p>
+            <p class="mt-2 text-sm text-text-primary leading-relaxed">{p.oscen}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

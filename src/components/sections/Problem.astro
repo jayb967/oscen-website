@@ -1,6 +1,6 @@
 ---
 /**
- * Section 2: The Problem — Three facts. Two sentences. No paragraphs.
+ * Section 2: The Problem. Three facts. Two sentences. No paragraphs.
  * Flip cards reveal context on hover.
  */
 const stats = [
@@ -39,7 +39,7 @@ const stats = [
       </h2>
     </div>
 
-    <!-- Flip cards — hover reveals depth -->
+    <!-- Flip cards. hover reveals depth -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
       {stats.map((s, i) => (
         <div class="flip-card reveal h-44" tabindex="0" role="button" aria-label={`${s.value} ${s.label}. Hover for details.`} style={`--glow-delay: ${i * 2}s; --glow-color: var(--color-${s.color.replace('text-', '')});`}>
@@ -59,7 +59,7 @@ const stats = [
       ))}
     </div>
 
-    <!-- Pivot — the turn toward solution -->
+    <!-- Pivot. the turn toward solution -->
     <div class="text-center">
       <div class="divider max-w-24 mx-auto mb-14"></div>
       <p id="pivot-line" class="ghost-text font-display text-[clamp(1.8rem,4vw,3rem)] text-text-primary italic leading-snug">

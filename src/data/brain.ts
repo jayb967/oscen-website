@@ -1,5 +1,5 @@
 /**
- * Brain architecture data — single source of truth for all brain-related
+ * Brain architecture data. single source of truth for all brain-related
  * content across the site. Region data mirrors brain-viz/data-bridge.js
  * but is statically typed for use in Astro components.
  */

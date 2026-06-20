@@ -1,5 +1,5 @@
 /**
- * Shared formatting utilities — used across multiple sections
+ * Shared formatting utilities. used across multiple sections
  * to keep display logic DRY.
  */
 

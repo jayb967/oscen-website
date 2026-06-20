@@ -3,7 +3,7 @@
  *
  * Runs on every page load (via Base.astro). Captures utm_* params and the
  * landing referrer into sessionStorage so they survive multi-page browsing
- * before a user submits a form. First-touch wins — we never overwrite once set.
+ * before a user submits a form. First-touch wins. we never overwrite once set.
  *
  * Exposes window.injectAttribution(form) for form submit handlers.
  */
@@ -53,7 +53,7 @@ function capture() {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(attribution));
   } catch {
-    // sessionStorage may be unavailable (private mode, etc.) — fail silent
+    // sessionStorage may be unavailable (private mode, etc.). fail silent
   }
 }
 

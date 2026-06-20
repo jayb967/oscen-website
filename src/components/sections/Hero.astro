@@ -1,12 +1,12 @@
 ---
 /**
- * Hero — Pure awe. The brain IS the experience.
+ * Hero. Pure awe. The brain IS the experience.
  * Three words of tagline. The visualization does the rest.
  */
 ---
 
 <section id="hero" class="relative h-screen w-full overflow-hidden flex items-center justify-center">
-  <!-- Brain visualization — full viewport -->
+  <!-- Brain visualization. full viewport -->
   <div class="absolute inset-0 z-0">
     <iframe
       id="brain-frame"
@@ -21,8 +21,11 @@
     <div class="absolute bottom-0 left-0 right-0 h-64 pointer-events-none" style="background: linear-gradient(to top, var(--color-abyss), transparent);"></div>
   </div>
 
-  <!-- Content — deliberately sparse -->
+  <!-- Content. Deliberately sparse. -->
   <div class="relative z-10 text-center max-w-4xl mx-auto px-6 hero-backdrop">
+    <p id="hero-eyebrow" class="text-[11px] font-mono text-text-secondary uppercase tracking-[0.35em] mb-6 hero-text-shadow">
+      Brain software for robots
+    </p>
     <h1 id="hero-title" class="font-display text-[clamp(3.5rem,9vw,9rem)] leading-[0.85] tracking-tight hero-text-shadow">
       <span class="block text-text-primary">Intelligence</span>
       <span
@@ -35,7 +38,7 @@
       Everyone is building the body. <span class="text-text-primary italic">We're building the brain.</span>
     </p>
 
-    <!-- Minimal stat line — whisper-quiet -->
+    <!-- Minimal stat line. whisper-quiet -->
     <div id="hero-stats" class="mt-12 flex items-center justify-center gap-6 text-text-secondary hero-text-shadow">
       <span class="text-[12px] font-mono tracking-wider">1.15M neurons</span>
       <span class="text-text-secondary/30">&middot;</span>
@@ -45,7 +48,7 @@
     </div>
   </div>
 
-  <!-- Scroll hint — a single subtle line -->
+  <!-- Scroll hint. a single subtle line -->
   <div id="hero-scroll" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
     <div class="w-px h-8 bg-gradient-to-b from-transparent to-text-muted/30"></div>
   </div>
