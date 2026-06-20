@@ -1,0 +1,71 @@
+---
+/**
+ * Three conversion paths. Each is a card link.
+ *
+ * Invest → /invest (qualifying form, accreditation fork)
+ * Build  → /build  (collaborator memo flow)
+ * Follow → #email-capture (the single Buttondown form, in CTA below)
+ */
+const paths = [
+  {
+    title: "Invest",
+    eyebrow: "Path A · Investors",
+    desc: "Accredited investors and Reg CF backers. We'll send the brief after a short qualification step.",
+    cta: "Back the brain",
+    href: "/invest",
+    eyebrowCls: "text-accent-amber/70",
+    titleHoverCls: "group-hover:text-accent-amber",
+    ctaCls: "text-accent-amber/80 group-hover:text-accent-amber",
+  },
+  {
+    title: "Build with us",
+    eyebrow: "Path B · Collaborators",
+    desc: "Engineers, researchers, and robotics partners. Tell us how you'd push it, in your own words.",
+    cta: "Apply to collaborate",
+    href: "/build",
+    eyebrowCls: "text-accent-blue/70",
+    titleHoverCls: "group-hover:text-accent-blue",
+    ctaCls: "text-accent-blue/80 group-hover:text-accent-blue",
+  },
+  {
+    title: "Follow",
+    eyebrow: "Path C · Followers",
+    desc: "One short update when something real happens. No filler. One click to unsubscribe.",
+    cta: "Watch it learn",
+    href: "#email-capture",
+    eyebrowCls: "text-accent-purple/70",
+    titleHoverCls: "group-hover:text-accent-purple",
+    ctaCls: "text-accent-purple/80 group-hover:text-accent-purple",
+  },
+];
+---
+
+<section id="three-paths" class="section relative">
+  <div class="max-w-5xl mx-auto w-full px-6">
+    <div class="text-center mb-12">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">Three ways in</p>
+      <h2 class="reveal font-display text-[clamp(2rem,4.5vw,3rem)] text-text-primary leading-tight">
+        Pick your <span class="italic gradient-text">path</span>.
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {paths.map((p) => (
+        <a
+          href={p.href}
+          class="reveal glass rounded-2xl p-7 group hover:border-border-bright transition-all duration-300 block"
+        >
+          <p class={`text-[10px] font-mono uppercase tracking-[0.25em] ${p.eyebrowCls}`}>{p.eyebrow}</p>
+          <h3 class={`mt-3 text-2xl font-display text-text-primary ${p.titleHoverCls} transition-colors`}>
+            {p.title}
+          </h3>
+          <p class="mt-3 text-sm text-text-secondary leading-relaxed">{p.desc}</p>
+          <div class={`mt-5 inline-flex items-center gap-2 text-xs font-mono ${p.ctaCls} transition-colors`}>
+            <span>{p.cta}</span>
+            <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

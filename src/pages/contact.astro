@@ -5,6 +5,7 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
+import { FORMSPREE } from "../lib/forms";
 
 const paths = [
   {
@@ -58,7 +59,7 @@ const paths = [
     <section class="max-w-4xl mx-auto px-6 mb-24">
       <div class="reveal glass-bright rounded-2xl p-8 md:p-10">
         <h2 class="text-xl font-medium text-text-primary mb-8">Get in touch</h2>
-        <form id="contact-form" class="space-y-6" action="https://formspree.io/f/xzdkgdol" method="POST">
+        <form id="contact-form" class="space-y-6" action={FORMSPREE.contact} method="POST">
           <input type="hidden" name="_subject" value="New contact from oscen.ai" />
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -158,39 +159,22 @@ const paths = [
   </main>
 
   <script>
-    const form = document.getElementById('contact-form') as HTMLFormElement;
-    const btn = document.getElementById('contact-submit') as HTMLButtonElement;
-    const status = document.getElementById('contact-status') as HTMLElement;
+    import { submitFormspree } from "../lib/forms";
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-      status.classList.add('hidden');
+    const form = document.getElementById("contact-form") as HTMLFormElement | null;
+    const btn = document.getElementById("contact-submit") as HTMLButtonElement | null;
+    const status = document.getElementById("contact-status") as HTMLElement | null;
 
-      try {
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          headers: { Accept: 'application/json' },
-        });
-
-        if (res.ok) {
+    if (form && btn && status) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        submitFormspree(form, btn, status, () => {
           form.reset();
-          status.textContent = 'Message sent. We\'ll be in touch.';
-          status.className = 'text-sm font-mono text-accent-blue';
-        } else {
-          const data = await res.json();
-          status.textContent = data?.errors?.[0]?.message || 'Something went wrong. Please try again.';
-          status.className = 'text-sm font-mono text-red-400';
-        }
-      } catch {
-        status.textContent = 'Network error. Please try again.';
-        status.className = 'text-sm font-mono text-red-400';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Send message';
-      }
-    });
+          status.textContent = "Message sent. We'll be in touch.";
+          status.classList.remove("hidden", "text-accent-red");
+          status.classList.add("text-accent-blue");
+        });
+      });
+    }
   </script>
 </Base>

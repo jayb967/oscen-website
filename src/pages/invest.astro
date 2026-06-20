@@ -1,355 +1,209 @@
 ---
 /**
- * Invest - Market data, patent details, competitive landscape, investment thesis.
- * For investors and strategic partners. Numbers-first, narrative-second.
+ * /invest — Public investor funnel.
+ *
+ * Flow:
+ *   1. Hook  → tagline + 4 public-safe market signals
+ *   2. Thesis → 3 sentences, no numbers we shouldn't say publicly
+ *   3. Form  → accreditation fork (Yes / Not sure / No) drives segment
+ *      - Yes        → tagged investor-accredited, founder replies w/ brief + call link
+ *      - Not sure   → tagged investor-unverified, founder reply asks qualifying Q
+ *      - No         → tagged investor-retail, joins Reg CF waitlist via same form
+ *
+ * IMPORTANT: this page must not contain confidential numbers (valuation,
+ * raise size, cap table, ownership splits). Those live behind the
+ * (noindex'd) /investor-pitch/* pages, shared by link only.
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
+import ProofStrip from "../components/sections/ProofStrip.astro";
+import { FORMSPREE, SEGMENTS } from "../lib/forms";
 ---
 
-<Base title="Invest | OSCEN" description="OSCEN investment thesis: patent-protected neuromorphic brain for robotics. $200M+ neuromorphic VC in 2025.">
+<Base title="Invest | OSCEN" description="Back a neuromorphic brain for robots. Patent pending. Submit interest and we'll send the brief.">
   <Nav />
 
   <main class="pt-32 pb-24">
-    <!-- Page header -->
-    <section class="max-w-5xl mx-auto px-6 mb-24">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Invest</p>
+    <!-- 1. Hook -->
+    <section class="max-w-5xl mx-auto px-6 mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Path A · Investors</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
-        The opportunity<br />
-        <span class="italic gradient-text">in intelligence.</span>
+        Everyone is building the body.<br />
+        <span class="italic gradient-text">We're building the brain.</span>
       </h1>
       <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
-        Neuromorphic computing is the next platform shift. OSCEN is the first patent-protected brain architecture built for real-world robots.
+        A spiking neural network that learns continuously, never forgets, and is designed to run on a fraction of the power of today's AI. The brain is real and training right now. The body is what we build next, with you.
       </p>
     </section>
 
-    <!-- The Thesis - 3 sentences -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <div class="reveal glass-bright rounded-2xl p-8 md:p-12">
-        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Investment Thesis</p>
-        <div class="space-y-4 text-lg text-text-secondary leading-relaxed max-w-3xl">
-          <p>Every robot will need a brain. Today's AI is built on frozen transformers trained on massive datasets that can't learn from experience, can't run on edge hardware, and can't adapt in real time.</p>
-          <p>OSCEN is building the brain that can. A neuromorphic architecture with <span class="text-text-primary">6 patented learning mechanisms</span> that grows through developmental phases, modeled on biological brain development.</p>
-          <p>The market is early. The hardware wave is coming. And <span class="text-accent-blue">no one else is building this</span>.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Market Numbers -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        Market signals
-      </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Neuromorphic computing investment is accelerating.</p>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+    <!-- 2. Public-safe market signals (no internal numbers) -->
+    <section class="max-w-5xl mx-auto px-6 mb-20">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { value: "$200M+", label: "Neuromorphic VC in 2025", sub: "3× increase from 2024", color: "text-accent-amber" },
-          { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs estimate", color: "text-accent-blue" },
-          { value: "73–109×", label: "Energy advantage", sub: "SNN vs GPU on neuromorphic HW", color: "text-accent-green" },
+          { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
+          { value: "$200M+", label: "Neuromorphic VC in 2025", sub: "3× from 2024", color: "text-accent-amber" },
+          { value: "1.15M", label: "Neurons training live", sub: "Today, not pitched", color: "text-accent-green" },
           { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
-        ].map((stat, i) => (
-          <div class="flip-card reveal h-40" tabindex="0" role="button" aria-label={`${stat.value}: ${stat.label}`} style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${stat.color.replace('text-', '')});`}>
-            <div class="flip-inner w-full h-full">
-              <div class="flip-front w-full h-full glass-bright rounded-xl p-4 flex flex-col items-center justify-center text-center">
-                <div class={`text-xl md:text-2xl font-mono font-bold ${stat.color}`}>{stat.value}</div>
-                <div class="text-[10px] text-text-muted mt-2 uppercase tracking-wider leading-tight">{stat.label}</div>
-              </div>
-              <div class="flip-back w-full h-full glass rounded-xl p-4 flex items-center justify-center text-center">
-                <p class="text-[11px] text-text-secondary">{stat.sub}</p>
-              </div>
-            </div>
+        ].map((stat) => (
+          <div class="reveal glass-bright rounded-xl p-4 text-center">
+            <div class={`text-xl md:text-2xl font-mono font-bold ${stat.color}`}>{stat.value}</div>
+            <div class="text-[10px] text-text-muted mt-2 uppercase tracking-wider leading-tight">{stat.label}</div>
+            <div class="text-[10px] text-text-muted/60 mt-2">{stat.sub}</div>
           </div>
         ))}
       </div>
     </section>
 
-    <!-- Why Now — AMI validates the thesis -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        Why now
-      </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The market is moving beyond LLMs. The biggest names in AI agree, but their solutions still have the same old problems.</p>
-
-      <div class="reveal glass-bright rounded-2xl p-6 md:p-8 mb-6">
-        <div class="flex items-start gap-4 mb-4">
-          <span class="px-3 py-1 rounded-full bg-accent-amber/10 border border-accent-amber/20 text-accent-amber text-[10px] font-mono uppercase tracking-wider shrink-0">March 2026</span>
-          <div>
-            <p class="text-sm text-text-primary font-medium">Yann LeCun's AMI Labs raises $1.03B for "world models"</p>
-            <p class="text-xs text-text-secondary mt-1 leading-relaxed">The Turing Award winner left Meta to build JEPA, world models that go beyond LLMs. Nvidia, Toyota, Samsung, Jeff Bezos invested. This validates the core thesis: <span class="text-text-primary">LLMs are not enough for robots.</span></p>
-          </div>
-        </div>
-        <div class="divider mb-4"></div>
-        <p class="text-xs text-text-secondary leading-relaxed">But AMI still trains on GPU clusters, still deploys frozen models, still can't learn on-device, and still has no answer for catastrophic forgetting. <span class="text-accent-blue">OSCEN solves all four.</span></p>
-      </div>
-
-      <div class="reveal glass rounded-xl p-5">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div>
-            <div class="text-sm font-mono text-text-primary">AMI (JEPA)</div>
-            <div class="text-[10px] text-text-muted mt-1">GPU pretraining</div>
-            <div class="text-[10px] text-accent-red mt-0.5">No continual learning</div>
-          </div>
-          <div>
-            <div class="text-sm font-mono text-text-primary">Figure / π</div>
-            <div class="text-[10px] text-text-muted mt-1">Transformer VLA</div>
-            <div class="text-[10px] text-accent-red mt-0.5">Static, 50–200W</div>
-          </div>
-          <div>
-            <div class="text-sm font-mono text-text-primary">Google</div>
-            <div class="text-[10px] text-text-muted mt-1">Gemini VLA</div>
-            <div class="text-[10px] text-accent-amber mt-0.5">Retrain to update</div>
-          </div>
-          <div>
-            <div class="text-sm font-mono text-accent-blue font-medium">OSCEN</div>
-            <div class="text-[10px] text-text-muted mt-1">Spiking Neural Net</div>
-            <div class="text-[10px] text-accent-green mt-0.5">Continual, &lt;5W</div>
-          </div>
+    <!-- 3. Thesis — short, no numbers -->
+    <section class="max-w-5xl mx-auto px-6 mb-20">
+      <div class="reveal glass-bright rounded-2xl p-8 md:p-12">
+        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Investment thesis</p>
+        <div class="space-y-4 text-lg text-text-secondary leading-relaxed max-w-3xl">
+          <p>Every robot will need a brain. Today's AI is frozen the day it's trained, can't adapt without retraining from scratch, and underneath is just predicting text.</p>
+          <p>OSCEN is a neuromorphic brain that learns on the fly by association, uses reward and stress to learn from outcomes, doesn't forget old skills when it learns new ones, and is designed to run on a fraction of the power.</p>
+          <p>The architecture is patent pending. The brain is training continuously today. <span class="text-accent-blue">The body is what we build next.</span></p>
         </div>
       </div>
     </section>
 
-    <!-- Energy Problem -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        The energy problem
-      </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Current AI is unsustainable for edge deployment. Robots need intelligence that runs on batteries, not data centers.</p>
+    <ProofStrip />
 
-      <div class="reveal glass rounded-xl p-6 mb-6">
-        <div class="space-y-4">
-          {[
-            { label: "GPT-4o", value: "~0.3 Wh per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
-            { label: "Gemini", value: "~0.24 Wh per prompt", source: "Google official", bar: 80, color: "accent-amber" },
-            { label: "GPU Robot Brain", value: "50–200W continuous", source: "Industry standard", bar: 90, color: "accent-pink" },
-            { label: "OSCEN (custom silicon)", value: "<5W continuous", source: "Neuromorphic benchmarks", bar: 5, color: "accent-green" },
-          ].map((item) => (
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <div>
-                  <span class="text-sm text-text-primary">{item.label}</span>
-                  <span class="text-[9px] font-mono text-text-muted ml-2">{item.source}</span>
-                </div>
-                <span class={`text-[11px] font-mono text-${item.color}`}>{item.value}</span>
-              </div>
-              <div class="h-1.5 rounded-full bg-elevated overflow-hidden">
-                <div class={`h-full rounded-full bg-${item.color}/50`} style={`width: ${item.bar}%`}></div>
-              </div>
-            </div>
-          ))}
+    <!-- 4. The form — the only conversion on this page -->
+    <section id="investor-form" class="max-w-3xl mx-auto px-6 mt-20 mb-16 scroll-mt-24">
+      <h2 class="reveal font-display text-[clamp(2rem,4.5vw,3rem)] text-text-primary leading-tight mb-3">
+        Start the conversation.
+      </h2>
+      <p class="reveal text-sm text-text-secondary mb-10 max-w-xl">
+        Tell us who you are. We'll reply within 48 hours with the brief — what we're raising, milestones, and a call link if you're a fit.
+      </p>
+
+      <form
+        id="investor-form-el"
+        class="reveal glass rounded-2xl p-7 md:p-9 space-y-6"
+        action={FORMSPREE.investor}
+        method="POST"
+      >
+        <!-- Routing field. JS upgrades based on accreditation answer.
+             Default is "unverified" so non-JS submits still land in a safe bucket. -->
+        <input type="hidden" name="segment" value={SEGMENTS.investorUnverified} />
+        <input type="hidden" name="_subject" value="New investor inquiry from oscen.ai" />
+        <div class="hidden" aria-hidden="true">
+          <label>Don't fill this: <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></label>
         </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <label class="block">
+            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Name</span>
+            <input
+              type="text"
+              name="name"
+              required
+              autocomplete="name"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors"
+            />
+          </label>
+          <label class="block">
+            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Email</span>
+            <input
+              type="email"
+              name="email"
+              required
+              autocomplete="email"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors"
+            />
+          </label>
+        </div>
+
+        <!-- Accreditation. Required. No default selection. -->
+        <fieldset>
+          <legend class="text-[11px] font-mono text-text-muted uppercase tracking-wider">
+            Are you an accredited investor in the US?
+            <span class="ml-2 text-text-muted/50 normal-case tracking-normal" title="An accredited investor has $200K+ annual income ($300K joint), $1M+ net worth excluding home, or holds qualifying licenses. SEC rule.">
+              (what's this?)
+            </span>
+          </legend>
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {[
+              { value: "yes", label: "Yes, accredited" },
+              { value: "not-sure", label: "Not sure" },
+              { value: "no", label: "No (Reg CF waitlist)" },
+            ].map((opt) => (
+              <label class="cursor-pointer">
+                <input type="radio" name="accreditation" value={opt.value} required class="peer sr-only" />
+                <span class="block px-4 py-3 rounded-lg border border-border bg-void/30 text-sm text-text-secondary text-center hover:border-border-bright peer-checked:border-accent-amber/60 peer-checked:bg-accent-amber/10 peer-checked:text-accent-amber peer-focus-visible:ring-2 peer-focus-visible:ring-accent-amber/40 transition-all">
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <!-- Conditional fields: shown only when accreditation = yes or not-sure -->
+        <div id="accredited-fields" class="hidden space-y-5">
+          <label class="block">
+            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Check size (optional)</span>
+            <select
+              name="check_size"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary focus:border-accent-amber/40 focus:outline-none transition-colors"
+            >
+              <option value="">Select range</option>
+              <option value="25-100k">$25K – $100K</option>
+              <option value="100-500k">$100K – $500K</option>
+              <option value="500k-1m">$500K – $1M</option>
+              <option value="1m+">$1M+</option>
+              <option value="other">Other / strategic</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">LinkedIn or website</span>
+            <input
+              type="url"
+              name="linkedin"
+              inputmode="url"
+              placeholder="https://linkedin.com/in/..."
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors"
+            />
+            <span class="text-[10px] text-text-muted/60 mt-1 block">Helps us reply quickly. Not required but recommended.</span>
+          </label>
+        </div>
+
+        <label class="block">
+          <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Anything you want us to know? (optional)</span>
+          <textarea
+            name="message"
+            rows="3"
+            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors resize-none"
+          ></textarea>
+        </label>
+
+        <label class="flex items-start gap-3 text-xs text-text-muted">
+          <input type="checkbox" name="consent" required class="mt-0.5" style="accent-color: var(--color-accent-amber);" />
+          <span>I consent to OSCEN contacting me about this inquiry. We won't share your info.</span>
+        </label>
+
+        <button
+          type="submit"
+          id="investor-submit"
+          class="w-full px-7 py-3 rounded-full bg-accent-amber/15 border border-accent-amber/30 text-accent-amber font-medium hover:bg-accent-amber/25 hover:border-accent-amber/50 transition-all duration-300 cursor-pointer disabled:opacity-50"
+        >
+          Send
+        </button>
+
+        <p id="investor-status" class="text-center text-sm font-mono hidden"></p>
+      </form>
+
+      <div id="investor-success" class="hidden reveal glass-bright rounded-2xl p-9 text-center">
+        <p class="text-[10px] font-mono text-accent-green uppercase tracking-[0.3em] mb-3">Received</p>
+        <h3 class="font-display text-2xl text-text-primary">Thanks. We'll be in touch within 48 hours.</h3>
+        <p id="investor-success-detail" class="text-sm text-text-secondary mt-3 max-w-md mx-auto leading-relaxed"></p>
       </div>
 
-      <p class="reveal text-xs text-text-muted italic text-center">
-        Neuromorphic hardware computes only when neurons fire, not idle GPU cycles. The architecture is ready; the hardware is catching up.
+      <p class="reveal text-[10px] text-text-muted/60 mt-6 text-center max-w-xl mx-auto leading-relaxed">
+        Nothing on this page constitutes an offer to sell or a solicitation to buy any security. All conversations are subject to applicable securities law.
       </p>
     </section>
 
-    <!-- Patent Protection -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        Patent protection
-      </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The architecture is protected. The IP moat is real.</p>
-
-      <div class="reveal glass-bright rounded-2xl p-6 md:p-8 mb-8">
-        <div class="flex flex-wrap items-center gap-4 mb-6">
-          <span class="px-3 py-1 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-[10px] font-mono uppercase tracking-wider">Patent Pending</span>
-          <span class="text-sm text-text-primary font-mono">US 63/986,737</span>
-          <span class="text-xs text-text-muted">Filed February 20, 2026</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            { claim: "1", title: "Integrated Multi-Mechanism Learning", desc: "6 learning rules operating simultaneously every step across all synapse groups" },
-            { claim: "2", title: "Developmental Critical Periods", desc: "5 phases with experience-dependent adolescent entry: pruning, myelination, identity" },
-            { claim: "3", title: "Hybrid SNN-LLM Architecture", desc: "Brain learns when to query external knowledge through emergent STDP, not hardcoded rules" },
-            { claim: "4", title: "Cross-Modal Binding", desc: "Arbitrary sensor modalities bind through spike-timing coincidence with multiplicative instinctual gain" },
-            { claim: "5", title: "Multi-Compartment Dendrites", desc: "4 compartments per neuron with independent dynamics and supralinear dendritic spikes" },
-            { claim: "6", title: "Neuromodulatory Continual Learning", desc: "Eligibility traces + homeostatic scaling + myelination enable learning without forgetting" },
-          ].map((c) => (
-            <div class="glass rounded-xl p-4">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-xs font-mono text-accent-purple">Claim {c.claim}</span>
-                <span class="text-sm text-text-primary">{c.title}</span>
-              </div>
-              <p class="text-[11px] text-text-secondary leading-relaxed">{c.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div class="grid grid-cols-3 gap-3">
-        <div class="reveal glass rounded-xl p-4 text-center">
-          <div class="text-xl font-mono text-accent-blue font-bold">258</div>
-          <div class="text-[10px] text-text-muted mt-1">Prior art patents searched</div>
-        </div>
-        <div class="reveal glass rounded-xl p-4 text-center">
-          <div class="text-xl font-mono text-accent-green font-bold">0</div>
-          <div class="text-[10px] text-text-muted mt-1">Overlapping claims found</div>
-        </div>
-        <div class="reveal glass rounded-xl p-4 text-center">
-          <div class="text-xl font-mono text-accent-amber font-bold">20</div>
-          <div class="text-[10px] text-text-muted mt-1">Continuation patents planned</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- What's Built -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        What's built
-      </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">This is not a pitch deck. The brain is running.</p>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {[
-          { stat: "1,156,800", label: "Spiking neurons", desc: "15 brain regions. 66 synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning." },
-          { stat: "~850M plastic", label: "Synapses", desc: "Sparse CSR matrices. Eligibility traces on every group. BCM, neuromodulation, and synaptic scaling active system-wide." },
-          { stat: "~10 years", label: "Research to deployment", desc: "Nearly a decade of neuroscience research and architectural design. 7 months of focused implementation, bootstrapped with considerable personal investment." },
-          { stat: "24/7", label: "Continuous training", desc: "Enterprise-grade dedicated server. Processing a multimodal video and audio curriculum around the clock. Currently in the adolescent developmental phase." },
-          { stat: "6", label: "Learning rules", desc: "All running simultaneously every simulation step. STDP, eligibility traces, BCM, neuromodulation, homeostatic scaling, R-STDP." },
-          { stat: "5", label: "Developmental phases", desc: "Infant → Toddler → Juvenile → Adolescent → Mature. Phase transitions are experience-dependent, not hardcoded." },
-        ].map((item, i) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-lg font-mono text-accent-blue font-bold">{item.stat}</span>
-                <span class="text-xs text-text-muted ml-2">{item.label}</span>
-              </div>
-              <span class="expand-indicator text-text-muted/40 text-sm">+</span>
-            </div>
-            <div class="expand-body mt-3">
-              <p class="text-xs text-text-secondary leading-relaxed">{item.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <!-- Live status -->
-      <div class="reveal text-center mt-8">
-        <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-border">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
-          <span class="text-[10px] font-mono text-text-muted tracking-wider">
-            Training live &middot; Juvenile phase &middot; 403-video curriculum
-          </span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Built with conviction -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        Built with conviction
-      </h2>
-
-      <div class="reveal glass rounded-xl p-6">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div>
-            <div class="text-lg font-mono text-accent-green font-bold">3,500+ hours</div>
-            <div class="text-[10px] text-text-muted mt-1">Dedicated R&D</div>
-          </div>
-          <div>
-            <div class="text-lg font-mono text-accent-blue font-bold">~10 years</div>
-            <div class="text-[10px] text-text-muted mt-1">Research & development</div>
-          </div>
-          <div>
-            <div class="text-lg font-mono text-accent-amber font-bold">1 person</div>
-            <div class="text-[10px] text-text-muted mt-1">Team size</div>
-          </div>
-          <div>
-            <div class="text-lg font-mono text-accent-purple font-bold">Full-stack</div>
-            <div class="text-[10px] text-text-muted mt-1">Expertise</div>
-          </div>
-        </div>
-        <p class="text-xs text-text-secondary text-center mt-6 leading-relaxed max-w-xl mx-auto">
-          Deep domain knowledge across computational neuroscience, distributed systems, sparse linear algebra, and real-time sensor fusion.
-          This level of cross-disciplinary understanding is what makes the architecture work.
-        </p>
-      </div>
-    </section>
-
-    <!-- Use of Funds (high level) -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        What funding enables
-      </h2>
-
-      <div class="space-y-2">
-        {[
-          { priority: "01", item: "Neuromorphic hardware", desc: "Custom neuromorphic chip development for edge deployment. Move from CPU simulation to purpose-built silicon. 73-109x energy reduction." },
-          { priority: "02", item: "Robotics integration", desc: "Physical robot body. Camera, servos, touch sensors. Close the full sensorimotor loop with real-world feedback." },
-          { priority: "03", item: "Team expansion", desc: "Computational neuroscientist, robotics engineer, hardware specialist. Three hires transform timeline from solo → production." },
-          { priority: "04", item: "Patent portfolio", desc: "Non-provisional filing by Feb 2027. 20 continuation patents covering hardware mapping, fleet learning, safety architecture." },
-          { priority: "05", item: "Benchmarks & papers", desc: "Formal evaluation on standard robotics tasks. Published results for academic credibility and partnership conversations." },
-        ].map((item, i) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
-            <div class="flex items-center gap-4">
-              <span class="text-[10px] font-mono text-text-muted">{item.priority}</span>
-              <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{item.item}</h3>
-              <span class="expand-indicator text-text-muted/40 text-sm ml-auto">+</span>
-            </div>
-            <div class="expand-body mt-3 ml-10">
-              <p class="text-xs text-text-secondary leading-relaxed">{item.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <!-- Founder -->
-    <section class="max-w-5xl mx-auto px-6 mb-32">
-      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        Founder
-      </h2>
-
-      <div class="reveal glass rounded-xl p-6">
-        <div class="flex flex-col md:flex-row gap-6 items-start">
-          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-purple/20 border border-border-bright flex items-center justify-center shrink-0">
-            <span class="text-2xl font-display text-text-primary">RB</span>
-          </div>
-          <div>
-            <h3 class="text-lg text-text-primary font-medium">Rio Bold</h3>
-            <p class="text-xs text-text-muted font-mono mt-1">Founder & Sole Developer</p>
-            <div class="flex items-center gap-4 mt-2">
-              <a href="mailto:info@oscen.ai" class="text-[10px] font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">info@oscen.ai</a>
-              <!-- <a href="https://linkedin.com/in/rio-bold" target="_blank" rel="noopener" class="text-[10px] font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">LinkedIn</a> -->
-            </div>
-            <p class="text-sm text-text-secondary mt-4 leading-relaxed max-w-2xl">
-              Nearly a decade of neuroscience research, computational modeling, and architectural design. Then 7 months of focused build to bring the complete OSCEN architecture from concept to 1M-neuron deployment.
-              Sensory gateway, brain simulation, motor output, cognitive action channel, speech motor, developmental phases, and training pipeline.
-              Every line of code. Every architectural decision. Every patent claim.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="max-w-5xl mx-auto px-6 mb-16">
-      <div class="reveal text-center">
-        <p class="ghost-text font-display text-[clamp(1.5rem,3.5vw,2.5rem)] text-text-primary leading-snug mb-10">
-          The brain is built. The patent is filed.<br />
-          <span class="italic text-text-secondary">Now it needs fuel.</span>
-        </p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="mailto:info@oscen.ai"
-            class="px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
-          >
-            Get in touch
-          </a>
-          <a
-            href="/architecture"
-            class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
-          >
-            Read the architecture
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Back to home -->
+    <!-- Back -->
     <section class="max-w-5xl mx-auto px-6 text-center">
       <div class="divider max-w-24 mx-auto mb-10"></div>
       <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
@@ -358,9 +212,57 @@ import Nav from "../components/Nav.astro";
 </Base>
 
 <script>
-  if ("ontouchstart" in window) {
-    document.querySelectorAll<HTMLElement>(".expand-card").forEach((card) => {
-      card.addEventListener("click", () => card.classList.toggle("expanded"));
+  import { SEGMENTS, submitFormspree } from "../lib/forms";
+
+  const form = document.getElementById("investor-form-el") as HTMLFormElement | null;
+  const btn = document.getElementById("investor-submit") as HTMLButtonElement | null;
+  const status = document.getElementById("investor-status") as HTMLElement | null;
+  const accreditedFields = document.getElementById("accredited-fields") as HTMLElement | null;
+  const successCard = document.getElementById("investor-success") as HTMLElement | null;
+  const successDetail = document.getElementById("investor-success-detail") as HTMLElement | null;
+
+  // Reflect accreditation choice into the UI + hidden routing segment.
+  // No-selection → keep the safe default (investor-unverified) in the segment field.
+  // "no" hides the accredited-only fields entirely (retail goes straight to the
+  // Reg CF waitlist without check-size theatre).
+  function updateAccreditationUI() {
+    if (!form || !accreditedFields) return;
+    const selected = form.querySelector<HTMLInputElement>('input[name="accreditation"]:checked');
+    if (!selected) {
+      accreditedFields.classList.add("hidden");
+      return;
+    }
+    accreditedFields.classList.toggle("hidden", selected.value === "no");
+
+    const segmentInput = form.querySelector<HTMLInputElement>('input[name="segment"]');
+    if (segmentInput) {
+      segmentInput.value =
+        selected.value === "yes"
+          ? SEGMENTS.investorAccredited
+          : selected.value === "no"
+          ? SEGMENTS.investorRetail
+          : SEGMENTS.investorUnverified;
+    }
+  }
+
+  form?.querySelectorAll<HTMLInputElement>('input[name="accreditation"]').forEach((input) => {
+    input.addEventListener("change", updateAccreditationUI);
+  });
+
+  if (form && btn && status && successCard && successDetail) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      submitFormspree(form, btn, status, () => {
+        const selected = form.querySelector<HTMLInputElement>('input[name="accreditation"]:checked');
+        successDetail.textContent =
+          selected?.value === "yes"
+            ? "We'll reply with the investor brief and a call link."
+            : selected?.value === "no"
+            ? "You're on the Reg CF waitlist. We'll notify you when our community raise opens."
+            : "We'll reply with a quick qualifying question, then the brief.";
+        form.classList.add("hidden");
+        successCard.classList.remove("hidden");
+      });
     });
   }
 </script>

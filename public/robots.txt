@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /investor-pitch/
+
+Sitemap: https://oscen.ai/sitemap-index.xml

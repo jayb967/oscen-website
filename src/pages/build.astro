@@ -1,0 +1,199 @@
+---
+/**
+ * /build — Public collaborator funnel.
+ *
+ * Two-step flow:
+ *   Step 1 (this form): name / email / role / LinkedIn / why Oscen
+ *   Step 2 (reply email): 500-word memo prompt sent within 48h
+ *
+ * The memo IS the screen. People who don't reply self-select out.
+ */
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import { FORMSPREE, SEGMENTS } from "../lib/forms";
+---
+
+<Base title="Build with us | OSCEN" description="Engineers, researchers, robotics partners. Apply to collaborate on the brain for every robot.">
+  <Nav />
+
+  <main class="pt-32 pb-24">
+    <!-- Header -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Path B · Collaborators</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
+        Build the brain<br />
+        <span class="italic gradient-text">with us.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        Engineers, researchers, robotics partners. We'd rather see how you think than read a resume. Two steps. Both short.
+      </p>
+    </section>
+
+    <!-- How this works — two-step explanation -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="reveal glass rounded-2xl p-6">
+          <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-blue/70">Step 1 · 60 seconds</p>
+          <h3 class="mt-3 text-xl font-display text-text-primary">Tell us who you are</h3>
+          <p class="mt-2 text-sm text-text-secondary leading-relaxed">Name, email, role, and what pulled you here. Below.</p>
+        </div>
+        <div class="reveal glass rounded-2xl p-6">
+          <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-blue/70">Step 2 · 500-word memo</p>
+          <h3 class="mt-3 text-xl font-display text-text-primary">Show how you think</h3>
+          <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            We'll reply within 48 hours with a single prompt. Pick the part of the brain you'd push hardest on and tell us how. We read every reply.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 1 form -->
+    <section id="collab-form" class="max-w-3xl mx-auto px-6 mb-16 scroll-mt-24">
+      <form
+        id="collab-form-el"
+        class="reveal glass rounded-2xl p-7 md:p-9 space-y-6"
+        action={FORMSPREE.build}
+        method="POST"
+      >
+        <input type="hidden" name="segment" value={SEGMENTS.collaboratorPending} />
+        <input type="hidden" name="_subject" value="New collaborator inquiry from oscen.ai" />
+        <div class="hidden" aria-hidden="true">
+          <label>Don't fill this: <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <label class="block">
+            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Name</span>
+            <input
+              type="text"
+              name="name"
+              required
+              autocomplete="name"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors"
+            />
+          </label>
+          <label class="block">
+            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Email</span>
+            <input
+              type="email"
+              name="email"
+              required
+              autocomplete="email"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors"
+            />
+          </label>
+        </div>
+
+        <fieldset>
+          <legend class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Your role</legend>
+          <div class="mt-3 grid grid-cols-2 md:grid-cols-5 gap-2">
+            {[
+              { value: "engineer", label: "Engineer" },
+              { value: "researcher", label: "Researcher" },
+              { value: "robotics-partner", label: "Robotics partner" },
+              { value: "advisor", label: "Advisor" },
+              { value: "other", label: "Other" },
+            ].map((opt) => (
+              <label class="cursor-pointer">
+                <input type="radio" name="role" value={opt.value} required class="peer sr-only" />
+                <span class="block px-3 py-2.5 rounded-lg border border-border bg-void/30 text-xs text-text-secondary text-center hover:border-border-bright peer-checked:border-accent-blue/60 peer-checked:bg-accent-blue/10 peer-checked:text-accent-blue peer-focus-visible:ring-2 peer-focus-visible:ring-accent-blue/40 transition-all">
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <label class="block">
+          <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">LinkedIn, GitHub, or company site</span>
+          <input
+            type="url"
+            name="link"
+            required
+            inputmode="url"
+            placeholder="https://"
+            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors"
+          />
+        </label>
+
+        <label class="block">
+          <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Why OSCEN? (one sentence)</span>
+          <textarea
+            name="why"
+            rows="3"
+            required
+            maxlength="400"
+            placeholder="What pulls you to this and what would you push on?"
+            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors resize-none"
+          ></textarea>
+        </label>
+
+        <label class="flex items-start gap-3 text-xs text-text-muted">
+          <input type="checkbox" name="consent" required class="mt-0.5" style="accent-color: var(--color-accent-blue);" />
+          <span>I consent to OSCEN contacting me about collaboration. We won't share your info.</span>
+        </label>
+
+        <button
+          type="submit"
+          id="collab-submit"
+          class="w-full px-7 py-3 rounded-full bg-accent-blue/15 border border-accent-blue/30 text-accent-blue font-medium hover:bg-accent-blue/25 hover:border-accent-blue/50 transition-all duration-300 cursor-pointer disabled:opacity-50"
+        >
+          Send
+        </button>
+
+        <p id="collab-status" class="text-center text-sm font-mono hidden"></p>
+      </form>
+
+      <div id="collab-success" class="hidden reveal glass-bright rounded-2xl p-9 text-center">
+        <p class="text-[10px] font-mono text-accent-green uppercase tracking-[0.3em] mb-3">Received</p>
+        <h3 class="font-display text-2xl text-text-primary">Step 1 done.</h3>
+        <p class="text-sm text-text-secondary mt-3 max-w-md mx-auto leading-relaxed">
+          Watch your inbox for the 500-word memo prompt within 48 hours. Reply within a week and we'll read it.
+        </p>
+      </div>
+    </section>
+
+    <!-- What we look for — sets expectations before they fill the form -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <h2 class="reveal font-display text-2xl text-text-primary mb-6">What we look for</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[
+          { title: "Specificity over polish", desc: "We'd rather read a rough memo on one part of the brain than a glossy pitch about all of it." },
+          { title: "Skin in the game", desc: "Side projects, open-source contributions, published work. Anything that shows you build, not just talk." },
+          { title: "Real domain", desc: "Spiking networks, computational neuroscience, embodied robotics, edge inference, neuromorphic hardware, real-time systems." },
+          { title: "Honest curiosity", desc: "We pick the part of the brain we'd push on by what we don't yet understand, and we expect you to do the same." },
+        ].map((item) => (
+          <div class="reveal glass rounded-xl p-5">
+            <h3 class="text-sm font-medium text-text-primary">{item.title}</h3>
+            <p class="text-xs text-text-secondary mt-2 leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Back -->
+    <section class="max-w-5xl mx-auto px-6 text-center">
+      <div class="divider max-w-24 mx-auto mb-10"></div>
+      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+    </section>
+  </main>
+</Base>
+
+<script>
+  import { submitFormspree } from "../lib/forms";
+
+  const form = document.getElementById("collab-form-el") as HTMLFormElement | null;
+  const btn = document.getElementById("collab-submit") as HTMLButtonElement | null;
+  const status = document.getElementById("collab-status") as HTMLElement | null;
+  const successCard = document.getElementById("collab-success") as HTMLElement | null;
+
+  if (form && btn && status && successCard) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      submitFormspree(form, btn, status, () => {
+        form.classList.add("hidden");
+        successCard.classList.remove("hidden");
+      });
+    });
+  }
+</script>

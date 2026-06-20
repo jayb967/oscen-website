@@ -1,0 +1,34 @@
+---
+/**
+ * Public-safe credibility strip.
+ *
+ * Only facts we can say publicly:
+ *   - Patent application number (public on USPTO)
+ *   - "DARPA proposals submitted" (factual, no award implied)
+ *   - "IQT engagement" (engagement is factual; investment is not implied)
+ *   - "Patent pending"
+ *
+ * DO NOT add award claims, valuation, or anything from oscen-internal.
+ */
+const items = [
+  { label: "Patent pending", value: "US 63/986,737" },
+  { label: "Proposals submitted to", value: "DARPA" },
+  { label: "Engaged with", value: "IQT" },
+  { label: "Architecture", value: "Spiking neural network" },
+];
+---
+
+<section id="proof-strip" class="section py-12">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="reveal glass rounded-2xl px-6 py-5">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+        {items.map((item) => (
+          <div class="text-center md:text-left">
+            <p class="text-[9px] font-mono uppercase tracking-[0.25em] text-text-muted/70">{item.label}</p>
+            <p class="mt-1 text-sm font-mono text-text-primary">{item.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

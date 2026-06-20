@@ -2,14 +2,22 @@
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "A neuromorphic brain that learns like a child, through experience, not training data. Patent pending.",
+  ogImage = "/og-default.png",
+  noindex = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? "oscen.ai";
+const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === "true";
 ---
 
 <!doctype html>
@@ -23,6 +31,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
     <link rel="canonical" href={canonicalURL} />
 
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
     <title>{title}</title>
     <meta name="description" content={description} />
 
@@ -31,12 +41,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageURL} />
     <meta property="og:site_name" content="OSCEN" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
 
     <!-- Fonts: preconnect then load -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,9 +57,18 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    {plausibleEnabled && (
+      <script defer data-domain={plausibleDomain} src="https://plausible.io/js/script.outbound-links.js"></script>
+    )}
   </head>
   <body>
     <slot />
+
+    <!-- First-touch UTM + referrer capture (must load before form scripts) -->
+    <script>
+      import "../scripts/attribution";
+    </script>
 
     <!-- GSAP ScrollTrigger animations -->
     <script>

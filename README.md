@@ -1,43 +1,49 @@
-# Astro Starter Kit: Minimal
+# oscen-website
+
+Marketing and investor-facing site for OSCEN at https://oscen.ai. Astro + Tailwind CSS + GSAP ScrollTrigger. Deploys to Netlify from `main`.
+
+This repo lives at `jayb967/oscen-website` (personal account, public). The product/architecture/business docs live in `oscenai/oscen` and `oscenai/oscen-internal`; this repo is only the public site.
+
+## Pages
+
+| Route | Purpose |
+|---|---|
+| `/` | Landing. 9 sections: Hero, Problem, Solution, HowItWorks, Proof, Market, Vision, FounderVision, CTA |
+| `/architecture` | Architecture overview for technical audiences |
+| `/research` | Research notes, papers, neuroscience context |
+| `/invest` | Investor entry point |
+| `/investor-pitch/*` | Pitch deck pages |
+| `/contact` | Contact form |
+
+## Project layout
+
+```
+src/
+  components/sections/   # one component per landing-page section
+  layouts/               # shared <html>/<head> wrappers
+  styles/global.css      # design tokens, glass/flip/expand card patterns
+  pages/                 # each .astro file becomes a route
+  data/                  # static content (copy, links)
+  lib/                   # client-side helpers
+  scripts/               # build/dev helper scripts
+public/                  # static assets served as-is
+```
+
+## Local development
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+npm run dev       # http://localhost:4321
+npm run build     # writes static site to dist/
+npm run preview   # preview production build locally
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Deploy
 
-## 🚀 Project Structure
+Pushes to `main` deploy to Netlify automatically. There is no separate build step to run.
 
-Inside of your Astro project, you'll see the following folders and files:
+## Related
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Product PRD: `oscen-internal/docs/OSCEN-SITE-PRD.md` (founder access only).
+- Brand and content vision lives in the PRD, not in this repo.
+- Code repo (closed): `oscenai/oscen`.
