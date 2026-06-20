@@ -25,7 +25,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
   <main class="pt-32 pb-24">
     <!-- 1. Hook -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
+    <section class="max-w-5xl mx-auto px-6 mb-12">
       <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Path A · Investors</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
         Everyone is building the body.<br />
@@ -37,7 +37,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 2. Public-safe market signals (no internal numbers) -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
+    <section class="max-w-5xl mx-auto px-6 mb-12">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
@@ -55,7 +55,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 3. Thesis — short, no numbers -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
+    <section class="max-w-5xl mx-auto px-6 mb-12">
       <div class="reveal glass-bright rounded-2xl p-8 md:p-12">
         <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Investment thesis</p>
         <div class="space-y-4 text-lg text-text-secondary leading-relaxed max-w-3xl">
@@ -69,7 +69,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     <ProofStrip />
 
     <!-- 4. The form — the only conversion on this page -->
-    <section id="investor-form" class="max-w-3xl mx-auto px-6 mt-20 mb-16 scroll-mt-24">
+    <section id="investor-form" class="max-w-3xl mx-auto px-6 mt-12 mb-12 scroll-mt-24">
       <h2 class="reveal font-display text-[clamp(2rem,4.5vw,3rem)] text-text-primary leading-tight mb-3">
         Start the conversation.
       </h2>
@@ -79,7 +79,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
       <form
         id="investor-form-el"
-        class="reveal glass rounded-2xl p-7 md:p-9 space-y-6"
+        class="reveal glass-bright rounded-2xl p-7 md:p-9 space-y-6 shadow-2xl shadow-black/40"
         action={FORMSPREE.investor}
         method="POST"
       >
@@ -93,30 +93,30 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <label class="block">
-            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Name</span>
+            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Name</span>
             <input
               type="text"
               name="name"
               required
               autocomplete="name"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
             />
           </label>
           <label class="block">
-            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Email</span>
+            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Email</span>
             <input
               type="email"
               name="email"
               required
               autocomplete="email"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
             />
           </label>
         </div>
 
         <!-- Accreditation. Required. No default selection. -->
         <fieldset>
-          <legend class="text-[11px] font-mono text-text-muted uppercase tracking-wider">
+          <legend class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">
             Are you an accredited investor in the US?
             <span class="ml-2 text-text-muted/50 normal-case tracking-normal" title="An accredited investor has $200K+ annual income ($300K joint), $1M+ net worth excluding home, or holds qualifying licenses. SEC rule.">
               (what's this?)
@@ -130,7 +130,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             ].map((opt) => (
               <label class="cursor-pointer">
                 <input type="radio" name="accreditation" value={opt.value} required class="peer sr-only" />
-                <span class="block px-4 py-3 rounded-lg border border-border bg-void/30 text-sm text-text-secondary text-center hover:border-border-bright peer-checked:border-accent-amber/60 peer-checked:bg-accent-amber/10 peer-checked:text-accent-amber peer-focus-visible:ring-2 peer-focus-visible:ring-accent-amber/40 transition-all">
+                <span class="block px-4 py-3 rounded-lg border border-border-bright bg-deep text-sm text-text-secondary text-center hover:border-accent-amber/40 hover:text-text-primary peer-checked:border-accent-amber peer-checked:bg-accent-amber/15 peer-checked:text-accent-amber peer-focus-visible:ring-2 peer-focus-visible:ring-accent-amber/40 transition-all">
                   {opt.label}
                 </span>
               </label>
@@ -141,10 +141,10 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
         <!-- Conditional fields: shown only when accreditation = yes or not-sure -->
         <div id="accredited-fields" class="hidden space-y-5">
           <label class="block">
-            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Check size (optional)</span>
+            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Check size (optional)</span>
             <select
               name="check_size"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary focus:border-accent-amber/40 focus:outline-none transition-colors"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
             >
               <option value="">Select range</option>
               <option value="25-100k">$25K – $100K</option>
@@ -155,24 +155,24 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             </select>
           </label>
           <label class="block">
-            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">LinkedIn or website</span>
+            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">LinkedIn or website</span>
             <input
               type="url"
               name="linkedin"
               inputmode="url"
               placeholder="https://linkedin.com/in/..."
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
             />
             <span class="text-[10px] text-text-muted/60 mt-1 block">Helps us reply quickly. Not required but recommended.</span>
           </label>
         </div>
 
         <label class="block">
-          <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Anything you want us to know? (optional)</span>
+          <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Anything you want us to know? (optional)</span>
           <textarea
             name="message"
             rows="3"
-            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/40 focus:outline-none transition-colors resize-none"
+            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all resize-none"
           ></textarea>
         </label>
 

@@ -51,7 +51,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     <section id="collab-form" class="max-w-3xl mx-auto px-6 mb-16 scroll-mt-24">
       <form
         id="collab-form-el"
-        class="reveal glass rounded-2xl p-7 md:p-9 space-y-6"
+        class="reveal glass-bright rounded-2xl p-7 md:p-9 space-y-6 shadow-2xl shadow-black/40"
         action={FORMSPREE.build}
         method="POST"
       >
@@ -63,29 +63,29 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <label class="block">
-            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Name</span>
+            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Name</span>
             <input
               type="text"
               name="name"
               required
               autocomplete="name"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all"
             />
           </label>
           <label class="block">
-            <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Email</span>
+            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Email</span>
             <input
               type="email"
               name="email"
               required
               autocomplete="email"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all"
             />
           </label>
         </div>
 
         <fieldset>
-          <legend class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Your role</legend>
+          <legend class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Your role</legend>
           <div class="mt-3 grid grid-cols-2 md:grid-cols-5 gap-2">
             {[
               { value: "engineer", label: "Engineer" },
@@ -96,7 +96,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             ].map((opt) => (
               <label class="cursor-pointer">
                 <input type="radio" name="role" value={opt.value} required class="peer sr-only" />
-                <span class="block px-3 py-2.5 rounded-lg border border-border bg-void/30 text-xs text-text-secondary text-center hover:border-border-bright peer-checked:border-accent-blue/60 peer-checked:bg-accent-blue/10 peer-checked:text-accent-blue peer-focus-visible:ring-2 peer-focus-visible:ring-accent-blue/40 transition-all">
+                <span class="block px-3 py-2.5 rounded-lg border border-border-bright bg-deep text-xs text-text-secondary text-center hover:border-accent-blue/40 hover:text-text-primary peer-checked:border-accent-blue peer-checked:bg-accent-blue/15 peer-checked:text-accent-blue peer-focus-visible:ring-2 peer-focus-visible:ring-accent-blue/40 transition-all">
                   {opt.label}
                 </span>
               </label>
@@ -105,26 +105,26 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
         </fieldset>
 
         <label class="block">
-          <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">LinkedIn, GitHub, or company site</span>
+          <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">LinkedIn, GitHub, or company site</span>
           <input
             type="url"
             name="link"
             required
             inputmode="url"
             placeholder="https://"
-            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors"
+            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all"
           />
         </label>
 
         <label class="block">
-          <span class="text-[11px] font-mono text-text-muted uppercase tracking-wider">Why OSCEN? (one sentence)</span>
+          <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Why OSCEN? (one sentence)</span>
           <textarea
             name="why"
             rows="3"
             required
             maxlength="400"
             placeholder="What pulls you to this and what would you push on?"
-            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-blue/40 focus:outline-none transition-colors resize-none"
+            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all resize-none"
           ></textarea>
         </label>
 
