@@ -198,6 +198,7 @@ import Nav from "../components/Nav.astro";
             </thead>
             <tbody>
               {[
+                { name: "Prometheus (Bezos)", approach: "VLA Transformer (Industrial)", learning: "Retrain", edge: "No", highlight: false },
                 { name: "AMI Labs (LeCun)", approach: "JEPA World Models", learning: "Retrain", edge: "No", highlight: false },
                 { name: "Figure AI", approach: "VLA Transformer", learning: "Static", edge: "No", highlight: false },
                 { name: "Google DeepMind", approach: "Gemini VLA", learning: "Retrain", edge: "Partial", highlight: false },
@@ -240,6 +241,10 @@ import Nav from "../components/Nav.astro";
           {
             q: "What about LeCun's AMI Labs and JEPA world models?",
             a: "AMI validates our thesis: the future of robotics AI is beyond LLMs. But JEPA still relies on GPU-scale pretraining on millions of hours of video, then deploys a frozen model. It can't learn continuously on-device, can't run on milliwatts, and has no solution for catastrophic forgetting. OSCEN and JEPA are different bets: top-down (train big, deploy frozen) vs. bottom-up (learn continuously, adapt forever).",
+          },
+          {
+            q: "What about Bezos's Project Prometheus and the $12B physical-AI round?",
+            a: "Prometheus is a major validation of the physical-AI category: Wall-Street-scale capital (JPMorgan, Goldman, BlackRock) backing an 'artificial general engineer' for industrial design and manufacturing, with two of the original transformer authors as advisors. But it's the same architectural bet as AMI: video-language-action transformers trained at GPU scale. The contrast is the point. Prometheus and OSCEN aren't competing in the same market segment (industrial design vs. embodied continual learning); we're competing for which architecture defines physical AI. Theirs is the bet that data plus simulation beats biology. Ours is the bet that biology beats both.",
           },
           {
             q: "Why not just use transformers for everything?",

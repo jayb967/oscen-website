@@ -78,6 +78,15 @@ export interface Competitor {
 
 export const COMPETITORS: Competitor[] = [
   {
+    name: "Project Prometheus",
+    raised: "$18.2B",
+    valuation: "$41B",
+    date: "Jun 2026",
+    focus: "Industrial physical AI",
+    gpuDependent: true,
+    investors: "Bezos, JPMorgan, Goldman, BlackRock",
+  },
+  {
     name: "AMI Labs",
     raised: "$1.03B",
     valuation: "$3.5B",
@@ -389,6 +398,15 @@ export interface Comparable {
 }
 
 export const COMPARABLES: Comparable[] = [
+  {
+    company: "Project Prometheus",
+    valuation: "$41B",
+    raised: "$18.2B (2 rounds)",
+    stage: "<8 months old",
+    hadProduct: false,
+    hadPatent: false,
+    note: "Bezos + Bajaj. Transformer authors as advisors. Pre-product.",
+  },
   {
     company: "Unconventional AI",
     valuation: "$4.5B",
