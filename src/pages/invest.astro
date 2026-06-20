@@ -64,19 +64,32 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
           <span class="px-3 py-1 rounded-full bg-accent-amber/10 border border-accent-amber/30 text-accent-amber text-[10px] font-mono uppercase tracking-wider shrink-0">March 2026</span>
           <div>
             <p class="text-sm text-text-primary font-medium">Yann LeCun's AMI Labs raises $1.03B for "world models"</p>
-            <p class="text-xs text-text-secondary mt-1 leading-relaxed">The Turing Award winner left Meta to build JEPA, world models that go beyond LLMs. Nvidia, Toyota, Samsung, Jeff Bezos invested. This validates the core thesis: <span class="text-text-primary">LLMs are not enough for robots.</span></p>
+            <p class="text-xs text-text-secondary mt-1 leading-relaxed">The Turing Award winner left Meta to build JEPA, world models that go beyond LLMs. Nvidia, Toyota, Samsung, Jeff Bezos invested. The thesis: <span class="text-text-primary">LLMs are not enough for robots.</span></p>
           </div>
         </div>
         <div class="divider mb-4"></div>
-        <p class="text-xs text-text-secondary leading-relaxed">But AMI still trains on GPU clusters, still deploys frozen models, still can't learn on-device, and still has no answer for catastrophic forgetting. <span class="text-accent-blue">OSCEN solves all four.</span></p>
+        <div class="flex items-start gap-4">
+          <span class="px-3 py-1 rounded-full bg-accent-amber/10 border border-accent-amber/30 text-accent-amber text-[10px] font-mono uppercase tracking-wider shrink-0">June 2026</span>
+          <div>
+            <p class="text-sm text-text-primary font-medium">Jeff Bezos's Project Prometheus raises $12B at $41B valuation</p>
+            <p class="text-xs text-text-secondary mt-1 leading-relaxed">Bezos + Vik Bajaj as co-CEOs. JPMorgan, Goldman Sachs, BlackRock in. Founding advisors include Ashish Vaswani and Jakob Uszkoreit, two of the original "Attention Is All You Need" authors. Pitched as "physical AI" for industrial design and manufacturing. <span class="text-text-primary">Wall-Street-scale capital is now pouring into physical AI.</span></p>
+          </div>
+        </div>
+        <div class="divider my-4"></div>
+        <p class="text-xs text-text-secondary leading-relaxed">AMI and Prometheus both still train on GPU clusters, still deploy frozen models, still can't learn on-device, and still have no answer for catastrophic forgetting. <span class="text-accent-blue">OSCEN solves all four.</span></p>
       </div>
 
       <div class="reveal glass rounded-xl p-5">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
           <div>
             <div class="text-sm font-mono text-text-primary">AMI (JEPA)</div>
             <div class="text-[10px] text-text-secondary mt-1">GPU pretraining</div>
             <div class="text-[10px] text-accent-red mt-0.5">No continual learning</div>
+          </div>
+          <div>
+            <div class="text-sm font-mono text-text-primary">Prometheus</div>
+            <div class="text-[10px] text-text-secondary mt-1">VLA transformer</div>
+            <div class="text-[10px] text-accent-red mt-0.5">Frozen, GPU-scale</div>
           </div>
           <div>
             <div class="text-sm font-mono text-text-primary">Figure / π</div>
