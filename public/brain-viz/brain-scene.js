@@ -63,8 +63,8 @@ class BrainScene {
             statusBtn.addEventListener('click', () => this._toggleMode());
         }
 
-        // Default to live mode — fall back to simulated if connection fails
-        if (params.get('mode') === 'sim') {
+        // Default to live mode when a ws URL is known; otherwise simulated.
+        if (params.get('mode') === 'sim' || !this._liveWsUrl) {
             this.dataBridge.startSimulated();
         } else {
             this.dataBridge.startLive(this._liveWsUrl);
@@ -81,14 +81,11 @@ class BrainScene {
     }
 
     _detectLiveWsUrl() {
-        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = window.location.hostname;
-        // demo.oscen.ai: nginx on standard port proxies /ws to dashboard
-        if (host === 'demo.oscen.ai') {
-            return `${proto}//${host}/ws`;
+        if (window.location.hostname === 'demo.oscen.ai') {
+            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            return `${proto}//demo.oscen.ai/ws`;
         }
-        // Direct access: dashboard on port 8080
-        return `${proto}//${host}:8080/ws`;
+        return null;
     }
 
     _toggleMode() {
