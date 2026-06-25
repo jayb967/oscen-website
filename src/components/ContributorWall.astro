@@ -1,0 +1,35 @@
+---
+import { CONTRIBUTORS, TIER_DOT } from "../data/contributors";
+
+const sorted = [...CONTRIBUTORS].sort((a, b) =>
+  b.since.localeCompare(a.since) || a.name.localeCompare(b.name),
+);
+---
+
+<section class="max-w-5xl mx-auto px-6 mb-24">
+  <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">Contributors</h2>
+  <p class="reveal text-sm text-text-muted mb-12 max-w-xl">
+    The people keeping the brain learning. Synapse and above show up here by choice.
+  </p>
+
+  {sorted.length === 0 ? (
+    <div class="reveal glass rounded-xl p-8 text-center">
+      <p class="text-sm text-text-secondary">Be the first.</p>
+      <p class="text-xs text-text-muted mt-2 font-mono">The wall lights up the moment someone backs Synapse or above.</p>
+    </div>
+  ) : (
+    <div class="reveal glass rounded-xl p-6">
+      <ul class="flex flex-wrap gap-x-5 gap-y-3">
+        {sorted.map((c) => (
+          <li class="flex items-center gap-2 text-sm text-text-secondary">
+            <span class={`w-1.5 h-1.5 rounded-full ${TIER_DOT[c.tier]}`} aria-hidden="true"></span>
+            <span>{c.name}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="text-[10px] font-mono text-text-muted mt-6">
+        {sorted.length} {sorted.length === 1 ? "supporter" : "supporters"}. Want off the wall? Email info@oscen.ai.
+      </p>
+    </div>
+  )}
+</section>

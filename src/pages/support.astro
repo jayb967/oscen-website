@@ -5,6 +5,8 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
+import SupportThankYou from "../components/SupportThankYou.astro";
+import ContributorWall from "../components/ContributorWall.astro";
 import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support";
 ---
 
@@ -15,6 +17,8 @@ import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support"
   <Nav />
 
   <main class="pt-32 pb-24">
+    <SupportThankYou />
+
     <!-- Header -->
     <section class="max-w-5xl mx-auto px-6 mb-20">
       <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Support</p>
@@ -39,8 +43,6 @@ import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support"
           return (
             <a
               href={tier.href}
-              target="_blank"
-              rel="noopener"
               class={`reveal glass rounded-xl p-7 group block ${a.borderHover} transition-all duration-300`}
             >
               <div class="flex items-baseline justify-between mb-4">
@@ -96,6 +98,8 @@ import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support"
         </div>
       </div>
     </section>
+
+    <ContributorWall />
 
     <!-- Other ways -->
     <section class="max-w-5xl mx-auto px-6 mb-24">

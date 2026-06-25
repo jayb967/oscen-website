@@ -1,0 +1,215 @@
+---
+/**
+ * Post-checkout thank-you. Renders hidden by default; a client script makes it
+ * visible when /support is loaded with ?ok=1 and reads &tier=X to drive copy.
+ * Captures display name + email + tier and posts to BOTH Formspree (so Jay
+ * sees the wall request) and Buttondown (so the supporter joins the right
+ * segment for monthly notes / early demo access).
+ */
+import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
+---
+
+<section id="support-thanks" class="max-w-5xl mx-auto px-6 mb-20 hidden">
+  <div class="reveal glass rounded-xl p-8 border border-accent-amber/30">
+    <p class="text-[10px] font-mono text-accent-amber uppercase tracking-[0.3em] mb-3" id="thanks-eyebrow">Thanks</p>
+    <h2 class="font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary leading-tight mb-4" id="thanks-headline">
+      Thank you.
+    </h2>
+    <p class="text-sm text-text-secondary leading-relaxed max-w-xl mb-6" id="thanks-body">
+      Your support just bought hours of real brain time. A receipt is on the way from Stripe.
+    </p>
+
+    <form id="thanks-form" class="space-y-4 max-w-xl" novalidate>
+      <input type="hidden" name="kind" value="supporter-thanks" />
+      <input type="hidden" name="tier" id="thanks-tier" value="" />
+      <input type="hidden" name="_subject" value="New supporter sign-up" />
+
+      <div>
+        <label for="thanks-name" class="block text-[11px] font-mono text-text-muted uppercase tracking-wider mb-1.5">
+          Display name for the contributor wall (optional)
+        </label>
+        <input
+          type="text"
+          id="thanks-name"
+          name="name"
+          maxlength="60"
+          autocomplete="name"
+          placeholder="Real name, pseudonym, or leave blank"
+          class="w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/30 focus:outline-none transition-colors"
+        />
+      </div>
+
+      <div>
+        <label for="thanks-email" class="block text-[11px] font-mono text-text-muted uppercase tracking-wider mb-1.5">
+          Email <span id="thanks-email-hint" class="text-text-muted/60 normal-case">for thanks and updates</span>
+        </label>
+        <input
+          type="email"
+          id="thanks-email"
+          name="email"
+          required
+          autocomplete="email"
+          placeholder="your@email.com"
+          class="w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/30 focus:outline-none transition-colors"
+        />
+      </div>
+
+      <div class="flex items-center gap-3 pt-1">
+        <button
+          type="submit"
+          id="thanks-submit"
+          class="px-6 py-2.5 rounded-lg bg-accent-amber/10 border border-accent-amber/30 text-accent-amber text-sm font-medium hover:bg-accent-amber/20 hover:border-accent-amber/50 transition-all duration-300 cursor-pointer"
+        >
+          Lock it in
+        </button>
+        <button
+          type="button"
+          id="thanks-skip"
+          class="text-[12px] font-mono text-text-muted hover:text-text-primary transition-colors"
+        >
+          Skip
+        </button>
+      </div>
+      <p id="thanks-status" class="text-xs font-mono mt-2 hidden"></p>
+    </form>
+
+    <div id="thanks-done" class="hidden">
+      <p class="text-sm text-text-secondary leading-relaxed">
+        All set. We will be in touch.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ FORMSPREE_URL: FORMSPREE.contact, BUTTONDOWN_URL: BUTTONDOWN_ACTION }}>
+  const section = document.getElementById("support-thanks");
+  if (section) {
+    const url = new URL(window.location.href);
+    const ok = url.searchParams.get("ok") === "1";
+    const rawTier = (url.searchParams.get("tier") || "").toLowerCase();
+    const tier = ["spark", "synapse", "cortex", "custom"].includes(rawTier) ? rawTier : "";
+
+    if (ok) {
+      section.classList.remove("hidden");
+
+      const eyebrow  = document.getElementById("thanks-eyebrow");
+      const headline = document.getElementById("thanks-headline");
+      const body     = document.getElementById("thanks-body");
+      const hint     = document.getElementById("thanks-email-hint");
+      const tierInput = /** @type {HTMLInputElement|null} */ (document.getElementById("thanks-tier"));
+
+      const COPY = {
+        spark: {
+          eyebrow: "Spark supporter",
+          headline: "Thanks for the spark.",
+          body: "A day and a half of brain time on us. A receipt is on the way from Stripe. Leave a name if you want a footnote here.",
+          hint: "for thanks and the occasional update",
+        },
+        synapse: {
+          eyebrow: "Synapse supporter",
+          headline: "You bought us a week of brain time.",
+          body: "Drop a name and you go up on the contributor wall below. Stripe will email a receipt.",
+          hint: "for thanks and the occasional update",
+        },
+        cortex: {
+          eyebrow: "Cortex supporter",
+          headline: "Welcome to the monthly circle.",
+          body: "You bankroll a specialist brain. Leave your email and you get the monthly progress note and first crack at new demos. Drop a name to go on the wall.",
+          hint: "required for monthly notes",
+        },
+        custom: {
+          eyebrow: "Supporter",
+          headline: "Thank you, for whatever it was.",
+          body: "Every dollar buys compute, sensors, or runway. Leave a name for the wall, leave an email for updates.",
+          hint: "for thanks and updates",
+        },
+      };
+
+      const copy = tier ? COPY[tier] : null;
+      if (copy && eyebrow && headline && body && hint && tierInput) {
+        eyebrow.textContent = copy.eyebrow;
+        headline.textContent = copy.headline;
+        body.textContent = copy.body;
+        hint.textContent = copy.hint;
+        tierInput.value = tier;
+      }
+
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    const form    = /** @type {HTMLFormElement|null} */ (document.getElementById("thanks-form"));
+    const submit  = /** @type {HTMLButtonElement|null} */ (document.getElementById("thanks-submit"));
+    const skip    = document.getElementById("thanks-skip");
+    const status  = document.getElementById("thanks-status");
+    const done    = document.getElementById("thanks-done");
+
+    const TIER_TAG = {
+      spark: "supporter-spark",
+      synapse: "supporter-synapse",
+      cortex: "supporter-cortex",
+      custom: "supporter-custom",
+    };
+
+    function showDone() {
+      if (form) form.classList.add("hidden");
+      if (done) done.classList.remove("hidden");
+      if (status) status.classList.add("hidden");
+    }
+
+    function showStatus(msg, ok) {
+      if (!status) return;
+      status.textContent = msg;
+      status.classList.remove("hidden", "text-accent-blue", "text-accent-red");
+      status.classList.add(ok ? "text-accent-blue" : "text-accent-red");
+    }
+
+    if (skip) skip.addEventListener("click", showDone);
+
+    if (form && submit) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = /** @type {HTMLInputElement} */ (document.getElementById("thanks-email")).value.trim();
+        if (!email) { showStatus("Email required.", false); return; }
+
+        const t = /** @type {HTMLInputElement} */ (document.getElementById("thanks-tier")).value;
+        const tag = TIER_TAG[t] || "supporter-custom";
+
+        window.injectAttribution?.(form);
+        submit.disabled = true;
+        const original = submit.textContent;
+        submit.textContent = "Sending...";
+
+        const buttondown = new FormData();
+        buttondown.append("email", email);
+        buttondown.append("tag", tag);
+        buttondown.append("embed", "1");
+
+        const results = await Promise.allSettled([
+          fetch(FORMSPREE_URL, {
+            method: "POST",
+            body: new FormData(form),
+            headers: { Accept: "application/json" },
+          }),
+          fetch(BUTTONDOWN_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: buttondown,
+          }),
+        ]);
+
+        submit.disabled = false;
+        submit.textContent = original;
+
+        const formspreeOk =
+          results[0].status === "fulfilled" && results[0].value.ok;
+        const buttondownOk = results[1].status === "fulfilled";
+
+        if (formspreeOk || buttondownOk) {
+          showDone();
+        } else {
+          showStatus("Something went wrong. Email info@oscen.ai and we will sort it out.", false);
+        }
+      });
+    }
+  }
+</script>

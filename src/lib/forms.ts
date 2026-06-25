@@ -31,7 +31,18 @@ export const SEGMENTS = {
   investorRetail: "investor-retail",
   collaboratorPending: "collaborator-pending",
   follower: "follower",
+  supporterSpark: "supporter-spark",
+  supporterSynapse: "supporter-synapse",
+  supporterCortex: "supporter-cortex",
+  supporterCustom: "supporter-custom",
 } as const;
+
+export const SUPPORTER_TAG_FOR_TIER: Record<string, string> = {
+  spark:   SEGMENTS.supporterSpark,
+  synapse: SEGMENTS.supporterSynapse,
+  cortex:  SEGMENTS.supporterCortex,
+  custom:  SEGMENTS.supporterCustom,
+};
 
 // ---------- client-side submit helpers ----------
 
