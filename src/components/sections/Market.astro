@@ -26,7 +26,7 @@ const vlaLimits = [
     label: "GPU-hungry",
     stat: "50-200W",
     statLabel: "per inference, every 100ms",
-    body: "Every robot action requires a full forward pass through billions of parameters. At 10Hz control rate, that's 30 billion matrix multiplications per second, continuously. A warehouse fleet of 100 robots consumes 5-20kW just thinking. OSCEN targets under 5W total on neuromorphic hardware. The same power as an LED bulb.",
+    body: "Every robot action requires a full forward pass through billions of parameters. At 10Hz control rate, that's 30 billion matrix multiplications per second, continuously. A warehouse fleet of 100 robots consumes 5-20kW just thinking. OSCEN targets under 5W total through sparse, event-driven activation. The same power as an LED bulb.",
     accent: "accent-amber",
   },
   {
@@ -49,8 +49,8 @@ const vlaLimits = [
 
 const stats = [
   { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
-  { value: "$200M+", label: "Neuromorphic VC in 2025", sub: "3x increase from 2024", color: "text-accent-amber" },
-  { value: "73-109x", label: "Energy advantage on neuromorphic HW", sub: "Intel Loihi benchmarks", color: "text-accent-green" },
+  { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3x increase from 2024", color: "text-accent-amber" },
+  { value: "73-109x", label: "Energy advantage", sub: "Published spiking-network benchmarks", color: "text-accent-green" },
   { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
 ];
 ---
@@ -114,7 +114,7 @@ const stats = [
     </div>
 
     <p class="reveal text-[10px] text-text-muted text-center font-mono mb-24">
-      * Currently training on CPU at ~45W. Building custom neuromorphic silicon for edge deployment at &lt;5W.
+      * Currently training on CPU at ~45W. Targeting purpose-built low-power edge compute at &lt;5W.
     </p>
 
     <!-- VLA ceiling explainer -->

@@ -88,7 +88,7 @@ import Nav from "../components/Nav.astro";
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         Energy efficiency
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Spiking neural networks compute only when neurons fire. On neuromorphic hardware, this translates to dramatic energy savings.</p>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Spiking neural networks compute only when neurons fire. Sparse, event-driven activation translates to dramatic energy savings.</p>
 
       <div class="reveal glass rounded-xl p-6 mb-6">
         <div class="space-y-4">
@@ -96,7 +96,7 @@ import Nav from "../components/Nav.astro";
             { label: "GPU Inference", power: "50–200W", bar: 100, color: "accent-red" },
             { label: "LLM API Call", power: "~0.3 Wh/query", bar: 60, color: "accent-amber" },
             { label: "OSCEN (CPU sim)", power: "~45W", bar: 40, color: "accent-blue" },
-            { label: "OSCEN (Neuromorphic)", power: "<5W", bar: 5, color: "accent-green" },
+            { label: "OSCEN (event-driven)", power: "<5W", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -115,12 +115,12 @@ import Nav from "../components/Nav.astro";
         <div class="reveal glass rounded-xl p-5">
           <div class="text-2xl font-mono text-accent-green font-bold">73×</div>
           <div class="text-xs text-text-muted mt-1">less energy than CPU</div>
-          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Measured on Intel Loihi for robotics peg-in-hole task. IEEE 2024.</p>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Published spiking-network benchmark for robotics peg-in-hole task. IEEE 2024.</p>
         </div>
         <div class="reveal glass rounded-xl p-5">
           <div class="text-2xl font-mono text-accent-green font-bold">109×</div>
           <div class="text-xs text-text-muted mt-1">less energy than GPU</div>
-          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Measured on Intel Loihi for keyword spotting. Published benchmark.</p>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Published spiking-network benchmark for keyword spotting.</p>
         </div>
       </div>
     </section>
@@ -140,7 +140,7 @@ import Nav from "../components/Nav.astro";
               "Continual learning without catastrophic forgetting",
               "Event-driven computation (compute only when needed)",
               "Temporal pattern recognition (spike timing encodes information)",
-              "Neuromorphic hardware deployment (Intel Loihi, SpiNNaker)",
+              "Low-power edge deployment via sparse, event-driven compute",
               "Real-time sensor processing at <1ms latency",
             ].map((item) => (
               <li class="flex items-start gap-2">
@@ -158,7 +158,7 @@ import Nav from "../components/Nav.astro";
               "SNN LLMs max out at ~1.5B parameters",
               "Training tools less mature than PyTorch/JAX ecosystem",
               "Limited off-the-shelf pretrained models",
-              "Neuromorphic hardware still in early production",
+              "Specialized low-power compute still maturing",
             ].map((item) => (
               <li class="flex items-start gap-2">
                 <span class="text-accent-amber text-xs mt-0.5">~</span>
@@ -232,7 +232,7 @@ import Nav from "../components/Nav.astro";
           },
           {
             q: "Is it training on one server really enough?",
-            a: "For proof of concept, yes. We're demonstrating that a million spiking neurons can learn from raw sensory data. Production deployment on neuromorphic hardware will scale to billions of neurons at a fraction of the power.",
+            a: "For proof of concept, yes. We're demonstrating that a million spiking neurons can learn from raw sensory data. Production deployment on next-generation low-power compute will scale to billions of neurons at a fraction of the power.",
           },
           {
             q: "What about accuracy benchmarks?",
@@ -278,7 +278,7 @@ import Nav from "../components/Nav.astro";
           <p><span class="text-text-muted font-mono">Reward</span>. Schultz, W. (1998). Predictive reward signal of dopamine neurons. <em>J. Neurophysiol.</em></p>
           <p><span class="text-text-muted font-mono">Scaling</span>. Turrigiano, G. et al. (1998). Activity-dependent scaling of quantal amplitude in neocortical neurons. <em>Nature.</em></p>
           <p><span class="text-text-muted font-mono">Critical</span>. Hensch, T. (2005). Critical period plasticity in local cortical circuits. <em>Nature Rev. Neurosci.</em></p>
-          <p><span class="text-text-muted font-mono">Loihi</span>. Intel Labs (2024). Neuromorphic computing benchmarks on Loihi 2. <em>IEEE IJCNN.</em></p>
+          <p><span class="text-text-muted font-mono">SNN energy</span>. Published spiking neural network energy benchmarks (2024). <em>IEEE IJCNN.</em></p>
         </div>
       </div>
     </section>

@@ -18,7 +18,7 @@ import Nav from "../components/Nav.astro";
 import { FORMSPREE, SEGMENTS } from "../lib/forms";
 ---
 
-<Base title="Invest | OSCEN" description="Back a neuromorphic brain for robots. Patent pending. Submit interest and we'll send the brief.">
+<Base title="Invest | OSCEN" description="Back a brain-inspired AI for robots. Patent pending. Submit interest and we'll send the brief.">
   <Nav />
 
   <main class="pt-32 pb-24">
@@ -39,7 +39,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
-          { value: "$200M+", label: "Neuromorphic VC in 2025", sub: "3× from 2024", color: "text-accent-amber" },
+          { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3× from 2024", color: "text-accent-amber" },
           { value: "1.15M", label: "Neurons training live", sub: "Today, not pitched", color: "text-accent-green" },
           { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
         ].map((stat) => (
@@ -123,7 +123,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             { label: "GPT-4o", value: "~0.3 Wh per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
             { label: "Gemini", value: "~0.24 Wh per prompt", source: "Google official", bar: 80, color: "accent-amber" },
             { label: "GPU Robot Brain", value: "50-200W continuous", source: "Industry standard", bar: 90, color: "accent-pink" },
-            { label: "OSCEN (custom silicon)", value: "<5W continuous", source: "Neuromorphic benchmarks", bar: 5, color: "accent-green" },
+            { label: "OSCEN (event-driven)", value: "<5W continuous", source: "Spiking-network benchmarks", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -142,7 +142,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
       </div>
 
       <p class="reveal text-xs text-text-muted italic text-center">
-        Neuromorphic hardware computes only when neurons fire, not idle GPU cycles. The architecture is ready; the hardware is catching up.
+        Event-driven compute only runs when neurons fire, not idle GPU cycles. The architecture is ready; the compute layer is catching up.
       </p>
     </section>
 
@@ -248,17 +248,17 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             <div class="text-[10px] text-text-secondary mt-1">Research & development</div>
           </div>
           <div>
-            <div class="text-lg font-mono text-accent-amber font-bold">1 person</div>
-            <div class="text-[10px] text-text-secondary mt-1">Team size</div>
+            <div class="text-lg font-mono text-accent-amber font-bold">Live</div>
+            <div class="text-[10px] text-text-secondary mt-1">Brain training daily</div>
           </div>
           <div>
-            <div class="text-lg font-mono text-accent-purple font-bold">Full-stack</div>
-            <div class="text-[10px] text-text-secondary mt-1">Expertise</div>
+            <div class="text-lg font-mono text-accent-purple font-bold">CPU today</div>
+            <div class="text-[10px] text-text-secondary mt-1">Low-power next</div>
           </div>
         </div>
         <p class="text-xs text-text-secondary text-center mt-6 leading-relaxed max-w-xl mx-auto">
           Deep domain knowledge across computational neuroscience, distributed systems, sparse linear algebra, and real-time sensor fusion.
-          This level of cross-disciplinary understanding is what makes the architecture work.
+          The architecture runs on CPUs today and the brain is actively training. Funding continues the build, opens partnerships with low-power compute providers, and gets us to purpose-built edge deployment.
         </p>
       </div>
     </section>
@@ -269,7 +269,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
       <div class="space-y-2">
         {[
-          { priority: "01", item: "Neuromorphic hardware", desc: "Custom neuromorphic chip development for edge deployment. Move from CPU simulation to purpose-built silicon. 73-109x energy reduction." },
+          { priority: "01", item: "Low-power edge deployment", desc: "Move from CPU simulation to purpose-built edge compute. Up to 100× energy reduction via sparse, event-driven activation." },
           { priority: "02", item: "Robotics integration", desc: "Physical robot body. Camera, servos, touch sensors. Close the full sensorimotor loop with real-world feedback." },
           { priority: "03", item: "Team expansion", desc: "Computational neuroscientist, robotics engineer, hardware specialist. Three hires transform timeline from solo to production." },
           { priority: "04", item: "Patent portfolio", desc: "Non-provisional filing by Feb 2027. 20 continuation patents covering hardware mapping, fleet learning, safety architecture." },
@@ -300,7 +300,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
           </div>
           <div>
             <h3 class="text-lg text-text-primary font-medium">Rio Bold</h3>
-            <p class="text-xs text-text-secondary font-mono mt-1">Founder & Sole Developer</p>
+            <p class="text-xs text-text-secondary font-mono mt-1">Founder & Lead Architect</p>
             <div class="flex items-center gap-4 mt-2">
               <a href="mailto:info@oscen.ai" class="text-[10px] font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">info@oscen.ai</a>
             </div>
