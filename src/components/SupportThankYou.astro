@@ -37,6 +37,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
           placeholder="Real name, pseudonym, or leave blank"
           class="w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/30 focus:outline-none transition-colors"
         />
+        <p class="text-[10px] text-text-muted/70 mt-1.5 font-mono">If you already entered one at Stripe checkout, you can leave this blank.</p>
       </div>
 
       <div>
@@ -75,7 +76,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
 
     <div id="thanks-done" class="hidden">
       <p class="text-sm text-text-secondary leading-relaxed">
-        All set. We will be in touch.
+        Got it. Check your inbox to confirm the subscription so you keep getting updates.
       </p>
     </div>
   </div>
@@ -154,6 +155,12 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
       if (form) form.classList.add("hidden");
       if (done) done.classList.remove("hidden");
       if (status) status.classList.add("hidden");
+      // Strip ?ok and ?tier so a refresh does not re-open the form on an
+      // already-completed flow.
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete("ok");
+      clean.searchParams.delete("tier");
+      window.history.replaceState({}, "", clean.toString());
     }
 
     function showStatus(msg, ok) {

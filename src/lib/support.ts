@@ -14,7 +14,7 @@
  *
  * ACCENT is a static lookup keyed by tier.accent. It exists because Tailwind
  * v4's JIT will not pick up class names built from template literals like
- * `text-accent-${tier.accent}` — they have to appear as complete strings
+ * `text-accent-${tier.accent}`. They have to appear as complete strings
  * somewhere it can scan. Read accent classes from ACCENT[tier.accent] in
  * any component that iterates SUPPORT_TIERS.
  */
@@ -55,7 +55,7 @@ export const SUPPORT_TIERS: SupportTier[] = [
     name: "Synapse",
     price: "$50",
     cadence: "one-time",
-    blurb: "Almost a week of brain time — sensors, learning, the whole stack.",
+    blurb: "Almost a week of brain time. Sensors, learning, the whole stack.",
     perk: "Your name on the contributor wall.",
     href: env.PUBLIC_STRIPE_SUPPORT_SYNAPSE ?? LINKS.synapse,
     accent: "blue",
