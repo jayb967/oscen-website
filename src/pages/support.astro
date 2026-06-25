@@ -1,0 +1,123 @@
+---
+/**
+ * Support OSCEN. Four tiers, soft framing, zero "donation" language.
+ * For-profit entity, so support / sponsor only.
+ */
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED } from "../lib/support";
+---
+
+<Base
+  title="Support | OSCEN"
+  description="Sponsor a neuron. Help fund the brain that learns like a child, one supporter at a time."
+>
+  <Nav />
+
+  <main class="pt-32 pb-24">
+    <!-- Header -->
+    <section class="max-w-5xl mx-auto px-6 mb-20">
+      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Support</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
+        Sponsor a<br />
+        <span class="italic gradient-text">neuron.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        OSCEN is a tiny team building a new kind of mind, one that learns from experience instead of training data.
+        Every dollar goes to compute, sensors, and the runway to keep the brain learning.
+      </p>
+      <p class="reveal text-xs text-text-muted mt-4 max-w-2xl font-mono">
+        Note: OSCEN is a for-profit company, not a registered charity. Contributions are not tax-deductible.
+      </p>
+    </section>
+
+    <!-- Tier cards -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {SUPPORT_TIERS.map((tier) => (
+          <a
+            href={tier.href}
+            target="_blank"
+            rel="noopener"
+            class={`reveal glass rounded-xl p-7 group block hover:border-accent-${tier.accent}/30 transition-all duration-300`}
+          >
+            <div class="flex items-baseline justify-between mb-4">
+              <h2 class={`font-display text-2xl text-accent-${tier.accent}`}>{tier.name}</h2>
+              <div class="text-right">
+                <div class={`text-2xl font-mono text-text-primary group-hover:text-accent-${tier.accent} transition-colors`}>{tier.price}</div>
+                <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider">{tier.cadence}</div>
+              </div>
+            </div>
+            <p class="text-sm text-text-secondary leading-relaxed mb-3">{tier.blurb}</p>
+            <p class="text-xs text-text-muted leading-relaxed">{tier.perk}</p>
+            <div class={`mt-5 text-[11px] font-mono text-accent-${tier.accent}/70 group-hover:text-accent-${tier.accent} transition-colors`}>
+              Continue on Stripe →
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {!SUPPORT_LINKS_CONFIGURED && (
+        <p class="reveal text-[11px] font-mono text-accent-amber/70 mt-6 text-center">
+          ⚠ Stripe Payment Links not yet configured. Set PUBLIC_STRIPE_SUPPORT_* in Netlify env or edit src/lib/support.ts.
+        </p>
+      )}
+    </section>
+
+    <!-- Where money goes -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">Where it goes</h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">No marketing budget, no fancy office. Just the cost of running brains.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="reveal glass rounded-xl p-5">
+          <div class="text-2xl font-mono text-accent-blue">~$280/mo</div>
+          <div class="text-xs text-text-muted mt-1">Hetzner dedicated server</div>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">
+            32 cores, 252 GB RAM. Runs the million-neuron brain plus four specialist brains in parallel.
+          </p>
+        </div>
+        <div class="reveal glass rounded-xl p-5">
+          <div class="text-2xl font-mono text-accent-cyan">Sensors</div>
+          <div class="text-xs text-text-muted mt-1">Cameras, IMUs, mics</div>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">
+            Real bodies need real sensors. Every contribution buys the brain new ways to feel the world.
+          </p>
+        </div>
+        <div class="reveal glass rounded-xl p-5">
+          <div class="text-2xl font-mono text-accent-amber">Runway</div>
+          <div class="text-xs text-text-muted mt-1">Time to keep building</div>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">
+            We are not VC-funded yet. Every supporter buys days of focused work on the brain instead of consulting.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Other ways -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">Other ways to help</h2>
+
+      <div class="space-y-3">
+        <a href="/build" class="reveal glass rounded-xl p-5 block group hover:border-accent-blue/30 transition-all duration-300">
+          <h3 class="text-sm font-medium text-accent-blue group-hover:text-text-primary transition-colors">Build with us →</h3>
+          <p class="text-xs text-text-secondary mt-1 leading-relaxed">Engineers, neuroscientists, roboticists. If you want to put hands on a real brain, come work on it.</p>
+        </a>
+        <a href="/invest" class="reveal glass rounded-xl p-5 block group hover:border-accent-amber/30 transition-all duration-300">
+          <h3 class="text-sm font-medium text-accent-amber group-hover:text-text-primary transition-colors">Invest →</h3>
+          <p class="text-xs text-text-secondary mt-1 leading-relaxed">Accredited investors. We're raising to extend runway and scale the body program.</p>
+        </a>
+        <a href="mailto:info@oscen.ai" class="reveal glass rounded-xl p-5 block group hover:border-accent-cyan/30 transition-all duration-300">
+          <h3 class="text-sm font-medium text-accent-cyan group-hover:text-text-primary transition-colors">Just say hi →</h3>
+          <p class="text-xs text-text-secondary mt-1 leading-relaxed">info@oscen.ai. Critique, encouragement, an introduction. All of it helps.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Back to home -->
+    <section class="max-w-5xl mx-auto px-6 text-center">
+      <div class="divider max-w-24 mx-auto mb-10"></div>
+      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+    </section>
+  </main>
+</Base>
