@@ -15,7 +15,12 @@
 
 const env = import.meta.env;
 
-const PLACEHOLDER = "https://buy.stripe.com/PLACEHOLDER";
+const LINKS = {
+  spark:   "https://buy.stripe.com/5kQ14gbTt89Y9NI1vngbm01",
+  synapse: "https://buy.stripe.com/dRm4gse1Bbma7FAca1gbm02",
+  cortex:  "https://buy.stripe.com/28E9AM0aL3TIgc6a1Tgbm03",
+  custom:  "https://buy.stripe.com/4gMdR2f5FgGuaRM4Hzgbm04",
+};
 
 export type SupportTier = {
   id: "spark" | "synapse" | "cortex" | "custom";
@@ -36,7 +41,7 @@ export const SUPPORT_TIERS: SupportTier[] = [
     cadence: "one-time",
     blurb: "Powers about ten thousand simulated neurons for a week.",
     perk: "Our thanks, sent to your inbox.",
-    href: env.PUBLIC_STRIPE_SUPPORT_SPARK ?? PLACEHOLDER,
+    href: env.PUBLIC_STRIPE_SUPPORT_SPARK ?? LINKS.spark,
     accent: "cyan",
   },
   {
@@ -46,7 +51,7 @@ export const SUPPORT_TIERS: SupportTier[] = [
     cadence: "one-time",
     blurb: "Buys an hour of compute on the brain that's learning right now.",
     perk: "Your name on the contributor wall.",
-    href: env.PUBLIC_STRIPE_SUPPORT_SYNAPSE ?? PLACEHOLDER,
+    href: env.PUBLIC_STRIPE_SUPPORT_SYNAPSE ?? LINKS.synapse,
     accent: "blue",
   },
   {
@@ -56,7 +61,7 @@ export const SUPPORT_TIERS: SupportTier[] = [
     cadence: "monthly",
     blurb: "Sustains a specialist brain learning a new skill, every month.",
     perk: "Monthly progress note plus early demo access.",
-    href: env.PUBLIC_STRIPE_SUPPORT_CORTEX ?? PLACEHOLDER,
+    href: env.PUBLIC_STRIPE_SUPPORT_CORTEX ?? LINKS.cortex,
     accent: "amber",
   },
   {
@@ -66,11 +71,11 @@ export const SUPPORT_TIERS: SupportTier[] = [
     cadence: "you choose",
     blurb: "Whatever fits. Every dollar goes to compute, sensors, and runway.",
     perk: "Same thanks. Same wall. Same access if you cross a tier.",
-    href: env.PUBLIC_STRIPE_SUPPORT_CUSTOM ?? PLACEHOLDER,
+    href: env.PUBLIC_STRIPE_SUPPORT_CUSTOM ?? LINKS.custom,
     accent: "purple",
   },
 ];
 
 export const SUPPORT_LINKS_CONFIGURED = SUPPORT_TIERS.every(
-  (t) => !t.href.includes("PLACEHOLDER"),
+  (t) => t.href.startsWith("https://buy.stripe.com/") && !t.href.endsWith("PLACEHOLDER"),
 );
