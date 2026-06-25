@@ -5,7 +5,7 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
-import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED } from "../lib/support";
+import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support";
 ---
 
 <Base
@@ -34,27 +34,30 @@ import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED } from "../lib/support";
     <!-- Tier cards -->
     <section class="max-w-5xl mx-auto px-6 mb-24">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {SUPPORT_TIERS.map((tier) => (
-          <a
-            href={tier.href}
-            target="_blank"
-            rel="noopener"
-            class={`reveal glass rounded-xl p-7 group block hover:border-accent-${tier.accent}/30 transition-all duration-300`}
-          >
-            <div class="flex items-baseline justify-between mb-4">
-              <h2 class={`font-display text-2xl text-accent-${tier.accent}`}>{tier.name}</h2>
-              <div class="text-right">
-                <div class={`text-2xl font-mono text-text-primary group-hover:text-accent-${tier.accent} transition-colors`}>{tier.price}</div>
-                <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider">{tier.cadence}</div>
+        {SUPPORT_TIERS.map((tier) => {
+          const a = ACCENT[tier.accent];
+          return (
+            <a
+              href={tier.href}
+              target="_blank"
+              rel="noopener"
+              class={`reveal glass rounded-xl p-7 group block ${a.borderHover} transition-all duration-300`}
+            >
+              <div class="flex items-baseline justify-between mb-4">
+                <h2 class={`font-display text-2xl ${a.textBold}`}>{tier.name}</h2>
+                <div class="text-right">
+                  <div class={`text-2xl font-mono text-text-primary ${a.priceHover} transition-colors`}>{tier.price}</div>
+                  <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider">{tier.cadence}</div>
+                </div>
               </div>
-            </div>
-            <p class="text-sm text-text-secondary leading-relaxed mb-3">{tier.blurb}</p>
-            <p class="text-xs text-text-muted leading-relaxed">{tier.perk}</p>
-            <div class={`mt-5 text-[11px] font-mono text-accent-${tier.accent}/70 group-hover:text-accent-${tier.accent} transition-colors`}>
-              Continue on Stripe →
-            </div>
-          </a>
-        ))}
+              <p class="text-sm text-text-secondary leading-relaxed mb-3">{tier.blurb}</p>
+              <p class="text-xs text-text-muted leading-relaxed">{tier.perk}</p>
+              <div class={`mt-5 text-[11px] font-mono ${a.ctaIdle} ${a.ctaHover} transition-colors`}>
+                Continue on Stripe →
+              </div>
+            </a>
+          );
+        })}
       </div>
 
       {!SUPPORT_LINKS_CONFIGURED && (
