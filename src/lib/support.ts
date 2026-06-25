@@ -16,8 +16,8 @@
 const env = import.meta.env;
 
 const LINKS = {
-  spark:   "https://buy.stripe.com/5kQ14gbTt89Y9NI1vngbm01",
-  synapse: "https://buy.stripe.com/dRm4gse1Bbma7FAca1gbm02",
+  spark:   "https://buy.stripe.com/6oU3coe1B75U4toei9gbm05",
+  synapse: "https://buy.stripe.com/14AeV66z9eym3pk6PHgbm06",
   cortex:  "https://buy.stripe.com/28E9AM0aL3TIgc6a1Tgbm03",
   custom:  "https://buy.stripe.com/4gMdR2f5FgGuaRM4Hzgbm04",
 };
@@ -37,9 +37,9 @@ export const SUPPORT_TIERS: SupportTier[] = [
   {
     id: "spark",
     name: "Spark",
-    price: "$5",
+    price: "$20",
     cadence: "one-time",
-    blurb: "Powers about ten thousand simulated neurons for a week.",
+    blurb: "About a day and a half of compute on the brain that's learning right now.",
     perk: "Our thanks, sent to your inbox.",
     href: env.PUBLIC_STRIPE_SUPPORT_SPARK ?? LINKS.spark,
     accent: "cyan",
@@ -47,9 +47,9 @@ export const SUPPORT_TIERS: SupportTier[] = [
   {
     id: "synapse",
     name: "Synapse",
-    price: "$25",
+    price: "$50",
     cadence: "one-time",
-    blurb: "Buys an hour of compute on the brain that's learning right now.",
+    blurb: "Almost a week of brain time — sensors, learning, the whole stack.",
     perk: "Your name on the contributor wall.",
     href: env.PUBLIC_STRIPE_SUPPORT_SYNAPSE ?? LINKS.synapse,
     accent: "blue",
