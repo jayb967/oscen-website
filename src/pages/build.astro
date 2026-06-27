@@ -180,7 +180,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 </Base>
 
 <script>
-  import { submitFormspree } from "../lib/forms";
+  import { submitFormspree, trackingForCollaborator } from "../lib/forms";
 
   const form = document.getElementById("collab-form-el") as HTMLFormElement | null;
   const btn = document.getElementById("collab-submit") as HTMLButtonElement | null;
@@ -190,10 +190,16 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
   if (form && btn && status && successCard) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      submitFormspree(form, btn, status, () => {
-        form.classList.add("hidden");
-        successCard.classList.remove("hidden");
-      });
+      submitFormspree(
+        form,
+        btn,
+        status,
+        () => {
+          form.classList.add("hidden");
+          successCard.classList.remove("hidden");
+        },
+        trackingForCollaborator(form),
+      );
     });
   }
 </script>

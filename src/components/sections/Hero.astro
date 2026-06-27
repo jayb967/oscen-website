@@ -75,13 +75,23 @@
     requestAnimationFrame(() => (frame.style.opacity = "1"));
   });
 
-  // Mouse parallax: send normalized mouse position to brain viz
+  // Mouse parallax: send normalized mouse position to brain viz.
+  // First interaction also fires the BrainVizPlay conversion (once per pageview).
   const hero = document.getElementById("hero")!;
+  let brainVizFired = false;
+  function reportBrainVizPlay() {
+    if (brainVizFired) return;
+    brainVizFired = true;
+    window.metaTrack?.("BrainVizPlay", { surface: "hero" });
+    window.gtmPush?.("brain_viz_play", { surface: "hero" });
+  }
   hero.addEventListener("mousemove", (e) => {
+    reportBrainVizPlay();
     const x = (e.clientX / window.innerWidth) * 2 - 1;   // -1 to 1
     const y = (e.clientY / window.innerHeight) * 2 - 1;   // -1 to 1
     frame?.contentWindow?.postMessage({ mouse: { x, y } }, "*");
   });
+  hero.addEventListener("touchstart", reportBrainVizPlay, { passive: true });
   hero.addEventListener("mouseleave", () => {
     frame?.contentWindow?.postMessage({ mouse: { x: 0, y: 0 } }, "*");
   });

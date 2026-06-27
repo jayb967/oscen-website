@@ -159,7 +159,7 @@ const paths = [
   </main>
 
   <script>
-    import { submitFormspree } from "../lib/forms";
+    import { submitFormspree, trackingForContact } from "../lib/forms";
 
     const form = document.getElementById("contact-form") as HTMLFormElement | null;
     const btn = document.getElementById("contact-submit") as HTMLButtonElement | null;
@@ -168,12 +168,18 @@ const paths = [
     if (form && btn && status) {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
-        submitFormspree(form, btn, status, () => {
-          form.reset();
-          status.textContent = "Message sent. We'll be in touch.";
-          status.classList.remove("hidden", "text-accent-red");
-          status.classList.add("text-accent-blue");
-        });
+        submitFormspree(
+          form,
+          btn,
+          status,
+          () => {
+            form.reset();
+            status.textContent = "Message sent. We'll be in touch.";
+            status.classList.remove("hidden", "text-accent-red");
+            status.classList.add("text-accent-blue");
+          },
+          trackingForContact(form),
+        );
       });
     }
   </script>

@@ -1,0 +1,166 @@
+---
+/**
+ * CookieConsent.astro
+ *
+ * GDPR/CCPA consent banner. Site defaults to deny-all tracking;
+ * pixel and GTM only load after the user clicks Accept.
+ *
+ * Mounted once globally in Base.astro. No props.
+ * Region copy (US soft vs. INTL strict) is selected at runtime,
+ * because the page is statically generated and we don't know the
+ * visitor's region until the browser loads.
+ *
+ * Reopen mechanism: any element with [data-consent-reopen] (e.g. a
+ * footer link) will clear consent and re-show the banner on click.
+ */
+---
+
+<div
+  id="cookie-consent"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Cookie consent"
+  class="glass-bright fixed bottom-0 left-0 right-0 z-50 hidden opacity-0 transition-opacity duration-300 ease-out border-t"
+  style="border-top-color: var(--color-border-bright);"
+>
+  <div class="mx-auto max-w-6xl px-6 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex-1 min-w-0">
+      <!-- US copy (soft) -->
+      <div data-consent-copy="us" class="hidden">
+        <h2 class="text-sm font-medium text-text-primary mb-1">
+          We use cookies to understand what's working.
+        </h2>
+        <p class="text-xs text-text-secondary leading-relaxed">
+          Privacy-safe analytics plus optional ad measurement for our investor outreach. You can opt out anytime in the footer.
+        </p>
+      </div>
+
+      <!-- International copy (strict) -->
+      <div data-consent-copy="intl" class="hidden">
+        <h2 class="text-sm font-medium text-text-primary mb-1">
+          Cookies and tracking
+        </h2>
+        <p class="text-xs text-text-secondary leading-relaxed">
+          Required cookies keep this site working. Optional cookies help us measure our paid outreach to investors. Choose below or learn more in our
+          <a href="/privacy" class="underline decoration-white/20 hover:decoration-text-primary hover:text-text-primary transition-colors">Privacy Policy</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 sm:flex-shrink-0">
+      <button
+        type="button"
+        data-consent-decline
+        class="order-2 sm:order-1 px-5 py-2 text-[12px] font-medium rounded-full border border-white/15 text-text-primary/90 hover:text-text-primary hover:border-white/30 hover:-translate-y-px transition-all duration-300 font-mono tracking-wide"
+      >
+        <span data-consent-label="decline-us">Decline</span>
+        <span data-consent-label="decline-intl" class="hidden">Reject all</span>
+      </button>
+      <button
+        type="button"
+        data-consent-accept
+        class="order-1 sm:order-2 px-5 py-2 text-[12px] font-medium rounded-full border border-accent-amber/30 bg-accent-amber/10 text-accent-amber hover:bg-accent-amber/20 hover:border-accent-amber/50 transition-all duration-300 font-mono tracking-wide"
+      >
+        <span data-consent-label="accept-us">Accept</span>
+        <span data-consent-label="accept-intl" class="hidden">Accept all</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import "../scripts/consent";
+
+  type ConsentState = "granted" | "denied" | "unknown";
+  type ConsentRegion = "us" | "intl";
+
+  interface OscenConsent {
+    state: () => ConsentState;
+    region: () => ConsentRegion;
+    grant: () => void;
+    deny: () => void;
+    clear: () => void;
+    onChange: (handler: (state: ConsentState) => void) => void;
+  }
+
+  declare global {
+    interface Window {
+      oscenConsent: OscenConsent;
+    }
+  }
+
+  const banner = document.getElementById("cookie-consent");
+  if (banner) {
+    const acceptBtn = banner.querySelector<HTMLButtonElement>("[data-consent-accept]");
+    const declineBtn = banner.querySelector<HTMLButtonElement>("[data-consent-decline]");
+    const copyBlocks = banner.querySelectorAll<HTMLElement>("[data-consent-copy]");
+    const labels = banner.querySelectorAll<HTMLElement>("[data-consent-label]");
+
+    const applyRegionCopy = () => {
+      const region = window.oscenConsent?.region?.() ?? "us";
+      copyBlocks.forEach((el) => {
+        el.classList.toggle("hidden", el.dataset.consentCopy !== region);
+      });
+      labels.forEach((el) => {
+        const key = el.dataset.consentLabel ?? "";
+        el.classList.toggle("hidden", !key.endsWith(`-${region}`));
+      });
+    };
+
+    const showBanner = () => {
+      applyRegionCopy();
+      banner.classList.remove("hidden");
+      // Force layout so the opacity transition runs.
+      void banner.offsetHeight;
+      banner.style.opacity = "1";
+      acceptBtn?.focus({ preventScroll: true });
+    };
+
+    const hideBanner = () => {
+      banner.style.opacity = "0";
+      window.setTimeout(() => banner.classList.add("hidden"), 300);
+    };
+
+    const onAccept = () => {
+      window.oscenConsent?.grant?.();
+      hideBanner();
+    };
+
+    const onDecline = () => {
+      window.oscenConsent?.deny?.();
+      hideBanner();
+    };
+
+    acceptBtn?.addEventListener("click", onAccept);
+    declineBtn?.addEventListener("click", onDecline);
+
+    // Escape key = decline (matches "non-blocking dismiss" intent).
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !banner.classList.contains("hidden")) {
+        onDecline();
+      }
+    });
+
+    // Reopen hooks (footer "Cookie preferences" link, etc.).
+    document.querySelectorAll<HTMLElement>("[data-consent-reopen]").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.oscenConsent?.clear?.();
+        showBanner();
+      });
+    });
+
+    // Initial mount: only show if the user has not decided.
+    const init = () => {
+      const state = window.oscenConsent?.state?.() ?? "unknown";
+      if (state === "unknown") showBanner();
+    };
+
+    if (window.oscenConsent) {
+      init();
+    } else {
+      // consent.ts may attach asynchronously; retry on next tick.
+      window.setTimeout(init, 0);
+    }
+  }
+</script>

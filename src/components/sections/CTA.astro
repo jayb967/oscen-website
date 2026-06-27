@@ -55,7 +55,7 @@ import { BUTTONDOWN_ACTION } from "../../lib/forms";
 </section>
 
 <script>
-  import { subscribeButtondown } from "../../lib/forms";
+  import { subscribeButtondown, trackingForNewsletter } from "../../lib/forms";
 
   const form = document.getElementById("email-form") as HTMLFormElement | null;
   const btn = document.getElementById("subscribe-submit") as HTMLButtonElement | null;
@@ -64,7 +64,7 @@ import { BUTTONDOWN_ACTION } from "../../lib/forms";
   if (form && btn && status) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      subscribeButtondown(form, btn, status);
+      subscribeButtondown(form, btn, status, trackingForNewsletter(form));
     });
   }
 </script>

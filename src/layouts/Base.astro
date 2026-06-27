@@ -1,4 +1,6 @@
 ---
+import CookieConsent from "../components/CookieConsent.astro";
+
 interface Props {
   title: string;
   description?: string;
@@ -18,6 +20,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
 
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? "oscen.ai";
 const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === "true";
+const metaDomainVerification = import.meta.env.PUBLIC_META_DOMAIN_VERIFICATION;
 ---
 
 <!doctype html>
@@ -32,6 +35,10 @@ const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === "true";
     <link rel="canonical" href={canonicalURL} />
 
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {metaDomainVerification && (
+      <meta name="facebook-domain-verification" content={metaDomainVerification} />
+    )}
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -65,9 +72,41 @@ const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === "true";
   <body>
     <slot />
 
-    <!-- First-touch UTM + referrer capture (must load before form scripts) -->
+    <!-- Global legal strip. Sits below per-page footers. Privacy + Terms +
+         a reopen-consent button so users can change their tracking choice. -->
+    <div class="border-t border-border/40 py-4 px-6 text-center">
+      <p class="text-[10px] text-text-muted/60 font-mono space-x-4">
+        <a href="/privacy" class="hover:text-accent-blue transition-colors">Privacy</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="/terms" class="hover:text-accent-blue transition-colors">Terms</a>
+        <span aria-hidden="true">&middot;</span>
+        <button type="button" data-consent-reopen class="hover:text-accent-blue transition-colors cursor-pointer">Cookie preferences</button>
+      </p>
+    </div>
+
+    <!-- Consent banner: ships HTML up-front so the runtime can show it as soon
+         as oscenConsent loads. Internally consent-gates pixel + GTM. -->
+    <CookieConsent />
+
+    <!-- First-touch UTM + referrer capture (must load before form scripts). -->
     <script>
       import "../scripts/attribution";
+    </script>
+
+    <!-- Consent state machine. Must load before meta-pixel + gtm because both
+         gate their boot on window.oscenConsent. -->
+    <script>
+      import "../scripts/consent";
+    </script>
+
+    <!-- Meta Pixel loader. No-op until consent:granted; exposes window.metaTrack. -->
+    <script>
+      import "../scripts/meta-pixel";
+    </script>
+
+    <!-- Google Tag Manager loader. Same consent gate; exposes window.gtmPush. -->
+    <script>
+      import "../scripts/gtm";
     </script>
 
     <!-- GSAP ScrollTrigger animations -->

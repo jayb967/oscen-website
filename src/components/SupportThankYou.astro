@@ -163,6 +163,46 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
       window.history.replaceState({}, "", clean.toString());
     }
 
+    function fireRegistration(email, tierValue) {
+      const eventId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : "evt_" + Date.now();
+      const params = {
+        registration_method: "supporter_wall",
+        tier: tierValue || "unknown",
+        value: 50,
+        currency: "USD",
+      };
+      if (typeof window.metaTrack === "function") {
+        window.metaTrack("CompleteRegistration", params, eventId);
+      }
+      if (typeof window.gtmPush === "function") {
+        window.gtmPush("completeregistration", { ...params, event_id: eventId });
+      }
+      // Consent gate: do not send PII to the CAPI mirror unless granted.
+      if (window.oscenConsent && window.oscenConsent.state() !== "granted") return;
+      // Read fbp/fbc cookies for CAPI server-side dedup.
+      function readCookie(name) {
+        const m = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+        return m ? decodeURIComponent(m[1]) : undefined;
+      }
+      try {
+        fetch("/.netlify/functions/meta-capi/registration", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            event_id: eventId,
+            event_source_url: window.location.href,
+            user_data: email ? { em: email } : {},
+            custom_data: params,
+            fbp: readCookie("_fbp"),
+            fbc: readCookie("_fbc"),
+          }),
+          keepalive: true,
+        });
+      } catch {
+        // best-effort; pixel already fired
+      }
+    }
+
     function showStatus(msg, ok) {
       if (!status) return;
       status.textContent = msg;
@@ -212,6 +252,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
         const buttondownOk = results[1].status === "fulfilled";
 
         if (formspreeOk || buttondownOk) {
+          fireRegistration(email, t);
           showDone();
         } else {
           showStatus("Something went wrong. Email info@oscen.ai and we will sort it out.", false);
