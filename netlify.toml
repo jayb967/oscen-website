@@ -2,6 +2,13 @@
   publish = "dist"
   command = "npm run build"
 
+[build.environment]
+  # Both values are intentionally public:
+  # - PUBLIC_META_DOMAIN_VERIFICATION must appear in <meta> for Meta to verify
+  # - PUBLIC_META_PIXEL_ID appears in fbq('init', ...) on the page
+  # Netlify's secret scanner flags them because the values match env vars.
+  SECRETS_SCAN_OMIT_KEYS = "PUBLIC_META_DOMAIN_VERIFICATION,PUBLIC_META_PIXEL_ID"
+
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
