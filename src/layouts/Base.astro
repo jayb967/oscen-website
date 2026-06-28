@@ -20,7 +20,11 @@ const ogImageURL = new URL(ogImage, Astro.site);
 
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? "oscen.ai";
 const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === "true";
-const metaDomainVerification = import.meta.env.PUBLIC_META_DOMAIN_VERIFICATION;
+// Hardcoded fallback so the tag ships even before the Netlify env var is
+// configured. Env var override still wins when present.
+const metaDomainVerification =
+  import.meta.env.PUBLIC_META_DOMAIN_VERIFICATION ??
+  "nyjtlqf651sxfcwau3ne8fpoikry0a";
 ---
 
 <!doctype html>
