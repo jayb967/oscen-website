@@ -118,16 +118,20 @@ Source: `oscen/brain-viz/` (canonical, newer than the website copy).
 
 Reference: ref-go2-pinned-stat.jpeg caption system.
 
-- [ ] Pinned section (300-500vh): camera orbits/glides around the brain; each stop
-      highlights one stage -- Sense / Encode / Think / Act / Learn (reuse
-      HowItWorks.astro copy) -- by focusing a region cluster (`focusRegion` lerp
-      logic from BrainScene) and dimming the rest (`setDim`).
-- [ ] Oversized caption swap bottom-left: giant white stat/verb + small blue label,
-      SplitText-style stagger on enter/exit.
-- [ ] Trigger real synapse pulse bursts on section transitions (DataBridge
-      demo_reaction pathway already supports firing-rate overrides).
-- [ ] Glass explainer cards (corner-tick style, ref-unfor-glass-cards.jpeg) for the
-      Problem/Solution copy blocks between pinned scenes.
+- [x] Pinned 500vh scene in HowItWorks.astro: per-step focusRegion glide +
+      orbit pose + MOODS.focus brighten (named mood states in experience.ts).
+      Step->region mapping in `src/data/how-it-works.ts` (Sense=sensory_cortex,
+      Encode=feature_layer, Think=association_cortex, Act=motor_cortex,
+      Learn=predictive_layer). Degrades to a plain list without JS/reduced
+      motion (.hiw-pinned toggles the overlay layout).
+- [x] Oversized caption swap bottom-left (font-tech verb + accent step counter
+      + desc, gsap cross-fade, header yields after step 1, .text-scrim shared
+      utility for legibility over bright clusters).
+- [x] Real firing bursts per step via new `DataBridge.applyOverride()` (public
+      method refactored out of the demo_reaction postMessage handler; flare
+      0.18 merged via max() over organic sim activity).
+- [ ] Glass explainer cards (corner-tick style) for Problem/Solution copy
+      blocks -- rolled into Phase 6 restyle pass.
 
 ## Phase 4 -- The humanoid (3-5 days, parallelizable with Phase 3)
 
