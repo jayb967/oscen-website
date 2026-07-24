@@ -258,6 +258,14 @@ export class BrainRegions {
             // Add pulse flash on top (additive, capped)
             const intensity = Math.min(1.0, baseIntensity + data.pulseIntensity * 0.4);
 
+            // Everything below only matters when the instanced cloud is
+            // actually rendered. In cinematic mode the GPU point cloud
+            // replaces it and these meshes are permanently hidden -- but the
+            // rate/pulse smoothing above must keep running (regionData feeds
+            // the point cloud + labels). Skipping the per-particle breathing
+            // loop saves ~15k sin+matrix writes per frame.
+            if (!mesh.visible) continue;
+
             // Update material opacity and brightness
             mesh.material.opacity = 0.15 + intensity * 0.7;
             const col = mesh.material.color;
@@ -369,6 +377,10 @@ export class BrainRegions {
      * region firing data (regionData) keeps updating for the labels + point cloud.
      */
     setCloudVisible(visible) {
+        // Remember the cinematic replacement so setDim can't re-show the
+        // clouds (its low-factor branch flips visibility back on), and so
+        // update() can skip animating particles nobody can see.
+        this._cloudReplaced = !visible;
         for (const mesh of Object.values(this.regionMeshes)) {
             if (mesh) mesh.visible = visible;
         }
@@ -384,25 +396,26 @@ export class BrainRegions {
         // materials even at low opacity, so at high factor we toggle
         // visibility off entirely. Hull silhouette stays so the brain
         // outline still anchors the constellation.
+        // NOTE: no material.needsUpdate here. Opacity is a plain uniform
+        // refresh; needsUpdate forces a full initMaterial/program-cache pass
+        // per material, and setDim runs on every tick of a mood tween --
+        // 17 materials x 60Hz was a measurable main-thread stall (the
+        // "freeze on each How-It-Works step"). All these materials are
+        // created transparent, so the flag never needs re-setting either.
         const baseOpacity = 0.4;
         const opacity = baseOpacity * (1 - factor * 0.96);
         const hideMeshes = factor > 0.85;
+        const cloudReplaced = this._cloudReplaced === true; // cinematic: stay hidden
         for (const mesh of Object.values(this.regionMeshes)) {
             if (!mesh) continue;
-            mesh.visible = !hideMeshes;
-            if (mesh.material) {
-                mesh.material.opacity = opacity;
-                mesh.material.transparent = true;
-                mesh.material.needsUpdate = true;
-            }
+            mesh.visible = cloudReplaced ? false : !hideMeshes;
+            if (mesh.material) mesh.material.opacity = opacity;
         }
         if (this._hullMeshes) {
             for (const mesh of this._hullMeshes) {
                 if (!mesh || !mesh.material) continue;
                 const base = mesh.material.userData?.baseOpacity ?? 0.15;
                 mesh.material.opacity = base * (1 - factor * 0.7);
-                mesh.material.transparent = true;
-                mesh.material.needsUpdate = true;
             }
         }
     }

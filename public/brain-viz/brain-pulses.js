@@ -258,11 +258,17 @@ export class BrainPulses {
                 transparent: true,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false,
+                // No depth test: the reveal parks the arcs inside the
+                // humanoid's depth-writing head; they must stay visible
+                // through the skull (nothing else writes depth elsewhere).
+                depthTest: false,
                 side: THREE.DoubleSide,
             });
 
             const mesh = new THREE.Mesh(tubeGeo, material);
             mesh.frustumCulled = false;
+            // After the figure (0), with the glass shell (1), before points (2).
+            mesh.renderOrder = 1;
             this.scene.add(mesh);
 
             // Remember the default tube opacity so setDim() can restore.
