@@ -74,11 +74,17 @@ function init() {
     }
 }
 
-/** Named brain states so every scene speaks the same vocabulary. */
+/**
+ * Named brain states so every scene speaks the same vocabulary.
+ * Bloom values live in the CINEMATIC regime: BrainStage hard-caps strength
+ * at 0.34 (threshold 0.80) so only firing regions + pulses glow. The old
+ * 1.0/0.45/0.9 vocabulary was tuned for the classic renderer and would all
+ * clamp flat at the cap.
+ */
 const MOODS = {
-    hero: { dim: 0, bloom: 1.0 },        // full presence behind the hero
-    backdrop: { dim: 0.75, bloom: 0.45 }, // quiet behind copy sections
-    focus: { dim: 0.3, bloom: 0.9 },      // pinned scenes: bright, one region flared
+    hero: { dim: 0, bloom: 0.34 },         // full presence behind the hero
+    backdrop: { dim: 0.75, bloom: 0.16 },  // quiet behind copy sections
+    focus: { dim: 0.3, bloom: 0.3 },       // pinned scenes: bright, one region flared
 };
 
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;

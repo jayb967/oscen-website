@@ -15,7 +15,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { BrainModule } from './brain-module.js';
+import { createGradePass } from './brain-postfx.js';
+import { detectQualityTier } from './quality-tier.js';
 
 const DEFAULTS = {
     mode: 'sim',            // 'sim' | 'live'
@@ -28,9 +31,19 @@ const DEFAULTS = {
     maxPixelRatio: 2,
     pauseWhenHidden: true,  // IntersectionObserver + visibilitychange
     respectReducedMotion: true,
+    cinematic: true,        // lazy-load the glass shell + point cloud after first paint
+    shellUrl: '/models/brain.glb',
+    dracoDecoderPath: '/draco/',
 };
 
-const BASE_BLOOM = 1.0;
+// Cinematic bloom regime (from canonical brain-scene-cinematic.js): the
+// resting point cloud sits dim under a MID threshold so only firing regions
+// + pulses bloom. Strength is HARD-CAPPED -- the mood vocabulary in
+// experience.ts is scaled into this range.
+const BLOOM_THRESHOLD = 0.80;
+const BLOOM_RADIUS = 1.05;
+const BLOOM_CAP = 0.34;
+const BASE_BLOOM = BLOOM_CAP;
 const DEFAULT_CAMERA_POS = new THREE.Vector3(14, 4, 8);
 const DEFAULT_TARGET = new THREE.Vector3(0, 0.5, -0.5);
 
@@ -91,10 +104,16 @@ export class BrainStage {
         });
         const { clientWidth: w, clientHeight: h } = this.container;
         this.renderer.setSize(w, h);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.opts.maxPixelRatio));
+        // GPU auto-tier scales point counts / pixel ratio / post so the
+        // cinematic layer never stutters on integrated GPUs. The site's own
+        // maxPixelRatio cap (2 desktop / 1.5 mobile) still wins if lower.
+        this.quality = detectQualityTier(this.renderer);
+        this.renderer.setPixelRatio(Math.min(
+            window.devicePixelRatio, this.opts.maxPixelRatio, this.quality.pixelRatio,
+        ));
         this.renderer.setClearColor(this.opts.clearColor, this.opts.clearAlpha);
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.2;
+        this.renderer.toneMappingExposure = 1.0;
         this.renderer.domElement.style.display = 'block';
         this.renderer.domElement.style.width = '100%';
         this.renderer.domElement.style.height = '100%';
@@ -129,9 +148,40 @@ export class BrainStage {
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(new RenderPass(this.scene, this.camera));
         const { clientWidth: w, clientHeight: h } = this.container;
-        this.bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), BASE_BLOOM, 0.7, 0.5);
+        this._bloomCap = Math.min(this.quality.bloom, BLOOM_CAP);
+        this.bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(w, h),
+            Math.min(BASE_BLOOM, this._bloomCap),
+            BLOOM_RADIUS,
+            BLOOM_THRESHOLD,
+        );
         this.composer.addPass(this.bloomPass);
-        this._baseBloom = BASE_BLOOM;
+        this._baseBloom = Math.min(BASE_BLOOM, this._bloomCap);
+
+        // Cinematic color grade (vignette + grain + chromatic aberration),
+        // skipped on the low tier to save a full-screen pass.
+        if (this.quality.grade) {
+            try {
+                this.gradePass = createGradePass();
+                this.gradePass.uniforms.uGrain.value = this.quality.grain;
+                this.composer.addPass(this.gradePass);
+            } catch (e) {
+                console.warn('[BrainStage] grade pass failed:', e);
+            }
+        }
+
+        // IBL for the glass shell: PMREM-prefiltered RoomEnvironment on
+        // scene.environment ONLY (background stays the dark clear color).
+        // The humanoid x-ray ShaderMaterial ignores the env map, so this is
+        // safe to set unconditionally.
+        try {
+            const pmrem = new THREE.PMREMGenerator(this.renderer);
+            this._envRT = pmrem.fromScene(new RoomEnvironment(), 0.04);
+            this.scene.environment = this._envRT.texture;
+            pmrem.dispose();
+        } catch (e) {
+            console.warn('[BrainStage] IBL setup failed:', e);
+        }
     }
 
     _initControls() {
@@ -261,7 +311,9 @@ export class BrainStage {
     }
 
     setBloomStrength(s) {
-        this._baseBloom = s;
+        // Clamped to the cinematic cap so stale-vocabulary callers can't
+        // blow out the point cloud.
+        this._baseBloom = Math.min(s, this._bloomCap);
     }
 
     /** Register an object with update(dt), ticked inside the render loop. */
@@ -321,7 +373,35 @@ export class BrainStage {
         this.module.update(dt);
         for (const u of this._updatables) u.update(dt);
         this._updateNeuromodEffects(dt);
+        if (this.gradePass) this.gradePass.uniforms.uTime.value += dt;
         this.composer.render();
+
+        // Kick the shell GLB fetch AFTER the first classic-look paint so the
+        // cinematic layer never sits in the critical path (LCP rule).
+        if (!this._cinematicKicked) {
+            this._cinematicKicked = true;
+            if (this.opts.cinematic) this._kickCinematic();
+        }
+    }
+
+    _kickCinematic() {
+        const kick = () => {
+            this.module.loadCinematic({
+                url: this.opts.shellUrl,
+                dracoDecoderPath: this.opts.dracoDecoderPath,
+                pointCloud: {
+                    surfaceCount: this.quality.surfaceCount,
+                    fillTotal: this.quality.fillTotal,
+                    pixelRatio: this.renderer.getPixelRatio(),
+                },
+            }).then(() => {
+                // Region anchors pick the camera-facing hemisphere for
+                // focus glides (and labels, if a page ever adds them).
+                this.module.regions.setLabelCamera(this.camera);
+            }).catch((e) => console.warn('[BrainStage] cinematic layer failed:', e));
+        };
+        if ('requestIdleCallback' in window) requestIdleCallback(kick, { timeout: 2000 });
+        else setTimeout(kick, 300);
     }
 
     /** DA warms the key light, NE boosts bloom, 5-HT/OT tint the ambient. */
@@ -343,8 +423,12 @@ export class BrainStage {
             0.8 - daWarm * 0.3,
         );
 
+        // NE arousal boost, hard-capped so the dense point cloud never blows
+        // out (the cinematic regime's version of _updateNeuromodEffects cap).
         const neBoost = Math.max(0, (nm.ne - 0.8) * 0.15);
-        this.bloomPass.strength = this._baseBloom + neBoost;
+        this.bloomPass.strength = Math.min(this._baseBloom + neBoost, this._bloomCap);
+
+        this.module.pointCloud?.setNeuromodulation(nm);
 
         const shtCalm = Math.max(0, (nm.serotonin - 0.5) * 0.15);
         const otWarm = Math.max(0, (nm.oxytocin || 0) - 0.5) * 0.08;
@@ -380,6 +464,8 @@ export class BrainStage {
             this.starfield.geometry.dispose();
             this.starfield.material.dispose();
         }
+        this._envRT?.dispose();
+        this.gradePass?.material?.dispose();
         this.composer.dispose();
         this.renderer.dispose();
         this.renderer.domElement.remove();

@@ -91,7 +91,7 @@ export class HumanoidReveal {
             tgt.z = lerp(e.target.z, 0, t);
             const holo = smooth(clamp01((p - 0.06) / 0.34));
             fig.setXray({ head: holo, body: holo * 0.85 });
-            stage.setBloomStrength(lerp(0.45, 0.6, t));
+            stage.setBloomStrength(lerp(0.16, 0.2, t));
         } else if (p < 0.7) {
             // B -- closeup orbit, body materializing.
             const t = smooth((p - 0.4) / 0.3);
@@ -104,7 +104,7 @@ export class HumanoidReveal {
             cam.z = Math.cos(az) * dist;
             tgt.y = lerp(0, 0.05, t);
             fig.setXray({ head: 1, body: lerp(0.85, 0.3, t) });
-            stage.setBloomStrength(lerp(0.6, 0.42, t));
+            stage.setBloomStrength(lerp(0.2, 0.14, t));
         } else {
             // C -- the pull-back: she goes solid against black.
             const t = smooth((p - 0.7) / 0.3);
@@ -116,7 +116,7 @@ export class HumanoidReveal {
             cam.z = Math.cos(az) * dist;
             tgt.y = lerp(0.05, -2.6, t);
             fig.setXray({ head: lerp(1, 0.35, t), body: lerp(0.3, 0, t) });
-            stage.setBloomStrength(lerp(0.42, 0.18, t));
+            stage.setBloomStrength(lerp(0.14, 0.06, t));
         }
 
         stage.setCameraPose(cam, tgt);
@@ -146,7 +146,7 @@ export class HumanoidReveal {
         );
         // Skull glow eases down so late-page copy reads over a quiet head.
         fig.setXray({ head: lerp(0.35, 0.25, t), body: 0 });
-        this.stage.setBloomStrength(lerp(0.18, 0.24, t));
+        this.stage.setBloomStrength(lerp(0.06, 0.08, t));
     }
 
     /**
@@ -156,7 +156,7 @@ export class HumanoidReveal {
     setBackdrop() {
         this._active = false;
         this.figure.setXray({ head: 0.25, body: 0 });
-        this.stage.setBloomStrength(0.25);
+        this.stage.setBloomStrength(0.09);
     }
 
     /** Scrolled back above the reveal: hand everything back to the brain. */
