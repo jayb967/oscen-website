@@ -24,7 +24,9 @@ export class BrainRegions {
         this.scene = scene;
         this.regionMeshes = {};   // id → InstancedMesh
         this.regionData = {};     // id → { count, baseColors, currentRate }
-        this.regionCenters = {};  // id → THREE.Vector3
+        this.regionCenters = {};  // id → THREE.Vector3 (primary / label anchor)
+        this._sideCenters = {};   // id → { plus: Vector3, minus: Vector3 } (CINEMATIC bilateral)
+        this._labelCamera = null; // set by cinematic so labels pick the near side
         this.time = 0;
         this._basePositions = {}; // id → Float32Array (x,y,z per instance)
         this._noisePhases = {};   // id → Float32Array (3 phases per instance)
@@ -116,6 +118,8 @@ export class BrainRegions {
                 baseColor: new THREE.Color(region.color[0], region.color[1], region.color[2]),
                 currentRate: 0,
                 targetRate: 0,
+                pulseIntensity: 0,  // flash-on-activate effect
+                prevTargetRate: 0,  // track rate changes for pulse trigger
             };
             this._basePositions[region.id] = basePositions;
             this._noisePhases[region.id] = noisePhases;
@@ -151,8 +155,8 @@ export class BrainRegions {
                 x *= 1.0 - indent * 0.25;
             }
 
-            // Slight bilateral compression (brain is narrower left-right than front-back)
-            x *= 0.6;
+            // Bilateral compression (brain is narrower left-right than front-back)
+            x *= 0.82;
 
             // Cerebellum bulge at back-bottom
             if (z < -2.5 && y < -0.5 && y > -3.0) {
@@ -192,7 +196,7 @@ export class BrainRegions {
                     // Procedural sulci/gyri pattern — wavy lines suggesting cortical folds
                     float sulci = sin(vPos.x * 12.0 + sin(vPos.y * 4.0) * 2.0)
                                 * sin(vPos.y * 8.0 + sin(vPos.z * 5.0) * 1.5) * 0.5 + 0.5;
-                    float alpha = mix(0.02, 0.07, sulci);
+                    float alpha = mix(0.06, 0.14, sulci);
                     gl_FragColor = vec4(baseColor, alpha);
                 }
             `,
@@ -204,7 +208,7 @@ export class BrainRegions {
         const wireMat = new THREE.MeshBasicMaterial({
             color: 0x3a5a8a,
             transparent: true,
-            opacity: 0.07,
+            opacity: 0.14,
             wireframe: true,
             depthWrite: false,
         });
@@ -237,16 +241,30 @@ export class BrainRegions {
             // Smooth interpolation of firing rate
             data.currentRate += (data.targetRate - data.currentRate) * Math.min(1, dt * 3);
 
-            // Map firing rate to visual intensity (range: 0.005 - 0.08 → 0-1)
-            const intensity = Math.min(1.0, data.currentRate * 15);
+            // Detect activation: target rate jumped up → trigger pulse
+            if (data.targetRate > data.prevTargetRate + 0.005) {
+                data.pulseIntensity = 1.0;
+            }
+            data.prevTargetRate = data.targetRate;
+
+            // Decay pulse
+            data.pulseIntensity *= Math.max(0, 1.0 - dt * 3.0);
+            if (data.pulseIntensity < 0.01) data.pulseIntensity = 0;
+
+            // Map firing rate to visual intensity using sqrt curve for wider spread
+            // 0.01 → 0.22, 0.03 → 0.39, 0.05 → 0.50, 0.08 → 0.63, 0.12 → 0.77, 0.20 → 1.0
+            const baseIntensity = Math.min(1.0, Math.sqrt(data.currentRate * 5.0));
+
+            // Add pulse flash on top (additive, capped)
+            const intensity = Math.min(1.0, baseIntensity + data.pulseIntensity * 0.4);
 
             // Update material opacity and brightness
-            mesh.material.opacity = 0.2 + intensity * 0.6;
+            mesh.material.opacity = 0.15 + intensity * 0.7;
             const col = mesh.material.color;
-            const bright = 0.35 + intensity * 0.45; // max 0.8
-            col.r = data.baseColor.r * bright;
-            col.g = data.baseColor.g * bright;
-            col.b = data.baseColor.b * bright;
+            const bright = 0.25 + intensity * 0.55; // max 0.8
+            col.r = data.baseColor.r * bright + data.pulseIntensity * 0.15;
+            col.g = data.baseColor.g * bright + data.pulseIntensity * 0.1;
+            col.b = data.baseColor.b * bright + data.pulseIntensity * 0.15;
 
             // Breathing animation: oscillate around base position (no drift)
             const basePos = this._basePositions[region.id];
@@ -276,9 +294,117 @@ export class BrainRegions {
         }
     }
 
-    /** Get center position of a region */
-    getCenter(regionId) {
+    /**
+     * Get a region's center. `side` selects a hemisphere anchor (CINEMATIC only):
+     *   'plus' / 'minus'  -> the +lr / -lr bilateral anchor (used by the synapse
+     *                        pulses so tubes are built on BOTH hemispheres).
+     *   undefined (1-arg) -> the label/primary anchor. Classic never registers
+     *                        bilateral anchors, so this is byte-identical to the
+     *                        old behavior. Cinematic, once a label camera is set,
+     *                        returns whichever hemisphere anchor faces the camera
+     *                        so labels stop stacking on one half.
+     */
+    getCenter(regionId, side) {
+        const pair = this._sideCenters[regionId];
+        if (pair) {
+            if (side === 'plus') return pair.plus;
+            if (side === 'minus') return pair.minus;
+            // No explicit side: pick the camera-facing anchor for labels.
+            if (this._labelCamera && pair.plus !== pair.minus) {
+                const cam = this._labelCamera.position;
+                return pair.plus.distanceToSquared(cam) <= pair.minus.distanceToSquared(cam)
+                    ? pair.plus : pair.minus;
+            }
+        }
         return this.regionCenters[regionId] || new THREE.Vector3();
+    }
+
+    /**
+     * Override a region's center (CINEMATIC-ONLY). The cinematic scene registers
+     * anatomical anchors on the GLB mesh and calls this so labels + synapse
+     * endpoints follow the real anatomy instead of the midline schematic in
+     * REGION_POSITIONS. Also updates regionData.center (read by consumers that
+     * cache it). Classic never calls this, so its layout is unchanged.
+     */
+    setCenterOverride(regionId, vec3) {
+        if (!vec3) return;
+        const c = this.regionCenters[regionId];
+        if (c) c.copy(vec3); else this.regionCenters[regionId] = vec3.clone();
+        if (this.regionData[regionId]) this.regionData[regionId].center = this.regionCenters[regionId];
+    }
+
+    /**
+     * Register both hemisphere anchors for a region (CINEMATIC-ONLY). `plus` is
+     * the +lr side and doubles as the primary/label anchor; `minus` is the
+     * mirrored -lr side (pass the same vector for a midline region). Lets
+     * getCenter(id, 'plus'|'minus') hand the synapse pulses a per-hemisphere
+     * endpoint so activity appears on BOTH halves, not just one. Classic never
+     * calls this, so its single-anchor layout is unchanged.
+     */
+    setBilateralCenter(regionId, plus, minus) {
+        if (!plus) return;
+        this.setCenterOverride(regionId, plus);
+        this._sideCenters[regionId] = { plus, minus: minus || plus };
+    }
+
+    /** Camera used to pick the near-hemisphere label anchor (CINEMATIC-ONLY). */
+    setLabelCamera(camera) {
+        this._labelCamera = camera || null;
+    }
+
+    /**
+     * Show/hide the procedural sphere hull (solid sulci shader + wireframe).
+     * The cinematic scene hides it because the anatomical GLB shell replaces it.
+     */
+    setHullVisible(visible) {
+        if (!this._hullMeshes) return;
+        for (const mesh of this._hullMeshes) {
+            if (mesh) mesh.visible = visible;
+        }
+    }
+
+    /**
+     * Show/hide the instanced-sphere particle clouds. The cinematic scene hides
+     * them because the GPU point cloud (brain-pointcloud.js) replaces them, but
+     * region firing data (regionData) keeps updating for the labels + point cloud.
+     */
+    setCloudVisible(visible) {
+        for (const mesh of Object.values(this.regionMeshes)) {
+            if (mesh) mesh.visible = visible;
+        }
+    }
+
+    /**
+     * Multiplicative opacity dim. Used by Beliefs Mode to fade the
+     * cortex back so the belief constellation reads as the visual hero.
+     * factor: 0 = original opacity (0.4), 1 = effectively invisible.
+     */
+    setDim(factor) {
+        // factor: 0 = original, 1 = fully hidden. Bloom amplifies additive
+        // materials even at low opacity, so at high factor we toggle
+        // visibility off entirely. Hull silhouette stays so the brain
+        // outline still anchors the constellation.
+        const baseOpacity = 0.4;
+        const opacity = baseOpacity * (1 - factor * 0.96);
+        const hideMeshes = factor > 0.85;
+        for (const mesh of Object.values(this.regionMeshes)) {
+            if (!mesh) continue;
+            mesh.visible = !hideMeshes;
+            if (mesh.material) {
+                mesh.material.opacity = opacity;
+                mesh.material.transparent = true;
+                mesh.material.needsUpdate = true;
+            }
+        }
+        if (this._hullMeshes) {
+            for (const mesh of this._hullMeshes) {
+                if (!mesh || !mesh.material) continue;
+                const base = mesh.material.userData?.baseOpacity ?? 0.15;
+                mesh.material.opacity = base * (1 - factor * 0.7);
+                mesh.material.transparent = true;
+                mesh.material.needsUpdate = true;
+            }
+        }
     }
 
     dispose() {

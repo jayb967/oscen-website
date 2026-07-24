@@ -271,7 +271,8 @@ export class DataBridge {
             this.ws.onopen = () => {
                 console.log('[DataBridge] Connected to', wsUrl);
                 // If we don't get a neuro_update within 15s, start sim alongside
-                // but keep trying to reconnect.
+                // but keep trying to reconnect. 15s accounts for Cloudflare
+                // tunnel latency on initial WebSocket handshake.
                 this._liveTimeout = setTimeout(() => {
                     if (this.mode === 'connecting') {
                         console.log('[DataBridge] No brain data yet, showing simulated while waiting');

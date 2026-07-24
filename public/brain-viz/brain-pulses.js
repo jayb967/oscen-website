@@ -113,48 +113,119 @@ export class BrainPulses {
         this._spawnTimers = {};
         this._pulseColorOverrides = {};  // pathway.id -> THREE.Color
 
+        // Lateral (left-right) bulge of pathway arcs. 0 = classic sagittal-plane
+        // routing. The cinematic scene raises this so arcs weave through both
+        // hemispheres instead of collapsing to a flat midline sheet.
+        this.lateralSpread = 0;
+
+        // Radial arc bow, as a multiple of the base arc amount. +1 (classic)
+        // bows each pathway OUTWARD from the brain center -- fine for the classic
+        // sphere hull. The cinematic scene sets this small/negative so arcs bow
+        // INWARD and stay inside the anatomical glass mesh (whose cortical
+        // endpoints already span both hemispheres, so no outward bulge is needed).
+        this.radialArcScale = 1.0;
+
+        this._buildPathways();
+    }
+
+    /**
+     * Rebuild all pathway curves with a new lateral spread. Safe to call before
+     * the render loop starts (cinematic does so in _initEnhancements).
+     */
+    setLateralSpread(amount) {
+        if (this.lateralSpread === amount) return;
+        this.lateralSpread = amount;
+        this.rebuild();
+    }
+
+    /**
+     * Dispose + rebuild all pathway curves from the current region centers +
+     * lateral spread. The cinematic scene calls this after applying anatomical
+     * center overrides (which happen AFTER the base ctor built the pulses), so
+     * the arcs reconnect the real anatomical endpoints. Safe before render start.
+     */
+    rebuild() {
+        for (const pw of this.pathways) {
+            this.scene.remove(pw.mesh);
+            pw.mesh.geometry.dispose();
+            pw.material.dispose();
+        }
+        this.pathways = [];
+        this._spawnTimers = {};
         this._buildPathways();
     }
 
     _buildPathways() {
-        for (const pathway of SYNAPSE_PATHWAYS) {
-            const srcCenter = this.regions.getCenter(pathway.src);
-            const dstCenter = this.regions.getCenter(pathway.dst);
+        for (let pwIndex = 0; pwIndex < SYNAPSE_PATHWAYS.length; pwIndex++) {
+            const pathway = SYNAPSE_PATHWAYS[pwIndex];
+            // Build one tube per hemisphere so synapse pulses light BOTH halves.
+            // getCenter(id, side) returns the +lr ('plus') or -lr ('minus')
+            // anchor when the cinematic scene has registered bilateral centers.
+            // For a midline region both sides return the same primary anchor, and
+            // in classic (no bilateral anchors) BOTH sides return the primary for
+            // every region -- so the 'minus' pass dedupes away and classic gets
+            // exactly one tube per pathway, byte-identical to before.
+            for (const side of ['plus', 'minus']) {
+                const srcCenter = this.regions.getCenter(pathway.src, side);
+                const dstCenter = this.regions.getCenter(pathway.dst, side);
+                if (side === 'minus') {
+                    const pSrc = this.regions.getCenter(pathway.src, 'plus');
+                    const pDst = this.regions.getCenter(pathway.dst, 'plus');
+                    if (srcCenter.equals(pSrc) && dstCenter.equals(pDst)) continue;
+                }
+                this._buildTube(pathway, side, pwIndex, srcCenter, dstCenter);
+            }
+        }
+    }
 
+    /** Build a single pathway tube for one hemisphere side. */
+    _buildTube(pathway, side, pwIndex, srcCenter, dstCenter) {
+        {
             // Cubic bezier with two control points pushed outward from brain center
             // so curves arc along the brain's surface instead of cutting through
             const pathLen = srcCenter.distanceTo(dstCenter);
             const arcAmount = pathLen * 0.35;
 
-            // Use pathway index for deterministic left/right alternation
-            const pwIndex = SYNAPSE_PATHWAYS.indexOf(pathway);
+            // Deterministic left/right alternation for the arc bow.
             const xSign = (pwIndex % 2 === 0) ? 1 : -1;
+            // Per-pathway lateral magnitude (varies so arcs fan across the width
+            // and depth instead of stacking in one plane). Deterministic hash.
+            const lateralVary = 0.55 + 0.45 * (((pwIndex * 2654435761) % 100) / 100);
+            const lateral = this.lateralSpread * lateralVary;
+
+            // Radial bow. Classic (radialArcScale 1) bows outward from center;
+            // cinematic sets it small/negative so arcs bow inward and stay inside
+            // the anatomical mesh. Self-loop radius is clamped the same way.
+            const radialScale = this.radialArcScale;
 
             let curve;
             if (pathway.src === pathway.dst) {
-                // Self-loops: arc outward from the region, creating a visible loop
+                // Self-loops: a small loop off the region. Radius follows the
+                // radial scale so cinematic loops stay tucked inside the cortex.
                 const selfRadial = new THREE.Vector3()
                     .subVectors(srcCenter, BRAIN_CENTER).normalize();
                 const loopUp = new THREE.Vector3(0, 1, 0);
                 const loopSide = new THREE.Vector3().crossVectors(selfRadial, loopUp).normalize();
-                const cp1 = srcCenter.clone().add(selfRadial.clone().multiplyScalar(1.2))
-                    .add(loopSide.clone().multiplyScalar(0.6));
-                const cp2 = srcCenter.clone().add(selfRadial.clone().multiplyScalar(1.2))
-                    .add(loopSide.clone().multiplyScalar(-0.6));
+                const loopOut = 1.2 * radialScale;
+                const cp1 = srcCenter.clone().add(selfRadial.clone().multiplyScalar(loopOut))
+                    .add(loopSide.clone().multiplyScalar(0.6 + lateral));
+                const cp2 = srcCenter.clone().add(selfRadial.clone().multiplyScalar(loopOut))
+                    .add(loopSide.clone().multiplyScalar(-0.6 - lateral));
                 curve = new THREE.CubicBezierCurve3(srcCenter.clone(), cp1, cp2, dstCenter.clone());
             } else {
-                // X-axis spread: alternate left/right so tubes fan out in 3D
-                // Longer paths get more spread for visual separation
-                const xSpread = pathLen * 0.25 * xSign;
+                // X-axis spread: alternate left/right so tubes fan out in 3D.
+                // Scaled by radialArcScale so cinematic (inward) keeps the fan
+                // small and the tube close to the chord inside the mesh.
+                const xSpread = (pathLen * 0.25 + lateral) * xSign * radialScale;
 
                 const cp1 = new THREE.Vector3().lerpVectors(srcCenter, dstCenter, 0.3);
                 const radial1 = new THREE.Vector3().subVectors(cp1, BRAIN_CENTER).normalize();
-                cp1.add(radial1.multiplyScalar(arcAmount));
+                cp1.add(radial1.multiplyScalar(arcAmount * radialScale));
                 cp1.x += xSpread;
 
                 const cp2 = new THREE.Vector3().lerpVectors(srcCenter, dstCenter, 0.7);
                 const radial2 = new THREE.Vector3().subVectors(cp2, BRAIN_CENTER).normalize();
-                cp2.add(radial2.multiplyScalar(arcAmount));
+                cp2.add(radial2.multiplyScalar(arcAmount * radialScale));
                 cp2.x += xSpread;
 
                 curve = new THREE.CubicBezierCurve3(srcCenter.clone(), cp1, cp2, dstCenter.clone());
@@ -194,8 +265,19 @@ export class BrainPulses {
             mesh.frustumCulled = false;
             this.scene.add(mesh);
 
+            // Remember the default tube opacity so setDim() can restore.
+            material.userData = material.userData || {};
+            if (material.userData.baseOpacity == null) {
+                material.userData.baseOpacity = material.opacity != null ? material.opacity : 1.0;
+            }
+
+            // Unique per-tube key (pathway may have a plus + minus tube). Keep
+            // `id` = pathway.id so per-pathway color overrides still match both
+            // tubes; `_key` disambiguates the spawn timer + pulse queue per side.
+            const key = `${pathway.id}::${side}`;
             this.pathways.push({
                 ...pathway,
+                _key: key,
                 curve,
                 mesh,
                 material,
@@ -203,7 +285,7 @@ export class BrainPulses {
                 baseColor,
             });
 
-            this._spawnTimers[pathway.id] = Math.random() * SPAWN_COOLDOWN;
+            this._spawnTimers[key] = Math.random() * SPAWN_COOLDOWN;
         }
     }
 
@@ -291,8 +373,9 @@ export class BrainPulses {
         const serotoninDampen = Math.max(0.3, 1.0 - (serotonin - 0.5) * 0.3);
 
         for (const pw of this.pathways) {
-            this._spawnTimers[pw.id] -= dt;
-            if (this._spawnTimers[pw.id] > 0) continue;
+            const key = pw._key || pw.id;
+            this._spawnTimers[key] -= dt;
+            if (this._spawnTimers[key] > 0) continue;
 
             const srcRate = this.firingRates[pw.src] || 0;
             if (srcRate < FIRING_THRESHOLD) continue;
@@ -306,7 +389,7 @@ export class BrainPulses {
 
             // Cooldown scales with activity: more active = tighter spacing
             const intensity = Math.min(1.0, Math.sqrt(srcRate * 5.0));
-            this._spawnTimers[pw.id] = SPAWN_COOLDOWN + (1 - intensity) * 0.12;
+            this._spawnTimers[key] = SPAWN_COOLDOWN + (1 - intensity) * 0.12;
         }
     }
 
@@ -346,6 +429,32 @@ export class BrainPulses {
                     intArr[i] = 0.0;
                 }
             }
+        }
+    }
+
+    /**
+     * Multiplicative opacity dim. Used by Beliefs Mode so synaptic
+     * tubes / pulses fade back when the constellation is on stage.
+     * factor: 0 = original, 1 = invisible.
+     */
+    setDim(factor) {
+        // factor: 0 = original, 1 = fully hidden. Above 0.85 we hide the
+        // tube meshes entirely so the bloom pass can't amplify them, and
+        // active pulses are cleared so they don't keep blooming for a
+        // few hundred ms after the dim.
+        const k = Math.max(0, Math.min(1, 1 - factor));
+        const hide = factor > 0.85;
+        for (const pw of this.pathways) {
+            if (pw.material) {
+                const base = (pw.material.userData && pw.material.userData.baseOpacity != null)
+                    ? pw.material.userData.baseOpacity
+                    : 1.0;
+                pw.material.opacity = base * k;
+                pw.material.transparent = true;
+                pw.material.needsUpdate = true;
+            }
+            if (pw.mesh) pw.mesh.visible = !hide;
+            if (hide && Array.isArray(pw.pulses)) pw.pulses.length = 0;
         }
     }
 

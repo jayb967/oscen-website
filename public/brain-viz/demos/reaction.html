@@ -1,0 +1,2995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSCEN — Brain Reaction Demo</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="oscen-demo.css">
+    <style>
+        body {
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top bar */
+        .topbar {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: var(--grad-panel);
+            border-bottom: 1px solid var(--hairline);
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
+        .topbar-logo {
+            font-size: 13px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: var(--text-bright);
+        }
+        .topbar-sep { width: 1px; height: 16px; background: var(--hairline-mid); }
+        .topbar-title {
+            font-size: 11px; font-weight: 400;
+            letter-spacing: 1.8px; text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .demo-badge {
+            font-size: 9px; font-weight: 700; letter-spacing: 1.8px;
+            padding: 4px 10px;
+            border-radius: 0;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid var(--hairline);
+            text-transform: uppercase;
+        }
+
+        /* Main layout. Flex so the viewport actually fills the area; the
+           probe drawer is absolutely positioned over it. */
+        .main {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Probe drawer (slide-out). Sits over the brain viewport on the left. */
+        .panel-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 360px;
+            background: var(--grad-panel);
+            border-right: 1px solid var(--hairline-hi);
+            box-shadow: 4px 0 32px rgba(0, 0, 0, 0.6),
+                        1px 0 0 rgba(255, 255, 255, 0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 50;
+            transform: translateX(-100%);
+            transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+        }
+        .panel-left.open {
+            transform: translateX(0);
+        }
+        /* When drawer is open, push the rail right by drawer width so it
+           always rides on the drawer's outer edge. */
+        .activity-rail.shifted {
+            transform: translateY(-50%) translateX(360px);
+        }
+
+        /* Drawer header with close button */
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--hairline);
+            background: var(--grad-panel);
+            flex-shrink: 0;
+        }
+        .drawer-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+        .drawer-close {
+            background: transparent;
+            border: 1px solid var(--hairline-mid);
+            border-radius: 0;
+            color: var(--text-dim);
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--t-base) var(--ease);
+        }
+        .drawer-close:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Inner scrollable body — wraps the original sections. */
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--hairline-mid) transparent;
+        }
+        .drawer-body::-webkit-scrollbar { width: 4px; }
+        .drawer-body::-webkit-scrollbar-track { background: transparent; }
+        .drawer-body::-webkit-scrollbar-thumb { background: var(--hairline-mid); }
+
+        /* Activity rail. Glowing vertical bar of module tabs on the left
+           edge. Lives in .main (sibling of .panel-left) so it isn't
+           clipped by the drawer's overflow:hidden. Slides right by the
+           drawer's width when the drawer opens, so it always rides on
+           the drawer's outer edge. */
+        .activity-rail {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            z-index: 55;
+            transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 6px 0;
+            background: linear-gradient(135deg, rgba(10,10,10,0.92), rgba(20,20,20,0.92));
+            border: 1px solid var(--hairline-hi);
+            border-left: none;
+            box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.22),
+                        0 0 18px rgba(34, 211, 238, 0.28),
+                        0 0 36px rgba(34, 211, 238, 0.14);
+            animation: railGlow 3s ease-in-out infinite;
+        }
+        @keyframes railGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.22),
+                            0 0 18px rgba(34, 211, 238, 0.28),
+                            0 0 36px rgba(34, 211, 238, 0.14);
+            }
+            50% {
+                box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.40),
+                            0 0 26px rgba(34, 211, 238, 0.48),
+                            0 0 56px rgba(34, 211, 238, 0.24);
+            }
+        }
+
+        .activity-tab {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-dim);
+            background: transparent;
+            border: none;
+            font-family: var(--mono);
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1;
+            position: relative;
+            user-select: none;
+            border-left: 2px solid transparent;
+            transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+        }
+        .activity-tab:hover {
+            color: var(--c, var(--accent));
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .activity-tab.active {
+            color: var(--c, var(--accent));
+            border-left-color: var(--c, var(--accent));
+            background: rgba(255, 255, 255, 0.06);
+        }
+        /* Tooltip label that slides out on hover. */
+        .activity-tab::after {
+            content: attr(data-label);
+            position: absolute;
+            left: calc(100% + 6px);
+            top: 50%;
+            transform: translateY(-50%) translateX(-4px);
+            padding: 6px 10px;
+            background: rgba(10, 10, 10, 0.94);
+            border: 1px solid var(--hairline-mid);
+            color: var(--text-bright);
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+        .activity-tab:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        /* Brain-focus pill. Surfaces which region the active module is
+           locking onto. Top-right of the viewport, pulsing teal. This is
+           the "morphing-brain" visual cue (option 10). */
+        .brain-focus-pill {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 60;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(10, 10, 10, 0.92);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 16px rgba(34, 211, 238, 0.30);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: opacity 220ms ease, transform 220ms ease;
+        }
+        .brain-focus-pill.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .brain-focus-pill::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent);
+            animation: focusPillPulse 1.2s ease-in-out infinite;
+        }
+        .brain-focus-pill .focus-label { color: var(--text-dim); }
+        .brain-focus-pill .focus-region { color: var(--text-bright); }
+        @keyframes focusPillPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent); }
+            50%      { opacity: 0.4; box-shadow: 0 0 3px var(--accent); }
+        }
+
+        /* Module body containers — only the active one displays. */
+        .module-body {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow-y: auto;
+            min-height: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--hairline-mid) transparent;
+        }
+        .module-body.active { display: flex; }
+        .module-body::-webkit-scrollbar { width: 4px; }
+        .module-body::-webkit-scrollbar-track { background: transparent; }
+        .module-body::-webkit-scrollbar-thumb { background: var(--hairline-mid); }
+
+        /* Shared stub styles for the 6 mock modules. */
+        .big-metric {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-bright);
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+            margin: 4px 0 6px;
+        }
+        .big-metric.ok   { color: var(--ok); }
+        .big-metric.warn { color: var(--warn); }
+        .big-metric.err  { color: var(--err); }
+        .caption {
+            font-size: 10px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            position: relative;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.6s ease;
+        }
+        .metric {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-bright);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+        }
+        .phase-tracker {
+            display: flex;
+            gap: 4px;
+        }
+        .phase-pip {
+            flex: 1;
+            text-align: center;
+            font-size: 8px;
+            padding: 7px 4px;
+            border: 1px solid var(--hairline);
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .phase-pip.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .retention-row {
+            display: grid;
+            grid-template-columns: 1fr 90px 36px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 9px;
+            color: var(--text);
+        }
+        .retention-row .bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .retention-row .bar .fill {
+            height: 100%;
+            background: var(--accent);
+        }
+        .retention-row .bar .fill.ok   { background: var(--ok); }
+        .retention-row .bar .fill.warn { background: var(--warn); }
+        .retention-row .bar .fill.err  { background: var(--err); }
+        .retention-row .pct {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        .energy-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 72px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 11px;
+            color: var(--text-bright);
+        }
+        .energy-row .bar {
+            height: 14px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .energy-row .bar .fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.6s ease;
+        }
+        .energy-row .bar .fill.err { background: var(--err); }
+        .energy-row .bar .fill.ok  { background: var(--ok); }
+        .energy-row .val {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-dim);
+        }
+        .sim-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 11px;
+            color: var(--text);
+            border-bottom: 1px solid var(--hairline);
+        }
+        .sim-row:last-child { border-bottom: none; }
+        .sim-row .val {
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+        .stats-row {
+            display: flex;
+            gap: 8px;
+        }
+        .stat-box {
+            flex: 1;
+            background: var(--grad-card);
+            border: 1px solid var(--hairline);
+            padding: 12px 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-box .sval {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-bright);
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-box .slabel {
+            font-size: 8px;
+            color: var(--text-dim);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+        .audit-mock {
+            font-size: 10px;
+            color: var(--text);
+        }
+        .audit-mock > div {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--hairline);
+        }
+        .audit-mock > div:last-child { border-bottom: none; }
+        .audit-mock .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            margin-right: 8px;
+            font-weight: 700;
+            font-size: 8px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+        .audit-mock .badge.allow     { background: rgba(74, 222, 128, 0.12);  color: var(--ok); }
+        .audit-mock .badge.deny      { background: rgba(248, 113, 113, 0.12); color: var(--err); }
+        .audit-mock .badge.transform { background: rgba(251, 191, 36, 0.12);  color: var(--warn); }
+        .babble-stream-mock {
+            font-size: 22px;
+            letter-spacing: 3px;
+            line-height: 1.6;
+            color: var(--accent-hi);
+            font-family: var(--mono);
+            text-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+            word-break: break-all;
+        }
+        .mock-note {
+            margin: 14px 18px;
+            padding: 8px 12px;
+            border: 1px dashed var(--hairline-mid);
+            color: var(--text-dim);
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        /* Belief module: legend + node detail panel. */
+        .belief-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text);
+        }
+        .belief-legend > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .belief-legend .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .belief-detail {
+            font-size: 11px;
+        }
+        .belief-detail.empty .empty-hint {
+            color: var(--text-dim);
+            font-size: 10px;
+            font-style: italic;
+            text-align: center;
+            padding: 10px 0;
+            border: 1px dashed var(--hairline);
+        }
+        .belief-detail .bd-id {
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+        .belief-detail .bd-content {
+            color: var(--text-bright);
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        .belief-detail .bd-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 10px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--hairline);
+        }
+        .belief-detail .bd-row .v {
+            color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+        .belief-detail .bd-type {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .belief-detail .bd-type.value      { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .belief-detail .bd-type.norm       { background: rgba(251, 191, 36, 0.15);  color: #fbbf24; }
+        .belief-detail .bd-type.fact       { background: rgba(34, 211, 238, 0.15);  color: #22d3ee; }
+        .belief-detail .bd-type.capability { background: rgba(74, 222, 128, 0.15);  color: #4ade80; }
+        .belief-detail .bd-type.milestone  { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
+        .belief-detail .bd-conf-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            margin-top: 4px;
+        }
+        .belief-detail .bd-conf-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        /* Scenario simulator (B4) result panel. */
+        .sim-result { margin-top: 10px; }
+        .sim-verdict {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .sim-verdict.allow     { background: rgba(74, 222, 128, 0.15);  color: var(--ok); }
+        .sim-verdict.deny      { background: rgba(248, 113, 113, 0.15); color: var(--err); }
+        .sim-verdict.transform { background: rgba(251, 191, 36, 0.15);  color: var(--warn); }
+        .sim-reasoning {
+            font-size: 10.5px;
+            color: var(--text);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .sim-trace-title {
+            font-size: 8px;
+            color: var(--text-dim);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .sim-trace {
+            font-size: 10px;
+            color: var(--text);
+        }
+        .sim-trace > div {
+            display: grid;
+            grid-template-columns: 18px 1fr auto;
+            gap: 6px;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--hairline);
+            align-items: center;
+        }
+        .sim-trace .step-n {
+            color: var(--text-dim);
+            font-size: 9px;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        .sim-trace .node-id {
+            font-size: 10px;
+            color: var(--text-bright);
+            word-break: break-all;
+        }
+        .sim-trace .eval {
+            font-size: 9px;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+        .sim-trace .eval.violated, .sim-trace .eval.contradicts { color: var(--err); }
+        .sim-trace .eval.supports, .sim-trace .eval.entails     { color: var(--ok); }
+        .sim-error {
+            font-size: 10px;
+            color: var(--err);
+            padding: 6px 8px;
+            border: 1px dashed rgba(248, 113, 113, 0.4);
+        }
+        .btn-send.busy {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .section {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--hairline);
+        }
+        .section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .section-label::before {
+            content: '';
+            width: 3px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 0;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 1px dashed var(--hairline-mid);
+            border-radius: 0;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+            background: var(--grad-card);
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent);
+            background: var(--grad-card-hi);
+        }
+        .drop-zone.dragover {
+            box-shadow: inset 0 0 30px var(--accent-soft);
+        }
+        .drop-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            opacity: 0.35;
+            display: block;
+        }
+        .drop-text {
+            font-size: 11px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+        .drop-text strong {
+            color: var(--accent);
+        }
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+        .drop-preview {
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+        .drop-preview.active {
+            display: flex;
+        }
+        .drop-preview img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 0;
+            border: 1px solid var(--hairline);
+        }
+        .drop-preview-info {
+            text-align: left;
+        }
+        .drop-preview-name {
+            font-size: 11px;
+            color: var(--text);
+            margin-bottom: 2px;
+            word-break: break-all;
+        }
+        .drop-preview-size {
+            font-size: 9px;
+            color: var(--text-dim);
+        }
+        .drop-default { display: block; }
+        .drop-zone.has-file .drop-default { display: none; }
+
+        /* Text input */
+        .text-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .text-input {
+            flex: 1;
+            background: var(--grad-card);
+            border: 1px solid var(--hairline);
+            border-radius: 0;
+            padding: 9px 12px;
+            color: var(--text-bright);
+            font-family: var(--mono);
+            font-size: 11px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .text-input:focus { border-color: var(--accent); }
+        .text-input::placeholder { color: var(--text-dim); }
+        .btn-send {
+            padding: 9px 14px;
+            background: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 0;
+            color: #000;
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--t-base) var(--ease);
+            letter-spacing: 1.5px;
+        }
+        .btn-send:hover { background: var(--accent-hi); border-color: var(--accent-hi); }
+
+        /* Preset buttons */
+        .presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .preset-btn {
+            padding: 10px 8px;
+            background: var(--grad-card);
+            border: 1px solid var(--hairline);
+            border-radius: 0;
+            color: var(--text-dim);
+            font-family: var(--mono);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all var(--t-base) var(--ease);
+            text-align: left;
+            line-height: 1.4;
+            box-shadow: var(--shadow-sm);
+        }
+        .preset-btn:hover {
+            background: var(--grad-card-hi);
+            border-color: var(--hairline-hi);
+            color: var(--text-bright);
+        }
+        .preset-btn:active { transform: scale(0.97); }
+        .preset-tag {
+            display: block;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .preset-tag.visual   { color: #22d3ee; }
+        .preset-tag.auditory { color: #4ade80; }
+        .preset-tag.text     { color: #a78bfa; }
+        .preset-tag.multi    { color: #fbbf24; }
+
+        /* ── Activity Log ────────────────────────────────────── */
+        .log-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+        .log-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 18px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--hairline-mid) transparent;
+        }
+        .log-scroll::-webkit-scrollbar { width: 4px; }
+        .log-scroll::-webkit-scrollbar-track { background: transparent; }
+        .log-scroll::-webkit-scrollbar-thumb { background: var(--hairline-mid); border-radius: 0; }
+
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            animation: logSlideIn 0.3s ease-out;
+        }
+        @keyframes logSlideIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .log-time {
+            font-size: 9px;
+            color: var(--text-dim);
+            margin-bottom: 2px;
+        }
+        .log-region {
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 1px;
+        }
+        .log-detail {
+            font-size: 9px;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+        .log-bar {
+            margin-top: 4px;
+            height: 3px;
+            border-radius: 0;
+            background: rgba(255,255,255,0.04);
+            overflow: hidden;
+        }
+        .log-bar-fill {
+            height: 100%;
+            border-radius: 0;
+            transition: width 0.5s ease-out;
+        }
+
+        /* Processing overlay */
+        .processing {
+            display: none;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--hairline);
+        }
+        .processing.active {
+            display: block;
+        }
+        .processing-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .processing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: procPulse 1s infinite;
+        }
+        @keyframes procPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent); }
+            50% { opacity: 0.4; box-shadow: none; }
+        }
+        .processing-text {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+        .processing-bar {
+            height: 2px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 0;
+            overflow: hidden;
+        }
+        .processing-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hi));
+            border-radius: 0;
+            transition: width 0.15s linear;
+        }
+
+        /* Summary card */
+        .summary {
+            display: none;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--hairline);
+            background: rgba(74, 222, 128, 0.03);
+        }
+        .summary.active {
+            display: block;
+            animation: summaryIn 0.4s ease-out;
+        }
+        @keyframes summaryIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .summary-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--ok);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .summary-label::before {
+            content: '';
+            width: 3px;
+            height: 10px;
+            background: var(--ok);
+            border-radius: 0;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .summary-stat {
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.025);
+            border-radius: 0;
+            border: 1px solid var(--hairline);
+        }
+        .summary-stat-label {
+            font-size: 8px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .summary-stat-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-top: 3px;
+            font-variant-numeric: tabular-nums;
+        }
+        .summary-stat-val.green { color: var(--ok); }
+        .summary-stat-val.amber { color: var(--warn); }
+        .summary-stat-val.cyan  { color: var(--accent); }
+
+        /* Brain viewport */
+        .viewport {
+            flex: 1;
+            position: relative;
+            background: var(--bg);
+        }
+        .viewport iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        /* Corner decorations */
+        .viewport::before, .viewport::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--hairline-mid);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .viewport::before {
+            top: 12px; left: 12px;
+            border-right: none; border-bottom: none;
+        }
+        .viewport::after {
+            bottom: 12px; right: 12px;
+            border-left: none; border-top: none;
+        }
+
+        /* Bottom bar */
+        .bottombar {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: var(--grad-panel);
+            border-top: 1px solid var(--hairline);
+            flex-shrink: 0;
+        }
+        .bottombar-item {
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .bottombar-item strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+        .bottombar-sep {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            opacity: 0.4;
+        }
+
+        /* ── Idle state hint in viewport ─────────────────────── */
+        .viewport-hint {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .viewport-hint.visible {
+            opacity: 1;
+        }
+        .viewport-hint-text {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 60px;
+        }
+
+        /* ── Mobile responsive ──────────────────────────────── */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .topbar {
+                padding: 0 12px;
+            }
+
+            .topbar-title {
+                font-size: 10px;
+                letter-spacing: 1px;
+            }
+
+            .main {
+                overflow: hidden;
+                flex: 1;
+            }
+
+            /* On mobile the drawer takes the full viewport when opened. */
+            .panel-left {
+                width: 100%;
+                max-width: 100%;
+                border-right: none;
+            }
+
+            .activity-tab {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+            .activity-tab::after {
+                font-size: 8px;
+                padding: 5px 8px;
+            }
+            .brain-focus-pill {
+                top: 8px;
+                right: 8px;
+                padding: 6px 10px;
+                font-size: 8px;
+            }
+
+            .viewport {
+                width: 100%;
+                height: 100%;
+            }
+            /* Inherit height:100% from the desktop rule so the brain iframe
+               fills the viewport area on mobile. A previous 300px override
+               left a large empty gap below the iframe. */
+
+            .drop-zone {
+                padding: 16px 12px;
+                min-height: 80px;
+            }
+
+            .section {
+                padding: 12px 14px;
+            }
+
+            .presets {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .preset-btn {
+                min-height: 44px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                touch-action: manipulation;
+            }
+
+            .btn-send {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            .text-input {
+                min-height: 44px;
+            }
+
+            .log-section {
+                max-height: 200px;
+                flex: none;
+                overflow: hidden;
+            }
+
+            .log-scroll {
+                padding: 0 14px 10px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .bottombar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 8px 12px;
+                gap: 10px;
+            }
+
+            .bottombar-item {
+                font-size: 8px;
+            }
+
+            /* Hide corner decorations on mobile - they overlap content */
+            .viewport::before,
+            .viewport::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Top Bar ────────────────────────────────────────────── -->
+<div class="topbar">
+    <div class="topbar-left">
+        <span class="topbar-logo">OSCEN</span>
+        <span class="topbar-sep"></span>
+        <span class="topbar-title">Neural Reaction Probe</span>
+    </div>
+    <span class="demo-badge" id="mode-badge">Interactive Demo</span>
+</div>
+
+<!-- ── Main Layout ────────────────────────────────────────── -->
+<div class="main">
+
+    <!-- Brain-focus pill: surfaces which region the active module is
+         locking onto. Appears only for modules that have a focus target. -->
+    <div class="brain-focus-pill" id="brain-focus-pill">
+        <span class="focus-label">Focus</span>
+        <span class="focus-region" id="brain-focus-region">Concept Layer</span>
+    </div>
+
+    <!-- Vertical glowing rail of module tabs (left-edge activity bar).
+         Sibling of .panel-left so it isn't clipped by overflow:hidden.
+         Slides right by the drawer's width when the drawer is open. -->
+    <div class="activity-rail" id="activity-rail">
+        <button class="activity-tab" data-module="probe"     data-label="Probe"       style="--c:#22d3ee" aria-label="Probe">⌖</button>
+        <button class="activity-tab" data-module="timeline"  data-label="Development" style="--c:#4ade80" aria-label="Development Timeline">◷</button>
+        <button class="activity-tab" data-module="concepts"  data-label="Concepts"    style="--c:#22d3ee" aria-label="Concept Formation">◇</button>
+        <button class="activity-tab" data-module="speech"    data-label="Speech"      style="--c:#f472b6" aria-label="Speech Motor Output">◌</button>
+        <button class="activity-tab" data-module="continual" data-label="Continual"   style="--c:#4ade80" aria-label="Continual Learning">↺</button>
+        <button class="activity-tab" data-module="beliefs"   data-label="Beliefs"     style="--c:#a78bfa" aria-label="Belief Graph">⌬</button>
+        <button class="activity-tab" data-module="energy"    data-label="Energy"      style="--c:#fbbf24" aria-label="Energy Efficiency">⚡</button>
+    </div>
+
+    <!-- Module drawer. -->
+    <div class="panel-left" id="panel-left">
+
+        <div class="drawer-header">
+            <div class="drawer-title" id="drawer-title">Probe Controls</div>
+            <button class="drawer-close" id="drawer-close" aria-label="Close drawer">&times;</button>
+        </div>
+
+        <div class="drawer-body">
+
+        <!-- ─── Module: Probe (real content) ────────────────── -->
+        <div class="module-body active" data-module="probe">
+
+        <!-- Input: Drop Zone -->
+        <div class="section">
+            <div class="section-label">Sensory Input</div>
+            <div class="drop-zone" id="drop-zone">
+                <div class="drop-default">
+                    <span class="drop-icon">&darr;</span>
+                    <div class="drop-text">
+                        Drop an <strong>image</strong> here<br>
+                        or click to select
+                    </div>
+                </div>
+                <div class="drop-preview" id="drop-preview">
+                    <img id="preview-img" src="" alt="">
+                    <div class="drop-preview-info">
+                        <div class="drop-preview-name" id="preview-name"></div>
+                        <div class="drop-preview-size" id="preview-size"></div>
+                    </div>
+                </div>
+                <input type="file" id="file-input" accept="image/*">
+            </div>
+        </div>
+
+        <!-- Input: Text -->
+        <div class="section">
+            <div class="section-label">Text Stimulus</div>
+            <div class="text-input-row">
+                <input type="text" class="text-input" id="text-input" placeholder="Type a word or phrase...">
+                <button class="btn-send" id="btn-text-send">SEND</button>
+            </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="section">
+            <div class="section-label">Quick Stimuli</div>
+            <div class="presets">
+                <button class="preset-btn" data-preset="dog">
+                    <span class="preset-tag visual">Visual</span>
+                    Show it a dog
+                </button>
+                <button class="preset-btn" data-preset="sound">
+                    <span class="preset-tag auditory">Auditory</span>
+                    Play a loud sound
+                </button>
+                <button class="preset-btn" data-preset="flash">
+                    <span class="preset-tag visual">Visual</span>
+                    Flash a bright light
+                </button>
+                <button class="preset-btn" data-preset="hello">
+                    <span class="preset-tag text">Language</span>
+                    Say "Hello"
+                </button>
+                <button class="preset-btn" data-preset="pain">
+                    <span class="preset-tag multi">Reflex</span>
+                    Touch something hot
+                </button>
+                <button class="preset-btn" data-preset="novel">
+                    <span class="preset-tag multi">Novel</span>
+                    Show something new
+                </button>
+            </div>
+        </div>
+
+        <!-- Processing indicator -->
+        <div class="processing" id="processing">
+            <div class="processing-header">
+                <div class="processing-dot"></div>
+                <span class="processing-text" id="processing-text">Encoding sensory input...</span>
+            </div>
+            <div class="processing-bar">
+                <div class="processing-bar-fill" id="processing-bar"></div>
+            </div>
+        </div>
+
+        <!-- Summary card -->
+        <div class="summary" id="summary">
+            <div class="summary-label">Brain Response</div>
+            <div class="summary-grid" id="summary-grid"></div>
+        </div>
+
+        <!-- Activity log -->
+        <div class="section log-section">
+            <div class="section-label">Cascade Log</div>
+            <div class="log-scroll" id="log-scroll"></div>
+        </div>
+
+        </div><!-- /.module-body[probe] -->
+
+        <!-- ─── Module: Development Timeline (LIVE) ────────────
+             Driven by brain-data.onNeuroUpdate (NATS neuromorphic.metrics
+             via dashboard WebSocket). Phase pip and metric values update
+             every neuro_update tick. The stub HTML's text values are the
+             initial render -- they get overwritten the moment the first
+             live frame lands. -->
+        <div class="module-body" data-module="timeline">
+            <div class="section">
+                <div class="section-label">Developmental Phase</div>
+                <div class="phase-tracker" id="tl-phase-tracker">
+                    <div class="phase-pip" data-phase="infant">Infant</div>
+                    <div class="phase-pip" data-phase="toddler">Toddler</div>
+                    <div class="phase-pip" data-phase="juvenile">Juvenile</div>
+                    <div class="phase-pip" data-phase="adolescent">Adolescent</div>
+                    <div class="phase-pip" data-phase="mature">Mature</div>
+                </div>
+                <div class="metric" id="tl-step">Step --</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Plasticity</div>
+                <div class="progress-bar"><div class="fill" id="tl-plasticity-fill" style="width:0%; background:var(--warn)"></div></div>
+                <div class="metric" id="tl-plasticity-text">--</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Dopamine (DA)</div>
+                <div class="progress-bar"><div class="fill" id="tl-da-fill" style="width:0%; background:var(--accent)"></div></div>
+                <div class="metric" id="tl-da-text">--</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Prediction Error</div>
+                <div class="progress-bar"><div class="fill" id="tl-pe-fill" style="width:0%; background:var(--ok)"></div></div>
+                <div class="metric" id="tl-pe-text">--</div>
+            </div>
+            <div class="metric" id="tl-waiting" style="opacity:0.55">Waiting for live brain state...</div>
+        </div>
+
+        <!-- ─── Module: Concept Probe (stub) ────────────────── -->
+        <div class="module-body" data-module="concepts">
+            <div class="section">
+                <div class="section-label">Probe Word</div>
+                <div class="text-input-row">
+                    <input type="text" class="text-input" placeholder='Type "dog" then probe...' disabled>
+                    <button class="btn-send" disabled>PROBE</button>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-label">Cosine Similarity (sample)</div>
+                <div class="sim-row"><span>dog ↔ cat</span><span class="val">0.82</span></div>
+                <div class="sim-row"><span>dog ↔ car</span><span class="val">0.11</span></div>
+                <div class="sim-row"><span>cat ↔ car</span><span class="val">0.09</span></div>
+                <div class="sim-row"><span>walk ↔ run</span><span class="val">0.74</span></div>
+                <div class="sim-row"><span>music ↔ sound</span><span class="val">0.66</span></div>
+            </div>
+            <div class="section">
+                <div class="section-label">Concept Neurons Firing</div>
+                <div class="big-metric">347 / 5,000</div>
+                <div class="caption">Sparse code, average 6.9% active</div>
+            </div>
+            <div class="mock-note">Mock preview. Real probe + heatmap wires in next pass.</div>
+        </div>
+
+        <!-- ─── Module: Speech Motor Output (stub) ──────────── -->
+        <div class="module-body" data-module="speech">
+            <div class="section">
+                <div class="section-label">Live Babble Stream</div>
+                <div class="babble-stream-mock">tə kɪɾ æʃu mɪɾə ɡo ʃa lɪn pe...</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Tokens Today</div>
+                <div class="big-metric">4,128</div>
+                <div class="caption">From 3,486 speech motor neurons. Pre-linguistic phase.</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Vocabulary Anchored</div>
+                <div class="progress-bar"><div class="fill" style="width:11%; background:var(--warn)"></div></div>
+                <div class="metric">28 / 256 tokens with stable mapping</div>
+            </div>
+            <div class="mock-note">Mock preview. Live token stream wires via NATS speech.* next pass.</div>
+        </div>
+
+        <!-- ─── Module: Continual Learning (stub) ───────────── -->
+        <div class="module-body" data-module="continual">
+            <div class="section">
+                <div class="section-label">Last Benchmark</div>
+                <div class="big-metric warn">60.0%</div>
+                <div class="caption">Mean retention across 8 synapse groups after Task A → Task B switch.</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Per-Group Retention</div>
+                <div class="retention-row"><span>brainstem_motor</span><div class="bar"><div class="fill ok" style="width:97%"></div></div><span class="pct">97%</span></div>
+                <div class="retention-row"><span>feature_association</span><div class="bar"><div class="fill ok" style="width:91%"></div></div><span class="pct">91%</span></div>
+                <div class="retention-row"><span>sensory_motor</span><div class="bar"><div class="fill ok" style="width:70%"></div></div><span class="pct">70%</span></div>
+                <div class="retention-row"><span>cerebellum_motor</span><div class="bar"><div class="fill warn" style="width:58%"></div></div><span class="pct">58%</span></div>
+                <div class="retention-row"><span>working_motor</span><div class="bar"><div class="fill warn" style="width:48%"></div></div><span class="pct">48%</span></div>
+                <div class="retention-row"><span>motor_cerebellum</span><div class="bar"><div class="fill err" style="width:28%"></div></div><span class="pct">28%</span></div>
+            </div>
+            <div class="section">
+                <div class="section-label">Patent Claim 6</div>
+                <div class="caption">Eligibility traces + homeostatic scaling preserve learned weights across task switches without batch retraining.</div>
+            </div>
+            <div class="mock-note">Mock preview. Live benchmark replay wires in next pass.</div>
+        </div>
+
+        <!-- ─── Module: Belief Graph ────────────────────────── -->
+        <div class="module-body" data-module="beliefs">
+            <div class="section">
+                <div class="section-label">How to read it</div>
+                <div class="caption">
+                    Each glowing sphere in the brain is a belief. They cluster near the
+                    region that learned them. Click any sphere to inspect.
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-label">Legend</div>
+                <div class="belief-legend">
+                    <div><span class="dot" style="background:#f87171"></span>Value (immutable)</div>
+                    <div><span class="dot" style="background:#fbbf24"></span>Norm (behavioral)</div>
+                    <div><span class="dot" style="background:#22d3ee"></span>Fact (learned)</div>
+                    <div><span class="dot" style="background:#4ade80"></span>Capability</div>
+                    <div><span class="dot" style="background:#a78bfa"></span>Milestone</div>
+                </div>
+            </div>
+            <div class="section" id="belief-detail-section">
+                <div class="section-label">Selected Belief</div>
+                <div class="belief-detail empty" id="belief-detail">
+                    <div class="empty-hint">Click a sphere in the brain to inspect.</div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-label">Try a Scenario</div>
+                <div class="text-input-row">
+                    <input type="text" class="text-input" id="belief-scenario" placeholder='e.g. "approach a hot stove"'>
+                    <button class="btn-send" id="belief-scenario-run">RUN</button>
+                </div>
+                <div class="sim-result" id="belief-sim-result" hidden></div>
+            </div>
+            <div class="section">
+                <div class="section-label">Recent Kernel Decisions</div>
+                <div class="audit-mock" id="belief-audit">
+                    <div><span class="badge allow">allow</span> walk forward 1m</div>
+                    <div><span class="badge deny">deny</span> reach for hot surface</div>
+                    <div><span class="badge allow">allow</span> turn head left</div>
+                    <div><span class="badge deny">deny</span> query LLM (rate limited)</div>
+                    <div><span class="badge allow">allow</span> reach for cup</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Module: Energy Efficiency (stub) ────────────── -->
+        <div class="module-body" data-module="energy">
+            <div class="section">
+                <div class="section-label">Energy Per Inference</div>
+                <div class="energy-row">
+                    <span>GPT-4o</span>
+                    <div class="bar"><div class="fill err" style="width:100%"></div></div>
+                    <span class="val">0.3 Wh</span>
+                </div>
+                <div class="energy-row">
+                    <span>Gemini 1.5</span>
+                    <div class="bar"><div class="fill err" style="width:80%"></div></div>
+                    <span class="val">0.24 Wh</span>
+                </div>
+                <div class="energy-row">
+                    <span>Llama 3 GPU</span>
+                    <div class="bar"><div class="fill" style="width:27%; background:var(--warn)"></div></div>
+                    <span class="val">0.08 Wh</span>
+                </div>
+                <div class="energy-row">
+                    <span>OSCEN CPU</span>
+                    <div class="bar"><div class="fill" style="width:4%"></div></div>
+                    <span class="val">0.012 Wh</span>
+                </div>
+                <div class="energy-row">
+                    <span>OSCEN Loihi</span>
+                    <div class="bar"><div class="fill ok" style="width:1%"></div></div>
+                    <span class="val">0.0003 Wh</span>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-label">Loihi vs GPU Advantage</div>
+                <div class="big-metric ok">109×</div>
+                <div class="caption">Less energy per inference. Loihi 2 neuromorphic hardware.</div>
+            </div>
+            <div class="mock-note">Mock preview. Pulls live power telemetry in next pass.</div>
+        </div>
+
+        </div><!-- /.drawer-body -->
+    </div>
+
+    <!-- Brain Viewport. Full width; iframe enables hover/click on regions. -->
+    <div class="viewport">
+        <iframe id="brain-frame"></iframe>
+
+        <!-- Brain dashboard data layer. Bridges WebSocket + REST so each
+             module attaches to typed callbacks rather than inventing its
+             own fetch / poll / sub plumbing. Mirrors body-data.js. -->
+        <script type="module">
+            import { BrainData } from './brain-data.js?v=4';
+            const params = new URLSearchParams(window.location.search);
+            const isLive = params.get('live') !== 'false';
+            const host = window.location.hostname;
+            const isProxied = host === 'demo.oscen.ai';
+            const apiHost = isProxied ? host : host + ':8080';
+            const apiBase = window.location.protocol + '//' + apiHost;
+            const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = wsProto + '//' + apiHost + '/ws';
+
+            const data = new BrainData();
+            window.brainData = data;
+            window.brainDataConfig = { apiBase, wsUrl, isLive };
+            // Notify any code waiting for the data layer before it loaded.
+            window.dispatchEvent(new CustomEvent('brain-data-ready'));
+            if (isLive) data.start({ wsUrl, apiBase });
+        </script>
+
+        <script>
+        // Module switcher. Activity rail (left edge of drawer) selects
+        // which module is shown. Clicking an active tab closes the drawer.
+        // Drawer carries the morphing-brain focus cue via the focus pill;
+        // postMessage to the brain iframe is a stub for the real region
+        // camera-focus integration (handled inside brain-scene.js next pass).
+        (function() {
+            var panel       = document.getElementById('panel-left');
+            var rail        = document.getElementById('activity-rail');
+            var closeBtn    = document.getElementById('drawer-close');
+            var titleEl     = document.getElementById('drawer-title');
+            var pill        = document.getElementById('brain-focus-pill');
+            var pillRegion  = document.getElementById('brain-focus-region');
+            var tabs        = document.querySelectorAll('.activity-tab');
+            var bodies      = document.querySelectorAll('.module-body');
+
+            // Per-module config: drawer title + which brain region the
+            // morphing-brain cue should announce. `focus: null` hides the pill.
+            var MODULES = {
+                probe:     { name: 'Probe Controls',        focus: null },
+                timeline:  { name: 'Development Timeline',  focus: null },
+                concepts:  { name: 'Concept Probe',         focus: 'Concept Layer' },
+                speech:    { name: 'Speech Motor Output',   focus: 'Motor Cortex' },
+                continual: { name: 'Continual Learning',    focus: 'Motor Cortex' },
+                beliefs:   { name: 'Belief Graph',          focus: null },
+                energy:    { name: 'Energy Efficiency',     focus: null }
+            };
+
+            var activeModule = null;
+
+            function openDrawerWith(id) {
+                var cfg = MODULES[id];
+                if (!cfg) return;
+
+                activeModule = id;
+                titleEl.textContent = cfg.name;
+
+                bodies.forEach(function(b) {
+                    b.classList.toggle('active', b.dataset.module === id);
+                });
+                tabs.forEach(function(t) {
+                    t.classList.toggle('active', t.dataset.module === id);
+                });
+
+                panel.classList.add('open');
+                rail.classList.add('shifted');
+
+                if (cfg.focus) {
+                    pillRegion.textContent = cfg.focus;
+                    pill.classList.add('visible');
+                } else {
+                    pill.classList.remove('visible');
+                }
+
+                // Hand off to the brain iframe: region camera focus +
+                // beliefs constellation visibility.
+                try {
+                    var f = document.getElementById('brain-frame');
+                    if (f && f.contentWindow) {
+                        f.contentWindow.postMessage({
+                            type: 'oscen.focusRegion',
+                            region: cfg.focus
+                        }, '*');
+                        // Beliefs gets its own 3D constellation overlay.
+                        f.contentWindow.postMessage({
+                            type: id === 'beliefs' ? 'oscen.beliefs.show' : 'oscen.beliefs.hide'
+                        }, '*');
+                    }
+                } catch (_) { /* iframe not ready, ignore */ }
+            }
+
+            function closeDrawer() {
+                activeModule = null;
+                panel.classList.remove('open');
+                rail.classList.remove('shifted');
+                tabs.forEach(function(t) { t.classList.remove('active'); });
+                pill.classList.remove('visible');
+
+                // Also reset the brain (release region focus + hide beliefs).
+                try {
+                    var f = document.getElementById('brain-frame');
+                    if (f && f.contentWindow) {
+                        f.contentWindow.postMessage({ type: 'oscen.focusRegion', region: null }, '*');
+                        f.contentWindow.postMessage({ type: 'oscen.beliefs.hide' }, '*');
+                    }
+                } catch (_) {}
+            }
+
+            tabs.forEach(function(t) {
+                t.addEventListener('click', function() {
+                    if (activeModule === t.dataset.module) {
+                        closeDrawer();
+                    } else {
+                        openDrawerWith(t.dataset.module);
+                    }
+                });
+                t.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        t.click();
+                    }
+                });
+            });
+
+            closeBtn.addEventListener('click', closeDrawer);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && panel.classList.contains('open')) closeDrawer();
+            });
+
+            // Listen for clicks on belief constellation nodes (posted from
+            // the brain iframe). Populate the Selected Belief panel.
+            var detailEl = document.getElementById('belief-detail');
+            function renderBeliefDetail(b) {
+                if (!detailEl) return;
+                if (!b) {
+                    detailEl.className = 'belief-detail empty';
+                    detailEl.innerHTML = '<div class="empty-hint">Click a sphere in the brain to inspect.</div>';
+                    return;
+                }
+                var type = (b.type || 'fact').toLowerCase();
+                var conf = (typeof b.confidence === 'number') ? b.confidence : 0;
+                var confPct = Math.round(conf * 100);
+                var source = b.source || 'unknown';
+                var metaRegion = (b.metadata && b.metadata.region) || '';
+                detailEl.className = 'belief-detail';
+                detailEl.innerHTML =
+                    '<span class="bd-type ' + type + '">' + type + '</span>' +
+                    '<div class="bd-id">' + (b.id || '') + '</div>' +
+                    '<div class="bd-content">' + (b.content || '(no content)') + '</div>' +
+                    '<div class="bd-row"><span>Confidence</span><span class="v">' + confPct + '%</span></div>' +
+                    '<div class="bd-conf-bar"><div class="bd-conf-fill" style="width:' + confPct + '%"></div></div>' +
+                    '<div class="bd-row" style="margin-top:8px"><span>Source</span><span class="v">' + source + '</span></div>' +
+                    (metaRegion ? '<div class="bd-row"><span>Anchor</span><span class="v">' + metaRegion + '</span></div>' : '');
+            }
+            window.addEventListener('message', function(e) {
+                var m = e.data;
+                if (!m) return;
+                if (m.type === 'oscen.beliefs.nodeClicked') renderBeliefDetail(m.belief);
+                else if (m.type === 'oscen.beliefs.nodeCleared') renderBeliefDetail(null);
+            });
+
+            // ─── B3: Live kernel-decision feed ──────────────────────
+            // The shared brain-data layer owns the WebSocket; this module
+            // just attaches a typed callback. Audit feed + constellation
+            // cascade fire on every kernel_decision message regardless of
+            // which drawer is open -- the audit list builds up in the
+            // background and is visible the moment the user opens Beliefs.
+            var beliefAuditEl = document.getElementById('belief-audit');
+            var beliefAuditCleared = false;
+            var VERDICT_COLORS = { allow: 0x4ade80, deny: 0xf87171, transform: 0xfbbf24 };
+
+            function wireBeliefData() {
+                if (!window.brainData) return false;
+                window.brainData.onKernelDecision = handleKernelDecision;
+                return true;
+            }
+            if (!wireBeliefData()) {
+                window.addEventListener('brain-data-ready', wireBeliefData, { once: true });
+            }
+
+            function handleKernelDecision(d) {
+                if (!d) return;
+                var verdict = (d.decision || d.verdict || 'allow').toLowerCase();
+                var action  = d.action || d.summary || d.reason || '(action)';
+                var beliefs = d.beliefs || d.belief_ids || [];
+
+                appendAuditEntry(verdict, action);
+
+                if (beliefs.length) {
+                    try {
+                        var f = document.getElementById('brain-frame');
+                        if (f && f.contentWindow) {
+                            f.contentWindow.postMessage({
+                                type: 'oscen.beliefs.cascade',
+                                beliefIds: beliefs,
+                                color: VERDICT_COLORS[verdict] || VERDICT_COLORS.allow
+                            }, '*');
+                        }
+                    } catch (_) {}
+                }
+            }
+
+            function appendAuditEntry(verdict, action) {
+                if (!beliefAuditEl) return;
+                if (!beliefAuditCleared) {
+                    beliefAuditEl.innerHTML = '';
+                    beliefAuditCleared = true;
+                }
+                var row = document.createElement('div');
+                var badge = verdict === 'deny' ? 'deny'
+                          : verdict === 'transform' ? 'transform'
+                          : 'allow';
+                row.innerHTML = '<span class="badge ' + badge + '">' + verdict + '</span>'
+                              + escapeHtml(String(action).slice(0, 90));
+                beliefAuditEl.insertBefore(row, beliefAuditEl.firstChild);
+                while (beliefAuditEl.children.length > 50) {
+                    beliefAuditEl.removeChild(beliefAuditEl.lastChild);
+                }
+            }
+            function escapeHtml(s) {
+                return s.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            // ─── B4: Scenario Simulator ─────────────────────────────
+            // POST /api/beliefs/simulate, render verdict + trace, fire
+            // a cascade flash through the implicated beliefs.
+            var scenarioInput = document.getElementById('belief-scenario');
+            var scenarioBtn   = document.getElementById('belief-scenario-run');
+            var simResultEl   = document.getElementById('belief-sim-result');
+
+            function escapeHtml2(s) {
+                return String(s == null ? '' : s).replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            function renderSimResult(data) {
+                if (!simResultEl) return;
+                simResultEl.hidden = false;
+                var verdict = (data.verdict || 'transform').toLowerCase();
+                var traceRows = (data.trace || []).map(function(t) {
+                    var ev = (t.evaluation || '').toLowerCase();
+                    return '<div>'
+                        + '<span class="step-n">' + (t.step + 1) + '</span>'
+                        + '<span class="node-id">' + escapeHtml2(t.node_id) + '</span>'
+                        + '<span class="eval ' + ev.split(' ')[0] + '">' + escapeHtml2(t.evaluation) + '</span>'
+                        + '</div>';
+                }).join('');
+                simResultEl.innerHTML =
+                    '<span class="sim-verdict ' + verdict + '">' + verdict
+                    + ' &middot; ' + Math.round((data.confidence || 0) * 100) + '%</span>'
+                    + '<div class="sim-reasoning">' + escapeHtml2(data.reasoning || '') + '</div>'
+                    + (traceRows
+                        ? '<div class="sim-trace-title">Trace</div><div class="sim-trace">' + traceRows + '</div>'
+                        : '');
+            }
+
+            function renderSimError(msg) {
+                if (!simResultEl) return;
+                simResultEl.hidden = false;
+                simResultEl.innerHTML = '<div class="sim-error">' + escapeHtml2(msg) + '</div>';
+            }
+
+            function runScenario() {
+                var action = (scenarioInput.value || '').trim();
+                if (!action) {
+                    scenarioInput.focus();
+                    return;
+                }
+                if (action.length > 200) {
+                    renderSimError('Action is too long (max 200 chars).');
+                    return;
+                }
+                if (!window.brainData) {
+                    renderSimError('Data layer not ready yet.');
+                    return;
+                }
+                scenarioBtn.classList.add('busy');
+                scenarioBtn.disabled = true;
+                // Mirror the prior fetch-style envelope so renderSimResult
+                // still gets ``res.body``. brainData.simulateBelief resolves
+                // to the parsed JSON body directly.
+                window.brainData.simulateBelief(action).then(function(body) {
+                    return { ok: !(body && body.ok === false), body: body || {} };
+                }).then(function(res) {
+                    scenarioBtn.classList.remove('busy');
+                    scenarioBtn.disabled = false;
+                    if (!res.ok) {
+                        var err = (res.body && res.body.error) || ('HTTP ' + res.status);
+                        renderSimError(err);
+                        return;
+                    }
+                    renderSimResult(res.body);
+                    appendAuditEntry(
+                        (res.body.verdict || 'allow').toLowerCase(),
+                        '[sim] ' + action
+                    );
+                    var beliefIds = (res.body.trace || []).map(function(t) { return t.node_id; });
+                    if (beliefIds.length) {
+                        try {
+                            var f = document.getElementById('brain-frame');
+                            if (f && f.contentWindow) {
+                                f.contentWindow.postMessage({
+                                    type: 'oscen.beliefs.cascade',
+                                    beliefIds: beliefIds,
+                                    color: VERDICT_COLORS[(res.body.verdict || 'allow').toLowerCase()] || VERDICT_COLORS.allow
+                                }, '*');
+                            }
+                        } catch (_) {}
+                    }
+                }).catch(function(err) {
+                    scenarioBtn.classList.remove('busy');
+                    scenarioBtn.disabled = false;
+                    renderSimError('Network error: ' + (err && err.message || err));
+                });
+            }
+
+            if (scenarioBtn) scenarioBtn.addEventListener('click', runScenario);
+            if (scenarioInput) scenarioInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); runScenario(); }
+            });
+
+            // (B3 WebSocket open/close on tab switch is gone: brainData
+            // owns one always-on WS for the whole dashboard.)
+        })();
+        </script>
+        <script>
+        // Build iframe src, passing through live/ws params from parent URL
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var src = '../index.html?embed=true&labels=true';
+            if (params.get('mode')) src += '&mode=' + params.get('mode');
+            if (params.get('ws')) src += '&ws=' + encodeURIComponent(params.get('ws'));
+            document.getElementById('brain-frame').src = src;
+        })();
+        </script>
+    </div>
+
+</div>
+
+<!-- ── Bottom Bar ─────────────────────────────────────────── -->
+<div class="bottombar">
+    <span class="bottombar-item"><strong>OSCEN</strong> Neural Architecture</span>
+    <span class="bottombar-sep"></span>
+    <span class="bottombar-item">US Provisional 63/986,737</span>
+    <span class="bottombar-sep"></span>
+    <span class="bottombar-item"><strong>1,156,800</strong> neurons</span>
+    <span class="bottombar-sep"></span>
+    <span class="bottombar-item"><strong>1.5B</strong> synapses</span>
+    <span class="bottombar-sep"></span>
+    <span class="bottombar-item"><strong>64</strong> synapse groups</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// OSCEN Brain Reaction Demo — Live + Simulated modes
+// ═══════════════════════════════════════════════════════════════════
+
+const REGION_META = {
+    sensory_cortex:     { label: 'Sensory Cortex',   color: '#22d3ee', neurons: 200000 },
+    brainstem:          { label: 'Brainstem',         color: '#ff4d4d', neurons: 1800 },
+    reflex_arc:         { label: 'Reflex Arc',        color: '#ff9933', neurons: 1000 },
+    feature_layer:      { label: 'Feature Layer',     color: '#22c7c0', neurons: 20000 },
+    association_cortex: { label: 'Association',        color: '#5ea4f5', neurons: 500000 },
+    predictive_layer:   { label: 'Predictive',        color: '#a673f5', neurons: 100000 },
+    cerebellum:         { label: 'Cerebellum',        color: '#f2d933', neurons: 50000 },
+    working_memory:     { label: 'Working Memory',    color: '#f573b5', neurons: 20000 },
+    concept_layer:      { label: 'Concept Layer',     color: '#f5ba26', neurons: 5000 },
+    meta_controller:    { label: 'Meta Control',      color: '#e6e6f0', neurons: 3000 },
+    motor_cortex:       { label: 'Motor Cortex',      color: '#38d97a', neurons: 100000 },
+};
+
+// ── Simulated cascade profiles (used when NOT in live mode) ──────
+// Rate values tuned for pulse glow system: 0.06 = dim, 0.12 = medium, 0.20 = bright, 0.30 = peak
+// Higher rates = more pulse bursts visible on pathways leaving that region.
+const CASCADE_PROFILES = {
+    dog: {
+        name: 'Visual Object Recognition',
+        inputType: 'visual',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.35, detail: 'Visual encoding: 64x64 grayscale -> rate-coded spikes (4,096 neurons active)' },
+            { region: 'brainstem',           delay: 50,   rate: 0.18, detail: 'Arousal response: NE + ACh spike — novel visual stimulus detected' },
+            { region: 'feature_layer',       delay: 150,  rate: 0.30, detail: 'Feature extraction: edges, textures, shapes via STDP-learned filters' },
+            { region: 'association_cortex',  delay: 300,  rate: 0.28, detail: 'Cross-modal binding: visual features integrated with stored patterns' },
+            { region: 'predictive_layer',    delay: 450,  rate: 0.20, detail: 'Prediction comparison: "Is this what I expected?" — error signal generated' },
+            { region: 'concept_layer',       delay: 650,  rate: 0.22, detail: 'Concept activation: k-WTA competition, sparse code for "animal" emerges' },
+            { region: 'working_memory',      delay: 750,  rate: 0.16, detail: 'Context maintenance: holding "dog" representation for downstream use' },
+            { region: 'meta_controller',     delay: 850,  rate: 0.14, detail: 'Attention gating: DA modulation — "This is interesting, learn more"' },
+            { region: 'motor_cortex',        delay: 950,  rate: 0.12, detail: 'Motor readiness: head-orient sub-range activating (look at the dog)' },
+        ],
+        neuromod: { da: 1.8, ach: 1.6, ne: 1.5, serotonin: 0.8 },
+    },
+    sound: {
+        name: 'Auditory Startle Response',
+        inputType: 'auditory',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.32, detail: 'Auditory encoding: MFCC features -> tonotopic mapping (5,120 neurons)' },
+            { region: 'brainstem',           delay: 30,   rate: 0.28, detail: 'Startle circuit: immediate arousal, NE surge — "Danger?"' },
+            { region: 'reflex_arc',          delay: 60,   rate: 0.35, detail: 'Fast reflex pathway: subcortical route bypassing cognition (~10ms)' },
+            { region: 'motor_cortex',        delay: 80,   rate: 0.26, detail: 'Motor response: freeze/orient — reflex arc drives immediate action' },
+            { region: 'feature_layer',       delay: 200,  rate: 0.18, detail: 'Spectral analysis: frequency bands, onset transients extracted' },
+            { region: 'association_cortex',  delay: 350,  rate: 0.20, detail: 'Pattern matching: comparing sound to learned auditory templates' },
+            { region: 'predictive_layer',    delay: 500,  rate: 0.22, detail: 'High prediction error: unexpected stimulus — enhanced learning signal' },
+            { region: 'meta_controller',     delay: 650,  rate: 0.16, detail: 'Global modulation: DA burst from surprise, ACh gates new learning' },
+            { region: 'working_memory',      delay: 700,  rate: 0.14, detail: 'Auditory echo: maintaining sound representation for source localization' },
+        ],
+        neuromod: { da: 2.2, ach: 1.4, ne: 2.0, serotonin: 0.5 },
+    },
+    flash: {
+        name: 'Visual Flash Response',
+        inputType: 'visual',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.40, detail: 'Massive visual activation: full-field luminance spike (12,000+ neurons)' },
+            { region: 'brainstem',           delay: 20,   rate: 0.25, detail: 'Pupillary reflex: brainstem mediates protective response' },
+            { region: 'reflex_arc',          delay: 40,   rate: 0.22, detail: 'Blink reflex: hardwired protective motor pattern triggered' },
+            { region: 'motor_cortex',        delay: 60,   rate: 0.20, detail: 'Motor: blink + aversion movement initiated' },
+            { region: 'feature_layer',       delay: 180,  rate: 0.12, detail: 'Feature saturation: uniform luminance = low feature content' },
+            { region: 'association_cortex',  delay: 350,  rate: 0.12, detail: 'Low binding activity: flash has minimal structure to associate' },
+            { region: 'predictive_layer',    delay: 500,  rate: 0.16, detail: 'Moderate prediction error: sudden change, but simple pattern' },
+        ],
+        neuromod: { da: 1.4, ach: 1.0, ne: 1.8, serotonin: 0.7 },
+    },
+    hello: {
+        name: 'Language Processing Cascade',
+        inputType: 'text',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.22, detail: 'Text encoding: character ordinals normalized [0,1] -> sensory sub-range' },
+            { region: 'feature_layer',       delay: 150,  rate: 0.20, detail: 'Phoneme-like extraction: character n-gram patterns via learned filters' },
+            { region: 'association_cortex',  delay: 300,  rate: 0.32, detail: 'Semantic binding: "Hello" pattern activates greeting-associated neurons' },
+            { region: 'predictive_layer',    delay: 450,  rate: 0.16, detail: 'Sequence prediction: expecting social response pattern' },
+            { region: 'concept_layer',       delay: 600,  rate: 0.26, detail: 'Abstract concept: "greeting" sparse distributed representation active' },
+            { region: 'working_memory',      delay: 700,  rate: 0.22, detail: 'Context hold: maintaining conversation state for response generation' },
+            { region: 'meta_controller',     delay: 800,  rate: 0.16, detail: 'Attention modulation: social stimulus prioritized' },
+            { region: 'motor_cortex',        delay: 900,  rate: 0.18, detail: 'Speech sub-range activating: motor plan for vocal response forming' },
+        ],
+        neuromod: { da: 1.5, ach: 1.8, ne: 1.0, serotonin: 1.0 },
+    },
+    pain: {
+        name: 'Nociceptive Reflex Arc',
+        inputType: 'tactile',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.26, detail: 'Tactile/nociceptive encoding: pain receptor activation in somatosensory map' },
+            { region: 'reflex_arc',          delay: 15,   rate: 0.40, detail: 'REFLEX TRIGGERED: hardwired withdrawal pattern — fastest pathway (<10ms)' },
+            { region: 'motor_cortex',        delay: 25,   rate: 0.35, detail: 'Immediate withdrawal: locomotion sub-range fires maximum intensity' },
+            { region: 'brainstem',           delay: 30,   rate: 0.28, detail: 'Pain processing: damage drive increases, NE/DA surge for learning' },
+            { region: 'cerebellum',          delay: 100,  rate: 0.20, detail: 'Coordination: smoothing rapid withdrawal trajectory' },
+            { region: 'association_cortex',  delay: 200,  rate: 0.16, detail: 'Context binding: associating location + stimulus with pain outcome' },
+            { region: 'predictive_layer',    delay: 350,  rate: 0.22, detail: 'Massive prediction error: R-STDP teaching "avoid this" pattern' },
+            { region: 'working_memory',      delay: 400,  rate: 0.14, detail: 'Threat memory: holding pain context for avoidance learning' },
+            { region: 'meta_controller',     delay: 500,  rate: 0.16, detail: 'Emergency modulation: DA gates motor learning, 5-HT dampened' },
+        ],
+        neuromod: { da: 2.5, ach: 1.0, ne: 2.5, serotonin: 0.3 },
+    },
+    novel: {
+        name: 'Novelty Detection & Curiosity',
+        inputType: 'visual',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.22, detail: 'Visual encoding: unfamiliar pattern enters sensory cortex' },
+            { region: 'feature_layer',       delay: 150,  rate: 0.20, detail: 'Feature extraction: novel combination of known features detected' },
+            { region: 'association_cortex',  delay: 300,  rate: 0.14, detail: 'No match found: novel pattern fails to activate existing associations' },
+            { region: 'predictive_layer',    delay: 400,  rate: 0.35, detail: 'MAXIMUM prediction error: completely unexpected input — curiosity signal' },
+            { region: 'meta_controller',     delay: 500,  rate: 0.30, detail: 'Curiosity response: DA burst + ACh flood — "Learn everything about this"' },
+            { region: 'brainstem',           delay: 550,  rate: 0.22, detail: 'Arousal spike: NE increases global attention and sensitivity' },
+            { region: 'working_memory',      delay: 650,  rate: 0.22, detail: 'Active maintenance: holding novel stimulus for extended processing' },
+            { region: 'concept_layer',       delay: 800,  rate: 0.14, detail: 'New concept forming: k-WTA recruiting unused neurons for new pattern' },
+            { region: 'motor_cortex',        delay: 950,  rate: 0.12, detail: 'Exploratory motor: head-orient + approach behavior activating' },
+        ],
+        neuromod: { da: 2.4, ach: 2.0, ne: 1.8, serotonin: 0.4 },
+    },
+    image: {
+        name: 'Image Processing',
+        inputType: 'visual',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.34, detail: 'Visual encoding: pixel values rate-coded into sensory cortex spikes' },
+            { region: 'feature_layer',       delay: 150,  rate: 0.28, detail: 'CNN feature extraction: edges, textures, spatial structure detected' },
+            { region: 'association_cortex',  delay: 300,  rate: 0.24, detail: 'Pattern matching: comparing extracted features to learned associations' },
+            { region: 'predictive_layer',    delay: 450,  rate: 0.20, detail: 'Context prediction: inferring scene semantics from visual cues' },
+            { region: 'concept_layer',       delay: 650,  rate: 0.22, detail: 'Object categorization: sparse concept neurons activating' },
+            { region: 'working_memory',      delay: 750,  rate: 0.16, detail: 'Scene representation: maintaining holistic image context' },
+            { region: 'meta_controller',     delay: 850,  rate: 0.14, detail: 'Salience evaluation: DA modulation based on novelty assessment' },
+        ],
+        neuromod: { da: 1.6, ach: 1.5, ne: 1.3, serotonin: 0.9 },
+    },
+    text: {
+        name: 'Text Processing',
+        inputType: 'text',
+        stages: [
+            { region: 'sensory_cortex',     delay: 0,    rate: 0.20, detail: 'Text encoding: character sequence rate-coded into sensory sub-range' },
+            { region: 'feature_layer',       delay: 150,  rate: 0.18, detail: 'Character-level features: n-gram patterns extracted via STDP filters' },
+            { region: 'association_cortex',  delay: 300,  rate: 0.30, detail: 'Semantic activation: text pattern triggers cross-modal associations' },
+            { region: 'predictive_layer',    delay: 450,  rate: 0.16, detail: 'Sequence prediction: anticipating continuation of text pattern' },
+            { region: 'working_memory',      delay: 600,  rate: 0.22, detail: 'Context buffer: holding text representation for comprehension' },
+            { region: 'concept_layer',       delay: 700,  rate: 0.22, detail: 'Meaning extraction: abstract concept neurons activating' },
+            { region: 'meta_controller',     delay: 800,  rate: 0.16, detail: 'Language attention: ACh-mediated focus on linguistic input' },
+        ],
+        neuromod: { da: 1.4, ach: 1.8, ne: 1.0, serotonin: 1.1 },
+    },
+};
+
+// Preset text mapping — what text to send to the brain for each preset
+const PRESET_TEXT = {
+    dog: 'dog',
+    sound: 'loud bang',
+    flash: 'bright flash',
+    hello: 'Hello',
+    pain: 'ouch hot',
+    novel: 'xyzzy strange new thing',
+};
+
+// ── DOM refs ────────────────────────────────────────────────
+const brainFrame = document.getElementById('brain-frame');
+const modeBadge = document.getElementById('mode-badge');
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const dropPreview = document.getElementById('drop-preview');
+const previewImg = document.getElementById('preview-img');
+const previewName = document.getElementById('preview-name');
+const previewSize = document.getElementById('preview-size');
+const textInput = document.getElementById('text-input');
+const btnTextSend = document.getElementById('btn-text-send');
+const processingEl = document.getElementById('processing');
+const processingText = document.getElementById('processing-text');
+const processingBar = document.getElementById('processing-bar');
+const summaryEl = document.getElementById('summary');
+const summaryGrid = document.getElementById('summary-grid');
+const logScroll = document.getElementById('log-scroll');
+
+let cascadeRunning = false;
+let cascadeTimeouts = [];
+
+// ═══════════════════════════════════════════════════════════════════
+// LIVE MODE — wire UI to the shared brain-data layer (top of file)
+// ═══════════════════════════════════════════════════════════════════
+//
+// brain-data.js loads as a module before this script, owns the single
+// WebSocket and the REST helpers, and exposes the instance as
+// ``window.brainData``. We just bind UI callbacks to it here.
+
+const isLiveMode = (window.brainDataConfig && window.brainDataConfig.isLive) !== false;
+
+// Live state mirrors what the prior connectLiveWs maintained, so the
+// cascade renderer below keeps working unchanged.
+let liveConnected = false;
+let observeStartTime = 0;
+let lastNeuroData = null;   // most recent neuro_update data
+
+function wireLiveData() {
+    if (!window.brainData) return false;
+    window.brainData.onNeuroUpdate = (state) => { lastNeuroData = state; };
+    window.brainData.onStatus = (s) => {
+        liveConnected = !!s.connected;
+        if (!isLiveMode) return;
+        if (s.connected) setModeBadge('LIVE', '#38d97a');
+        else if (s.mode === 'connecting') setModeBadge('CONNECTING...', '#ffcc00');
+        else setModeBadge('DISCONNECTED', '#ff4d4d');
+    };
+    return true;
+}
+if (isLiveMode) {
+    setModeBadge('CONNECTING...', '#ffcc00');
+    if (!wireLiveData()) {
+        window.addEventListener('brain-data-ready', wireLiveData, { once: true });
+    }
+}
+
+function setModeBadge(text, color) {
+    modeBadge.textContent = text;
+    modeBadge.style.background = `rgba(${hexToRgb(color)}, 0.15)`;
+    modeBadge.style.color = color;
+}
+
+function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return `${r}, ${g}, ${b}`;
+}
+
+// ── Inject stimulus into brain (delegated to brain-data) ─────
+async function injectObservation(provenance, data) {
+    if (!window.brainData) return { ok: false, error: 'data layer not ready' };
+    return window.brainData.injectObservation(provenance, data);
+}
+
+// Send image as 64x64 grayscale pixel array — same format the brain expects
+async function injectImageToBrain(imgElement) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imgElement, 0, 0, 64, 64);
+    const imageData = ctx.getImageData(0, 0, 64, 64);
+    const pixels = [];
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        const gray = (imageData.data[i] * 0.299 + imageData.data[i+1] * 0.587 + imageData.data[i+2] * 0.114) / 255;
+        pixels.push(parseFloat(gray.toFixed(4)));
+    }
+    return injectObservation('sensor.image', pixels);
+}
+
+// ── Fetch brain state via REST API ──
+async function fetchBrainState() {
+    if (!window.brainData) return null;
+    return window.brainData.fetchNeuroState();
+}
+
+// ── Live mode cascade — hybrid: real brain state + architectural pathway ──
+async function runLiveCascade(stimulusType, textContent) {
+    if (cascadeRunning) return;
+    cascadeRunning = true;
+
+    // Clear previous (including any stale simulated timeouts)
+    cascadeTimeouts.forEach(t => clearTimeout(t));
+    cascadeTimeouts = [];
+    logScroll.innerHTML = '';
+    summaryEl.classList.remove('active');
+
+    // Show processing
+    processingEl.classList.add('active');
+    processingText.textContent = 'Reading live brain state...';
+    processingBar.style.width = '0%';
+
+    try {
+
+    // ── Step 1: Fetch real brain state ──
+    const brainState = await fetchBrainState();
+    const realStep = brainState ? (brainState.step_count || 0) : 0;
+    const realRates = brainState ? (brainState.firing_rates || {}) : {};
+    const realNeuromod = brainState ? (brainState.neuromodulation || {}) : {};
+    const realDrives = brainState ? (brainState.drives || {}) : {};
+
+    observeStartTime = Date.now();
+
+    // Show live brain state
+    addLiveLogEntry(0, 'LIVE BRAIN', 'Step ' + realStep.toLocaleString() + ' — 1,156,800 neurons active', '#38d97a');
+
+    const activeRegions = Object.entries(realRates)
+        .filter(([_, r]) => r > 0.001)
+        .sort((a, b) => b[1] - a[1]);
+    for (const [region, rate] of activeRegions) {
+        const meta = REGION_META[region];
+        if (meta) addLiveLogEntry(0, meta.label, (rate * 100).toFixed(2) + '% firing rate', meta.color);
+    }
+
+    // ── Step 2: Inject stimulus into real brain ──
+    processingText.textContent = 'Injecting stimulus into brain...';
+    processingBar.style.width = '15%';
+
+    let injectResult;
+    if (stimulusType === 'image') {
+        addLiveLogEntry(Date.now() - observeStartTime, 'INJECTING', '64x64 grayscale → sensor.image → NATS', '#22d3ee');
+        injectResult = await injectImageToBrain(previewImg);
+    } else {
+        const text = textContent || PRESET_TEXT[stimulusType] || stimulusType;
+        addLiveLogEntry(Date.now() - observeStartTime, 'INJECTING', '"' + text + '" → observation.text → NATS', '#22d3ee');
+        injectResult = await injectObservation('observation.text', text);
+    }
+
+    if (injectResult.ok) {
+        addLiveLogEntry(Date.now() - observeStartTime, 'DELIVERED', 'Stimulus injected into live brain', '#38d97a');
+    } else {
+        addLiveLogEntry(Date.now() - observeStartTime, 'WARN', 'Injection issue: ' + (injectResult.error || '?'), '#ffcc00');
+    }
+
+    // ── Step 3: Show architectural processing pathway with real firing rates ──
+    // The brain is training on 403 videos — a single stimulus gets processed in one step
+    // but the aggregate metrics (published every 10s) won't show a visible spike.
+    // Instead, we show the actual processing pathway with real neuron counts.
+    processingText.textContent = 'Tracing neural pathway...';
+
+    const profile = CASCADE_PROFILES[stimulusType] || CASCADE_PROFILES['text'];
+
+    addLiveLogEntry(Date.now() - observeStartTime, 'PATHWAY', profile.name + ' — tracing through brain regions', '#a673f5');
+
+    // Clear previous brain visualization so cascade lights up sequentially
+    postToBrain({ type: 'demo_clear' });
+    await new Promise(r => setTimeout(r, 100));
+
+    // Run the cascade using real firing rates blended with pathway activation
+    const cumulativeRates = {};
+
+    for (let idx = 0; idx < profile.stages.length; idx++) {
+        const stage = profile.stages[idx];
+
+        // Stagger delays for visible sequential activation
+        const stageDelay = idx === 0 ? 100 : Math.max(120, Math.min(stage.delay - (profile.stages[idx-1]?.delay || 0), 300));
+        await new Promise(r => setTimeout(r, stageDelay));
+
+        // Use the profile rate directly (already calibrated for the sqrt intensity curve)
+        const realRate = realRates[stage.region] || 0;
+        cumulativeRates[stage.region] = stage.rate;
+
+        // Send to brain iframe for visualization
+        postToBrain({
+            type: 'demo_reaction',
+            firingRates: { ...cumulativeRates },
+            neuromodulation: profile.neuromod,
+        });
+
+        // Update progress
+        const progress = 15 + ((idx + 1) / profile.stages.length) * 80;
+        processingBar.style.width = progress + '%';
+
+        // Log with real + pathway data
+        const meta = REGION_META[stage.region];
+        if (meta) {
+            const realPct = (realRate * 100).toFixed(2);
+            const activeNeurons = Math.floor(meta.neurons * stage.rate * 2);
+            addLiveLogEntry(
+                stage.delay,
+                meta.label,
+                stage.detail + ' [live: ' + realPct + '%, ~' + activeNeurons.toLocaleString() + ' neurons]',
+                meta.color
+            );
+        }
+    }
+
+    // ── Step 4: Show summary with real brain data ──
+    processingBar.style.width = '100%';
+    await new Promise(r => setTimeout(r, 300));
+    processingEl.classList.remove('active');
+
+    const peakStage = profile.stages.reduce((a, b) => a.rate > b.rate ? a : b);
+    const peakMeta = REGION_META[peakStage.region];
+    const totalNeurons = profile.stages.reduce((sum, s) => {
+        const m = REGION_META[s.region];
+        return sum + (m ? Math.floor(m.neurons * s.rate * 2) : 0);
+    }, 0);
+    const hasMotor = profile.stages.some(s => s.region === 'motor_cortex');
+    const cascadeTime = profile.stages[profile.stages.length - 1].delay;
+    const da = realNeuromod.da || realNeuromod.dopamine || profile.neuromod.da;
+    const predError = realDrives.prediction_error;
+
+    summaryGrid.innerHTML = `
+        <div class="summary-stat">
+            <div class="summary-stat-label">Regions in Pathway</div>
+            <div class="summary-stat-val cyan">${profile.stages.length} / 15</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Peak Region</div>
+            <div class="summary-stat-val" style="color: ${peakMeta.color}; font-size: 11px">${peakMeta.label}</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Neurons Active</div>
+            <div class="summary-stat-val green">${totalNeurons.toLocaleString()}</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Cascade Latency</div>
+            <div class="summary-stat-val amber">${cascadeTime}ms</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Motor Response</div>
+            <div class="summary-stat-val ${hasMotor ? 'green' : ''}">${hasMotor ? 'Yes' : 'None'}</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">DA Level</div>
+            <div class="summary-stat-val amber">${typeof da === 'number' ? da.toFixed(2) : 'N/A'}${predError != null ? ' | PE: ' + predError.toFixed(2) : ''}</div>
+        </div>
+    `;
+    summaryEl.classList.add('active');
+
+    // Fade out brain override after 6 seconds (let pulses linger)
+    cascadeTimeouts.push(setTimeout(() => {
+        postToBrain({ type: 'demo_clear' });
+    }, 6000));
+
+    } catch (e) {
+        console.error('Live cascade error:', e);
+        processingEl.classList.remove('active');
+        addLiveLogEntry(Date.now() - observeStartTime, 'ERROR', e.message || 'Cascade failed', '#ff4d4d');
+    } finally {
+        cascadeRunning = false;
+    }
+}
+
+function addLiveLogEntry(timeMs, label, detail, color) {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = `
+        <div class="log-time">+${timeMs}ms</div>
+        <div class="log-region" style="color: ${color}">${label}</div>
+        <div class="log-detail">${detail}</div>
+    `;
+    logScroll.appendChild(entry);
+    logScroll.scrollTop = logScroll.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SIMULATED MODE — scripted cascades (existing behavior)
+// ═══════════════════════════════════════════════════════════════════
+
+function runSimulatedCascade(profileKey) {
+    if (cascadeRunning) return;
+    cascadeRunning = true;
+
+    const profile = CASCADE_PROFILES[profileKey];
+    if (!profile) { cascadeRunning = false; return; }
+
+    cascadeTimeouts.forEach(t => clearTimeout(t));
+    cascadeTimeouts = [];
+    logScroll.innerHTML = '';
+    summaryEl.classList.remove('active');
+
+    processingEl.classList.add('active');
+    processingText.textContent = 'Encoding sensory input...';
+    processingBar.style.width = '0%';
+
+    postToBrain({ type: 'demo_clear' });
+
+    const encodingDelay = 600;
+    let barStart = Date.now();
+    const barInterval = setInterval(() => {
+        const elapsed = Date.now() - barStart;
+        processingBar.style.width = Math.min(100, (elapsed / encodingDelay) * 30) + '%';
+        if (elapsed >= encodingDelay) clearInterval(barInterval);
+    }, 30);
+
+    cascadeTimeouts.push(setTimeout(() => {
+        clearInterval(barInterval);
+        processingText.textContent = 'Processing: ' + profile.name;
+
+        const cumulativeRates = {};
+        const activatedRegions = [];
+
+        profile.stages.forEach((stage, idx) => {
+            cascadeTimeouts.push(setTimeout(() => {
+                cumulativeRates[stage.region] = stage.rate;
+                postToBrain({
+                    type: 'demo_reaction',
+                    firingRates: { ...cumulativeRates },
+                    neuromodulation: profile.neuromod,
+                });
+                const progress = 30 + ((idx + 1) / profile.stages.length) * 70;
+                processingBar.style.width = progress + '%';
+                addSimLogEntry(stage);
+                activatedRegions.push(stage);
+
+                if (idx === profile.stages.length - 1) {
+                    cascadeTimeouts.push(setTimeout(() => {
+                        processingEl.classList.remove('active');
+                        showSimSummary(profile, activatedRegions);
+                        cascadeRunning = false;
+                        cascadeTimeouts.push(setTimeout(() => {
+                            postToBrain({ type: 'demo_clear' });
+                        }, 6000));
+                    }, 500));
+                }
+            }, stage.delay));
+        });
+    }, encodingDelay));
+}
+
+// ── Cancel any running cascade ───────────────────────────────
+function cancelCascade() {
+    cascadeTimeouts.forEach(t => clearTimeout(t));
+    cascadeTimeouts = [];
+    cascadeRunning = false;
+    processingEl.classList.remove('active');
+}
+
+// ── Unified dispatch ─────────────────────────────────────────
+function runCascade(profileKey) {
+    // If a cascade is already running, cancel it so the new one can start
+    if (cascadeRunning) cancelCascade();
+
+    if (isLiveMode && liveConnected) {
+        // For text input, pass the user's typed text; presets use PRESET_TEXT mapping
+        const textContent = profileKey === 'text' ? textInput.value.trim() : null;
+        runLiveCascade(profileKey, textContent);
+    } else {
+        runSimulatedCascade(profileKey);
+    }
+}
+
+function handleImageFile(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+        // Clear any stale onload handler before setting src
+        previewImg.onload = null;
+
+        previewName.textContent = file.name;
+        previewSize.textContent = formatBytes(file.size);
+        dropPreview.classList.add('active');
+        dropZone.classList.add('has-file');
+
+        if (isLiveMode && liveConnected) {
+            // Wait for image to load in the img element, then inject
+            previewImg.onload = function onceLoaded() {
+                previewImg.onload = null; // clear after firing
+                runCascade('image');
+            };
+        }
+
+        previewImg.src = reader.result;
+
+        if (!(isLiveMode && liveConnected)) {
+            // In simulated mode, image data isn't needed — trigger immediately
+            runCascade('image');
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+// ── File drop handling ──────────────────────────────────────
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handleImageFile(file);
+});
+fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) handleImageFile(fileInput.files[0]);
+});
+
+function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// ── Text input ──────────────────────────────────────────────
+function sendTextInput() {
+    const val = textInput.value.trim();
+    if (val) runCascade('text');
+}
+btnTextSend.addEventListener('click', sendTextInput);
+textInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendTextInput();
+});
+
+// ── Presets ──────────────────────────────────────────────────
+document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const preset = btn.dataset.preset;
+        if (preset) runCascade(preset);
+    });
+});
+
+// ── Shared helpers ───────────────────────────────────────────
+function postToBrain(msg) {
+    if (brainFrame.contentWindow) {
+        brainFrame.contentWindow.postMessage(msg, '*');
+    }
+}
+
+function addSimLogEntry(stage) {
+    const meta = REGION_META[stage.region];
+    if (!meta) return;
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    const pct = (stage.rate * 100).toFixed(1);
+    entry.innerHTML = `
+        <div class="log-time">+${stage.delay}ms</div>
+        <div class="log-region" style="color: ${meta.color}">${meta.label}</div>
+        <div class="log-detail">${stage.detail}</div>
+        <div class="log-bar">
+            <div class="log-bar-fill" style="width: ${pct * 10}%; background: ${meta.color}"></div>
+        </div>
+    `;
+    logScroll.appendChild(entry);
+    logScroll.scrollTop = logScroll.scrollHeight;
+}
+
+function showSimSummary(profile, activated) {
+    const peakStage = activated.reduce((a, b) => a.rate > b.rate ? a : b);
+    const peakMeta = REGION_META[peakStage.region];
+    const totalNeurons = activated.reduce((sum, s) => {
+        const m = REGION_META[s.region];
+        return sum + (m ? Math.floor(m.neurons * s.rate * 2) : 0);
+    }, 0);
+    const hasMotor = activated.some(s => s.region === 'motor_cortex');
+    const cascadeTime = activated[activated.length - 1].delay;
+
+    summaryGrid.innerHTML = `
+        <div class="summary-stat">
+            <div class="summary-stat-label">Regions Activated</div>
+            <div class="summary-stat-val cyan">${activated.length} / 15</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Peak Region</div>
+            <div class="summary-stat-val" style="color: ${peakMeta.color}; font-size: 11px">${peakMeta.label}</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Neurons Activated</div>
+            <div class="summary-stat-val green">${(totalNeurons).toLocaleString()}</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Cascade Duration</div>
+            <div class="summary-stat-val amber">${cascadeTime}ms</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">Motor Response</div>
+            <div class="summary-stat-val ${hasMotor ? 'green' : ''}">${hasMotor ? 'Yes' : 'None'}</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-label">DA Level</div>
+            <div class="summary-stat-val amber">${profile.neuromod.da.toFixed(1)}x</div>
+        </div>
+    `;
+    summaryEl.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Timeline module (live) -- binds to brain-data.onNeuroUpdate
+// ═══════════════════════════════════════════════════════════════════
+//
+// Reads phase + step + plasticity + DA + prediction-error from each
+// `neuromorphic.metrics` tick. Throttled DOM writes (~5 Hz) so a busy
+// brain doesn't trash the renderer when the drawer is open.
+
+(function wireTimelineModule() {
+    const PHASES = ['infant', 'toddler', 'juvenile', 'adolescent', 'mature'];
+    const pipEls = {};
+    document.querySelectorAll('#tl-phase-tracker .phase-pip').forEach((el) => {
+        pipEls[el.dataset.phase] = el;
+    });
+    const stepEl       = document.getElementById('tl-step');
+    const plastFill    = document.getElementById('tl-plasticity-fill');
+    const plastText    = document.getElementById('tl-plasticity-text');
+    const daFill       = document.getElementById('tl-da-fill');
+    const daText       = document.getElementById('tl-da-text');
+    const peFill       = document.getElementById('tl-pe-fill');
+    const peText       = document.getElementById('tl-pe-text');
+    const waitingEl    = document.getElementById('tl-waiting');
+
+    let lastRender = 0;
+    function pct(v) { return Math.max(0, Math.min(100, v)); }
+
+    function renderTimeline(state) {
+        if (!state) return;
+        // Throttle to 5 Hz — the metrics ticker can hit 10+ Hz.
+        const now = Date.now();
+        if (now - lastRender < 200) return;
+        lastRender = now;
+
+        if (waitingEl) waitingEl.style.display = 'none';
+
+        // Phase pip. Phase comes from neuromodulation.development_phase
+        // (preferred), with fallbacks for older shapes.
+        const nm = state.neuromodulation || {};
+        const phase = (state.phase || nm.development_phase || nm.phase || '').toLowerCase();
+        Object.values(pipEls).forEach((el) => el.classList.remove('active'));
+        if (phase && pipEls[phase]) pipEls[phase].classList.add('active');
+
+        // Step count.
+        if (stepEl && typeof state.step_count === 'number') {
+            stepEl.textContent = 'Step ' + state.step_count.toLocaleString();
+        }
+
+        // Plasticity — drives.plasticity (0..1) is the canonical signal;
+        // fall back to neuromodulation.ach which gates plasticity.
+        const drives = state.drives || {};
+        const plasticity = (typeof drives.plasticity === 'number') ? drives.plasticity
+                         : (typeof nm.ach === 'number') ? nm.ach
+                         : null;
+        if (plasticity != null && plastFill && plastText) {
+            const p = pct(plasticity * 100);
+            plastFill.style.width = p.toFixed(1) + '%';
+            plastText.textContent = p.toFixed(1) + '% (' + (phase || 'unknown') + ')';
+        }
+
+        // Dopamine — direct read.
+        const da = (typeof nm.da === 'number') ? nm.da : null;
+        if (da != null && daFill && daText) {
+            // DA can exceed 1.0 during teaching bursts; clamp the bar but
+            // keep the raw value in the text.
+            daFill.style.width = pct(da * 50).toFixed(1) + '%';   // 2.0 = full bar
+            daText.textContent = da.toFixed(2) + 'x';
+        }
+
+        // Prediction error — drives.prediction_error.
+        const pe = (typeof drives.prediction_error === 'number') ? drives.prediction_error : null;
+        if (pe != null && peFill && peText) {
+            const p = pct(pe * 100);
+            peFill.style.width = p.toFixed(1) + '%';
+            peText.textContent = p.toFixed(2);
+        }
+    }
+
+    function attach() {
+        if (!window.brainData) return false;
+        window.brainData.chain('onNeuroUpdate', renderTimeline);
+        return true;
+    }
+    if (!attach()) {
+        window.addEventListener('brain-data-ready', attach, { once: true });
+    }
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// Concepts module (live) -- POST probes + render concept_probe_result
+// ═══════════════════════════════════════════════════════════════════
+//
+// Live path:
+//   1. user types a label and clicks PROBE
+//   2. POST /api/concept-probe (publishes neuromorphic.concept.probe)
+//   3. brain runs the probe, publishes a concept_probe_result back on NATS
+//   4. dashboard pushes that on the WS as `concept_probe_result`
+//   5. we re-render the active-neurons + cosine list from the result payload
+
+(function wireConceptsModule() {
+    const root = document.querySelector('.module-body[data-module="concepts"]');
+    if (!root) return;
+
+    // Rewrite the stub markup with live IDs. Done in JS rather than HTML
+    // so the file diff stays focused and the original mock survives in
+    // git history for one revision.
+    root.innerHTML = `
+        <div class="section">
+            <div class="section-label">Probe Word</div>
+            <div class="text-input-row">
+                <input type="text" class="text-input" id="cp-input" placeholder='Type a label then PROBE' maxlength="80">
+                <button class="btn-send" id="cp-run">PROBE</button>
+            </div>
+            <div class="metric" id="cp-status" style="opacity:0.55">Idle.</div>
+        </div>
+        <div class="section">
+            <div class="section-label">Recent Concept Results</div>
+            <div id="cp-results" style="display:flex;flex-direction:column;gap:6px;font-size:11px;"></div>
+        </div>
+        <div class="section">
+            <div class="section-label">Concept Neurons Firing</div>
+            <div class="big-metric" id="cp-active">--</div>
+            <div class="caption" id="cp-sparsity">Sparse code; waiting for first probe.</div>
+        </div>
+    `;
+
+    const input    = document.getElementById('cp-input');
+    const runBtn   = document.getElementById('cp-run');
+    const statusEl = document.getElementById('cp-status');
+    const resultsEl= document.getElementById('cp-results');
+    const activeEl = document.getElementById('cp-active');
+    const sparsEl  = document.getElementById('cp-sparsity');
+
+    function runProbe() {
+        if (!window.brainData) return;
+        const label = (input.value || '').trim();
+        if (!label) { input.focus(); return; }
+        runBtn.disabled = true;
+        statusEl.textContent = 'Probing "' + label + '"...';
+        window.brainData.injectObservation('neuromorphic.concept.probe', { label }).then((r) => {
+            runBtn.disabled = false;
+            if (r && r.ok === false) {
+                statusEl.textContent = 'Error: ' + (r.error || 'unknown');
+                return;
+            }
+            statusEl.textContent = 'Sent. Waiting for result...';
+        });
+    }
+    runBtn.addEventListener('click', runProbe);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); runProbe(); }
+    });
+
+    function renderResult(d) {
+        if (!d) return;
+        statusEl.textContent = 'Got result for "' + (d.label || '?') + '".';
+        // Active-neurons + sparsity. Field names defensive: server-side
+        // shapes have drifted as the probe was iterated.
+        const active = d.active_neurons ?? d.n_active ?? d.firing_count ?? null;
+        const total = d.total_neurons ?? d.n_concept_neurons ?? null;
+        if (active != null) {
+            activeEl.textContent = total ? (active + ' / ' + total) : active.toString();
+        }
+        const sparsity = d.sparsity ?? (active != null && total ? active / total : null);
+        if (sparsity != null) sparsEl.textContent = (sparsity * 100).toFixed(1) + '% of concept neurons active';
+
+        // Prepend a row, keep last 8.
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);';
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = d.label || '(unlabeled)';
+        const valSpan = document.createElement('span');
+        valSpan.style.color = '#22d3ee';
+        valSpan.textContent = active != null ? (active + ' neurons') : '--';
+        row.appendChild(labelSpan); row.appendChild(valSpan);
+        resultsEl.insertBefore(row, resultsEl.firstChild);
+        while (resultsEl.children.length > 8) resultsEl.removeChild(resultsEl.lastChild);
+    }
+
+    function attach() {
+        if (!window.brainData) return false;
+        window.brainData.chain('onConceptProbeResult', renderResult);
+        // Backfill from REST so the panel isn't empty if you opened the
+        // demo after some probes already ran.
+        window.brainData._getJson('/api/concept-probe/results').then((j) => {
+            if (!j || !Array.isArray(j.results)) return;
+            j.results.slice(-3).forEach(renderResult);
+        });
+        return true;
+    }
+    if (!attach()) window.addEventListener('brain-data-ready', attach, { once: true });
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// Continual module (live) -- /api/benchmark/continual poll
+// ═══════════════════════════════════════════════════════════════════
+
+(function wireContinualModule() {
+    const root = document.querySelector('.module-body[data-module="continual"]');
+    if (!root) return;
+
+    root.innerHTML = `
+        <div class="section">
+            <div class="section-label">Last Benchmark</div>
+            <div class="big-metric warn" id="cl-mean">--%</div>
+            <div class="caption" id="cl-caption">Loading continual benchmark...</div>
+        </div>
+        <div class="section">
+            <div class="section-label">Per-Group Retention</div>
+            <div id="cl-rows"></div>
+        </div>
+        <div class="section">
+            <div class="section-label">Patent Claim 6</div>
+            <div class="caption">Eligibility traces + homeostatic scaling preserve learned weights across task switches without batch retraining.</div>
+        </div>
+    `;
+
+    const meanEl    = document.getElementById('cl-mean');
+    const captionEl = document.getElementById('cl-caption');
+    const rowsEl    = document.getElementById('cl-rows');
+
+    function classify(pct) {
+        if (pct >= 80) return 'ok';
+        if (pct >= 50) return 'warn';
+        return 'err';
+    }
+
+    function renderContinual(json) {
+        if (!json) return;
+        const data = json.results || json;
+        if (!data || json.error) {
+            captionEl.textContent = json.error || 'No continual benchmark file yet.';
+            return;
+        }
+        // Defensive: schema may be {mean_retention, groups: [{name, retention_pct}]}
+        // or {retention: {group: pct}}, or {per_group_retention: {...}}.
+        const groups = data.groups
+            || (data.per_group_retention && Object.entries(data.per_group_retention).map(([name, v]) => ({ name, retention_pct: v * 100 })))
+            || (data.retention && Object.entries(data.retention).map(([name, v]) => ({ name, retention_pct: v * 100 })))
+            || [];
+        const mean = data.mean_retention != null
+            ? data.mean_retention * (data.mean_retention <= 1 ? 100 : 1)
+            : (groups.length ? groups.reduce((s, g) => s + (g.retention_pct || 0), 0) / groups.length : null);
+        if (mean != null) {
+            meanEl.textContent = mean.toFixed(1) + '%';
+            meanEl.className = 'big-metric ' + classify(mean);
+        }
+        captionEl.textContent = (data.task_pair ? data.task_pair + ' switch · ' : '')
+            + (groups.length || 0) + ' groups measured'
+            + (json.filename ? ' · ' + json.filename : '');
+
+        rowsEl.innerHTML = '';
+        groups.forEach((g) => {
+            const pct = Math.max(0, Math.min(100, g.retention_pct || 0));
+            const row = document.createElement('div');
+            row.className = 'retention-row';
+            row.innerHTML = '<span>' + (g.name || '?') + '</span>'
+                + '<div class="bar"><div class="fill ' + classify(pct) + '" style="width:' + pct.toFixed(0) + '%"></div></div>'
+                + '<span class="pct">' + pct.toFixed(0) + '%</span>';
+            rowsEl.appendChild(row);
+        });
+    }
+
+    function attach() {
+        if (!window.brainData) return false;
+        window.brainData.enablePoll('continual',
+            10000,
+            () => window.brainData._getJson('/api/benchmark/continual'),
+            renderContinual,
+        );
+        return true;
+    }
+    if (!attach()) window.addEventListener('brain-data-ready', attach, { once: true });
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// Speech module (live) -- chain onto WS speech_execute / audio_pcm
+// ═══════════════════════════════════════════════════════════════════
+
+(function wireSpeechModule() {
+    const root = document.querySelector('.module-body[data-module="speech"]');
+    if (!root) return;
+
+    root.innerHTML = `
+        <div class="section">
+            <div class="section-label">Live Babble Stream</div>
+            <div class="babble-stream-mock" id="sp-stream" style="min-height:48px;max-height:120px;overflow-y:auto;line-height:1.7;">Waiting for speech...</div>
+        </div>
+        <div class="section">
+            <div class="section-label">Tokens This Session</div>
+            <div class="big-metric" id="sp-token-count">0</div>
+            <div class="caption" id="sp-token-caption">From the audio brain's speech motor cortex.</div>
+            <div class="metric" id="sp-babble-count" style="margin-top:6px;opacity:0.75;">Babble attempts: 0</div>
+        </div>
+        <div class="section">
+            <div class="section-label">Audio Output (RMS)</div>
+            <div class="progress-bar"><div class="fill" id="sp-rms-fill" style="width:0%; background:var(--accent)"></div></div>
+            <div class="metric" id="sp-rms-text">Silent.</div>
+        </div>
+        <div class="section">
+            <div class="section-label">
+                Audio Self-Feedback Loop
+                <span id="sp-loop-status" style="float:right;font-size:9px;letter-spacing:1.2px;padding:2px 6px;border:1px solid rgba(255,255,255,0.18);">--</span>
+            </div>
+            <div class="caption" style="margin-bottom:6px">
+                Brain hears its own babble via mel-feature efference copy
+                (corollary discharge, Patent Claim 4). Tune
+                <code>NEURO_AUDIO_EFFERENCE_GAIN</code> if response is too weak.
+            </div>
+            <div class="metric" id="sp-loop-gain">Gain: --</div>
+            <div class="metric" id="sp-loop-rate">Publish rate: --</div>
+            <div class="metric" id="sp-loop-silent">Silent skips: --</div>
+        </div>
+    `;
+
+    const streamEl    = document.getElementById('sp-stream');
+    const countEl     = document.getElementById('sp-token-count');
+    const captionEl   = document.getElementById('sp-token-caption');
+    const babbleCountEl = document.getElementById('sp-babble-count');
+    const rmsFill     = document.getElementById('sp-rms-fill');
+    const rmsText     = document.getElementById('sp-rms-text');
+    let tokenCount = 0;
+    let babbleCount = 0;
+    let streamFirst = true;
+    let lastRmsRender = 0;
+
+    function tokenOf(d) {
+        // speech_execute payload shapes have varied: prefer ``token``,
+        // then ``ipa`` (IPA glyph), then a short stringified ``label``.
+        if (!d) return null;
+        return d.token || d.ipa || d.text || d.label || null;
+    }
+
+    function renderSpeech(d) {
+        const isBabble = !!(d && d.babble);
+        let tok = tokenOf(d);
+        // Babble events from the per-specialist motor.outcome.speech
+        // passthrough usually have no token string yet (the brain is
+        // still wiring its motor cortex). Show a placeholder so the
+        // panel proves the brain is actively trying.
+        if (!tok && isBabble) {
+            const conf = (typeof d.confidence === 'number') ? d.confidence : null;
+            tok = conf != null ? '?' + conf.toFixed(2) : '?';
+        }
+        if (!tok) return;
+        if (streamFirst) { streamEl.textContent = ''; streamFirst = false; }
+        const span = document.createElement('span');
+        span.textContent = tok + ' ';
+        if (isBabble) {
+            // Faded + italic so babble is visually distinct from real tokens.
+            span.style.cssText = 'opacity:0;transition:opacity 300ms ease;font-style:italic;color:rgba(255,255,255,0.55);';
+        } else {
+            span.style.cssText = 'opacity:0;transition:opacity 300ms ease;';
+        }
+        streamEl.appendChild(span);
+        // Force reflow then fade in.
+        // eslint-disable-next-line no-unused-expressions
+        span.offsetHeight;
+        span.style.opacity = '1';
+        // Trim if too long.
+        while (streamEl.children.length > 80) streamEl.removeChild(streamEl.firstChild);
+        streamEl.scrollTop = streamEl.scrollHeight;
+        if (isBabble) {
+            babbleCount++;
+            if (babbleCountEl) babbleCountEl.textContent = 'Babble attempts: ' + babbleCount.toLocaleString();
+        } else {
+            tokenCount++;
+            countEl.textContent = tokenCount.toLocaleString();
+        }
+    }
+
+    function renderAudioPcm(d) {
+        if (!d || typeof d.rms !== 'number') return;
+        const now = Date.now();
+        if (now - lastRmsRender < 200) return;
+        lastRmsRender = now;
+        const rms = d.rms;
+        // RMS for normalized [-1,1] audio is typically 0..0.5; scale to bar.
+        const pct = Math.max(0, Math.min(100, rms * 400));
+        rmsFill.style.width = pct.toFixed(0) + '%';
+        rmsText.textContent = rms < 0.005 ? 'Silent.' : 'RMS ' + rms.toFixed(3);
+    }
+
+    // ── Audio self-feedback loop health panel ────────────────────
+    const loopStatusEl = document.getElementById('sp-loop-status');
+    const loopGainEl   = document.getElementById('sp-loop-gain');
+    const loopRateEl   = document.getElementById('sp-loop-rate');
+    const loopSilentEl = document.getElementById('sp-loop-silent');
+    let lastLoopHealth = null;   // last sample, for rate diffing
+    let staleTimer = null;
+
+    function setLoopStatus(text, bg, color) {
+        if (!loopStatusEl) return;
+        loopStatusEl.textContent = text;
+        loopStatusEl.style.background = bg;
+        loopStatusEl.style.color = color;
+    }
+
+    function markLoopStale() {
+        setLoopStatus('STALE', 'rgba(248, 113, 113, 0.18)', '#f87171');
+    }
+
+    function renderLoopHealth(d) {
+        if (!d || typeof d.gain !== 'number') return;
+        const interval = d.interval_s || 5.0;
+        // Rate from monotonic counter diff. Counter can reset on brain
+        // restart -- treat negatives as "first sample after reset" and
+        // skip rate-render this tick.
+        let publishedDelta = null, silentDelta = null;
+        if (lastLoopHealth
+                && d.published_count >= lastLoopHealth.published_count
+                && d.silent_count >= lastLoopHealth.silent_count) {
+            publishedDelta = d.published_count - lastLoopHealth.published_count;
+            silentDelta    = d.silent_count - lastLoopHealth.silent_count;
+        }
+        lastLoopHealth = d;
+
+        loopGainEl.textContent = 'Gain: ' + d.gain.toFixed(3)
+            + ' (silence > ' + (d.silence_threshold_rms || 0).toFixed(3) + ' RMS)';
+
+        if (publishedDelta != null) {
+            const pubHz = publishedDelta / interval;
+            const silHz = silentDelta / interval;
+            const totalHz = pubHz + silHz;
+            const silenceRatio = totalHz > 0 ? silHz / totalHz : 0;
+            loopRateEl.textContent = 'Publish rate: ' + pubHz.toFixed(2) + ' Hz over last ' + interval.toFixed(0) + 's';
+            loopSilentEl.textContent = 'Silent skips: ' + (silenceRatio * 100).toFixed(0) + '% of ticks';
+            if (pubHz > 0.05) {
+                setLoopStatus('ALIVE', 'rgba(74, 222, 128, 0.15)', '#4ade80');
+            } else if (silHz > 0.05) {
+                setLoopStatus('SILENT', 'rgba(251, 191, 36, 0.18)', '#fbbf24');
+            } else {
+                setLoopStatus('IDLE', 'rgba(255, 255, 255, 0.06)', '#9ca3af');
+            }
+        } else {
+            // First sample -- show totals.
+            loopRateEl.textContent = 'Published: ' + (d.published_count || 0) + ' frames total';
+            loopSilentEl.textContent = 'Silent skips: ' + (d.silent_count || 0) + ' total';
+            setLoopStatus('WARMING', 'rgba(251, 191, 36, 0.18)', '#fbbf24');
+        }
+
+        // Mark stale if no telemetry in 3 * interval (e.g. brain crashed).
+        if (staleTimer) clearTimeout(staleTimer);
+        staleTimer = setTimeout(markLoopStale, interval * 3 * 1000);
+    }
+
+    function attach() {
+        if (!window.brainData) return false;
+        window.brainData.chain('onSpeechEvent', renderSpeech);
+        window.brainData.chain('onAudioPcm', renderAudioPcm);
+        window.brainData.chain('onAudioLoopHealth', renderLoopHealth);
+        captionEl.textContent = 'Listening to brain=' + window.brainData.brain + ' speech.execute + dashboard.audio.';
+        return true;
+    }
+    if (!attach()) window.addEventListener('brain-data-ready', attach, { once: true });
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// Energy module -- factual comparison + live this-brain footer
+// ═══════════════════════════════════════════════════════════════════
+//
+// The energy-per-inference table is real published research (GPT-4o /
+// Gemini / Llama / Loihi numbers). We leave those untouched -- they are
+// not mocks. We just append a "this dashboard right now" footer pulling
+// real uptime + step count so the panel proves it is live.
+
+(function wireEnergyFooter() {
+    const root = document.querySelector('.module-body[data-module="energy"]');
+    if (!root) return;
+    // Drop any existing mock-note in this module.
+    root.querySelectorAll('.mock-note').forEach((n) => n.remove());
+
+    const footer = document.createElement('div');
+    footer.className = 'section';
+    footer.innerHTML = `
+        <div class="section-label">This Brain Right Now</div>
+        <div class="metric" id="en-uptime">--</div>
+        <div class="metric" id="en-steps">--</div>
+        <div class="caption">Live readings -- proves the comparison above is bound to a running system, not a screenshot.</div>
+    `;
+    root.appendChild(footer);
+    const uptimeEl = document.getElementById('en-uptime');
+    const stepsEl  = document.getElementById('en-steps');
+
+    function fmtSecs(s) {
+        if (s == null) return '--';
+        const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+        if (d) return d + 'd ' + h + 'h';
+        if (h) return h + 'h ' + m + 'm';
+        return m + 'm';
+    }
+    function renderHealth(j) {
+        if (!j || typeof j.uptime_seconds !== 'number') return;
+        uptimeEl.textContent = 'Uptime: ' + fmtSecs(j.uptime_seconds);
+    }
+    function renderNeuro(state) {
+        if (state && typeof state.step_count === 'number') {
+            stepsEl.textContent = 'Steps: ' + state.step_count.toLocaleString();
+        }
+    }
+
+    function attach() {
+        if (!window.brainData) return false;
+        window.brainData.enableHealthPoll(15000);
+        window.brainData.chain('onHealth', renderHealth);
+        window.brainData.chain('onNeuroUpdate', renderNeuro);
+        return true;
+    }
+    if (!attach()) window.addEventListener('brain-data-ready', attach, { once: true });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "updated": "2026-06-03",
+  "notes": "Authoritative body roster and deployment state for the body.html Learning Journey panel. Source of truth: oscen/neuromorphic/src/neuromorphic/models/registry.py (bodies) and oscen/deploy/docker-compose.*.yml (deployments). Keep in sync when bodies are added or specialist brains move between stages.",
+  "bodies": [
+    {
+      "name": "pendulum",
+      "label": "Inverted Pendulum",
+      "description": "1-DOF inverted pendulum. Simplest motor control task. Teaches the brain to learn active angle control via STDP and eligibility traces without passive joint stiffness.",
+      "channels": ["locomotion"],
+      "status": "available",
+      "active_brains": [],
+      "prereq_bodies": [],
+      "stage": 0
+    },
+    {
+      "name": "arm_2dof",
+      "label": "2-DOF Planar Arm",
+      "description": "2-DOF fixed-base arm. Teaches reach-to-target coordination on the manipulation channel. Fall mode is none (the body cannot fall).",
+      "channels": ["manipulation"],
+      "status": "available",
+      "active_brains": [],
+      "deploy_overlay": "deploy/docker-compose.100k-manip.yml",
+      "prereq_bodies": [],
+      "stage": 1
+    },
+    {
+      "name": "walker_4dof",
+      "label": "4-DOF Biped Walker",
+      "description": "Minimal biped walker. Gait learning with a central pattern generator and honest forward-distance reward. Used by the 1M production brain and the locomotion / balance specialists.",
+      "channels": ["locomotion"],
+      "status": "active",
+      "active_brains": [
+        { "id": "1m", "label": "1M Production", "deployed": true },
+        { "id": "100k", "label": "100K Locomotion", "deployed": true },
+        { "id": "balance", "label": "100K Balance / Recovery", "deployed": true }
+      ],
+      "prereq_bodies": ["pendulum"],
+      "stage": 2
+    },
+    {
+      "name": "speech_only",
+      "label": "Speech-Only Brain",
+      "description": "No physics body. Motor cortex trains speech and prosody via STDP on a dedicated sub-range. Used by the 100K audio specialist for the speech curriculum (babbling -> first words -> tokens -> repeat -> association -> ...).",
+      "channels": ["speech"],
+      "status": "active",
+      "active_brains": [
+        { "id": "audio", "label": "100K Speech / Audio", "deployed": true }
+      ],
+      "prereq_bodies": [],
+      "stage": 2
+    },
+    {
+      "name": "humanoid_29dof",
+      "label": "29-DOF Humanoid",
+      "description": "Full Optimus / G1 / Atlas class humanoid. 29 actuated joints across locomotion (15), manipulation (12), and head (2) channels. Unlocks coordinated whole-body skills once the walker brain masters walk and the manip specialist reaches stable reach-and-hold.",
+      "channels": ["locomotion", "manipulation", "head"],
+      "status": "planned",
+      "active_brains": [],
+      "prereq_bodies": ["walker_4dof", "arm_2dof"],
+      "stage": 3
+    }
+  ],
+  "specialist_brains_unimplemented": [
+    {
+      "id": "head",
+      "label": "100K Head Control",
+      "deploy_overlay": "deploy/docker-compose.100k-head.yml",
+      "blocker": "no head_only body manifest in registry.py; overlay currently inherits walker_4dof"
+    },
+    {
+      "id": "sense",
+      "label": "100K Visual Learning",
+      "deploy_overlay": "deploy/docker-compose.100k-sense.yml",
+      "blocker": "no sensory-only body manifest; overlay currently inherits walker_4dof"
+    },
+    {
+      "id": "talk",
+      "label": "100K Language / LLM",
+      "deploy_overlay": "deploy/docker-compose.100k-talk.yml",
+      "blocker": "no language-only body manifest; overlay currently inherits walker_4dof"
+    }
+  ]
+}

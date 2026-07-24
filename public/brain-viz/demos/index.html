@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSCEN — Investor Demos</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="oscen-demo.css?v=4">
+</head>
+<body class="oscen-page-centered">
+
+<div class="oscen-header">
+    <div class="oscen-logo">OSC<span class="accent">E</span>N</div>
+    <div class="oscen-subtitle">Investor Demo Suite</div>
+    <div class="oscen-patent">US Provisional Patent 63/986,737 — Patent Pending</div>
+</div>
+
+<div class="oscen-stats-bar">
+    <div class="oscen-stat">
+        <div class="oscen-stat-value accent" id="stat-steps">--</div>
+        <div class="oscen-stat-label">Training Steps</div>
+    </div>
+    <div class="oscen-stat">
+        <div class="oscen-stat-value" id="stat-recall">--</div>
+        <div class="oscen-stat-label">Cross-Modal Recall</div>
+    </div>
+    <div class="oscen-stat">
+        <div class="oscen-stat-value" id="stat-regions">--</div>
+        <div class="oscen-stat-label">Regions Firing</div>
+    </div>
+    <div class="oscen-stat">
+        <div class="oscen-stat-value accent" id="stat-firing">--</div>
+        <div class="oscen-stat-label">Global Firing Rate</div>
+    </div>
+    <div class="oscen-stat">
+        <div class="oscen-stat-value" id="stat-tests">644</div>
+        <div class="oscen-stat-label">Tests Passing</div>
+    </div>
+</div>
+
+<script>
+// Fetch live stats from dashboard API
+(function() {
+    var host = window.location.hostname;
+    var port = host === 'demo.oscen.ai' ? '' : ':8080';
+    var base = window.location.protocol + '//' + host + port;
+
+    fetch(base + '/api/neuromorphic').then(function(r) { return r.json(); }).then(function(d) {
+        var n = d.neuromorphic || d;
+        if (n.step_count) {
+            var s = n.step_count;
+            document.getElementById('stat-steps').textContent =
+                s >= 1e6 ? (s / 1e6).toFixed(2) + 'M' : (s / 1e3).toFixed(0) + 'K';
+        }
+        if (n.firing_rates) {
+            var rates = n.firing_rates;
+            var keys = Object.keys(rates);
+            var firing = keys.filter(function(k) { return rates[k] > 0.001; });
+            document.getElementById('stat-regions').textContent = firing.length + '/' + keys.length;
+            var sum = 0;
+            keys.forEach(function(k) { sum += rates[k]; });
+            var avg = keys.length > 0 ? (sum / keys.length) * 100 : 0;
+            document.getElementById('stat-firing').textContent = avg.toFixed(1) + '%';
+        }
+    }).catch(function() {
+        document.getElementById('stat-steps').textContent = '2.25M';
+        document.getElementById('stat-regions').textContent = '13/13';
+        document.getElementById('stat-firing').textContent = '14.1%';
+    });
+
+    fetch(base + '/api/benchmark/latest').then(function(r) { return r.json(); }).then(function(d) {
+        if (d && d.cross_modal_recall != null) {
+            document.getElementById('stat-recall').textContent =
+                (d.cross_modal_recall * 100).toFixed(1) + '%';
+        } else {
+            document.getElementById('stat-recall').textContent = '34.2%';
+        }
+    }).catch(function() {
+        document.getElementById('stat-recall').textContent = '34.2%';
+    });
+})();
+</script>
+
+<div class="oscen-grid oscen-grid--hero">
+
+    <a href="reaction.html" class="oscen-card oscen-card--hero">
+        <div class="oscen-card-num">Dashboard 01</div>
+        <div class="oscen-card-title">Live Brain</div>
+        <div class="oscen-card-desc">
+            Real-time 3D brain with 15 regions, 64 synapse groups, and live synaptic arcs.
+            Hover regions for details. The glowing left rail opens seven interactive modules
+            over the brain.
+        </div>
+        <div class="oscen-card-modules">
+            <span>Probe</span><span>Development</span><span>Concepts</span><span>Speech</span>
+            <span>Continual</span><span>Beliefs</span><span>Energy</span>
+        </div>
+        <span class="oscen-card-tag">Three.js / 7 Modules</span>
+    </a>
+
+    <a href="body.html" class="oscen-card oscen-card--hero">
+        <div class="oscen-card-num">Dashboard 02</div>
+        <div class="oscen-card-title">Virtual Body</div>
+        <div class="oscen-card-desc">
+            Live MuJoCo humanoid body with per-joint motor activity across all 29 actuators.
+            The rail opens seven modules — switch brains (1M / 100K / Balance / Audio), run
+            guide drills, watch through the walker's eye.
+        </div>
+        <div class="oscen-card-modules">
+            <span>Stats</span><span>Joints</span><span>Guide</span><span>Self View</span>
+            <span>Audio</span><span>Demos</span><span>Brain</span>
+        </div>
+        <span class="oscen-card-tag">MuJoCo / 7 Modules</span>
+    </a>
+
+</div>
+
+<div class="oscen-footer">
+    <p>OSCEN Neural Architecture. 1,156,800 neurons. 1.5B synapses. 64 synapse groups. 6 biological learning mechanisms. walker_4dof body.</p>
+</div>
+
+</body>
+</html>

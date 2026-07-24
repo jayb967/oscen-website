@@ -262,7 +262,7 @@ export class BrainSynapses {
             const saturation = 0.5 + Math.min(1.0, da * 0.4);
             baseColor.multiplyScalar(saturation);
 
-            const intensity = Math.min(1.0, srcRate * 15);
+            const intensity = Math.min(1.0, Math.sqrt(srcRate * 5.0));
             // Cap active bolts to prevent visual overload
             if (this.activeBolts.length >= 60) continue;
 

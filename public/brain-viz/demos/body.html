@@ -1,0 +1,2596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSCEN — Virtual Body</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="oscen-demo.css">
+<style>
+body { overflow: hidden; height: 100vh; }
+
+/* Header bar */
+.topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 48px;
+    display: flex; align-items: center;
+    padding: 0 20px;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--hairline);
+    box-shadow: var(--shadow-sm);
+    z-index: 100;
+    gap: 16px;
+}
+.topbar a.back {
+    color: var(--accent); text-decoration: none;
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    opacity: 0.85; transition: opacity 0.2s;
+}
+.topbar a.back:hover { opacity: 1; color: var(--accent-hi); }
+.topbar .title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+.topbar .patent {
+    font-size: 9px; color: var(--text-dim); letter-spacing: 1px;
+    text-transform: uppercase; margin-left: auto;
+}
+
+/* HUD panel */
+.hud {
+    position: fixed; top: 60px; left: 16px;
+    width: 220px;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--hairline-mid);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    padding: 14px;
+    z-index: 90;
+    font-size: 12px;
+    line-height: 1.8;
+}
+.hud .label { color: var(--text-dim); }
+.hud .value { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+.hud .channel-locomotion   { color: #22d3ee; }
+.hud .channel-manipulation { color: #4ade80; }
+.hud .channel-head         { color: #fbbf24; }
+.hud .divider {
+    border: none; border-top: 1px solid var(--hairline);
+    margin: 6px 0;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+.status-dot.live      { background: var(--ok);  box-shadow: 0 0 6px rgba(74, 222, 128, 0.6); }
+.status-dot.simulated { background: var(--warn); }
+.status-dot.idle      { background: var(--text-dim); }
+
+/* Legend */
+.legend {
+    position: fixed; bottom: 16px; left: 16px;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--hairline-mid);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    padding: 10px 14px;
+    z-index: 90;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex; gap: 14px;
+}
+.legend-item {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--text);
+}
+.legend-swatch {
+    width: 10px; height: 10px; border-radius: 0;
+}
+
+/* Pulse buttons */
+.pulse-btn {
+    background: var(--grad-card);
+    border: 1px solid var(--c, var(--hairline-hi));
+    border-radius: 0;
+    color: var(--c, var(--text));
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    cursor: pointer;
+    transition: all var(--t-base) var(--ease);
+}
+.pulse-btn:hover { background: var(--grad-card-hi); }
+.pulse-btn:active { transform: scale(0.95); }
+
+/* Audio brain panel. Purple stays as the semantic audio identity. */
+.audio-panel {
+    position: fixed; top: 60px; left: 16px;
+    width: 310px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    background: transparent;
+    z-index: 90;
+    font-size: 12px;
+    display: none;
+}
+.audio-panel::-webkit-scrollbar { width: 4px; }
+.audio-panel::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 0; }
+
+.audio-card {
+    background: rgba(10, 10, 10, 0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(168, 85, 247, 0.22);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+.audio-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #a855f7, #e879f9, #a855f7);
+    opacity: 0.7;
+}
+.audio-card.input-card::before  { background: linear-gradient(90deg, #7c3aed, #a855f7, #7c3aed); }
+.audio-card.output-card::before { background: linear-gradient(90deg, #e879f9, #f0abfc, #e879f9); }
+.audio-card.status-card::before { background: linear-gradient(90deg, #6366f1, #818cf8, #6366f1); }
+
+.audio-card-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #a855f7;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+.audio-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.55;
+    margin-bottom: 8px;
+}
+.audio-stage {
+    display: inline-block;
+    background: rgba(168,85,247,0.15);
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 0;
+    padding: 3px 9px;
+    font-size: 9px;
+    color: #c4b5fd;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.audio-metric {
+    display: flex; justify-content: space-between;
+    padding: 3px 0;
+    line-height: 1.6;
+}
+.audio-metric .label { color: #6b7c93; font-size: 11px; }
+.audio-metric .value { color: #c4b5fd; font-weight: 600; }
+.audio-feed-item {
+    font-size: 10px;
+    color: #8b95a5;
+    padding: 2px 0;
+    display: flex; align-items: center; gap: 6px;
+}
+.audio-feed-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #a855f7;
+    flex-shrink: 0;
+    animation: audioPulse 2s ease-in-out infinite;
+}
+@keyframes audioPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1.0; box-shadow: 0 0 4px #a855f7; }
+}
+/* Featured phoneme display */
+.featured-phoneme {
+    text-align: center;
+    padding: 8px 0;
+    margin-bottom: 6px;
+}
+.featured-phoneme .phoneme-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e879f9;
+    text-shadow: 0 0 12px rgba(232,121,249,0.4);
+    letter-spacing: 2px;
+}
+.featured-phoneme .phoneme-conf {
+    font-size: 10px;
+    color: #6b7c93;
+    margin-top: 2px;
+}
+/* Sparkline */
+.sparkline-container {
+    height: 24px;
+    margin: 4px 0;
+    position: relative;
+}
+.sparkline-container canvas {
+    width: 100%; height: 100%;
+}
+
+/* Transcript highlight */
+.transcript-highlight {
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 0;
+    padding: 8px 10px;
+    margin: 6px 0;
+    text-align: center;
+}
+.transcript-highlight .th-label {
+    font-size: 9px;
+    color: #6b7c93;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+.transcript-highlight .th-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #c4b5fd;
+    text-shadow: 0 0 8px rgba(168,85,247,0.3);
+    line-height: 1.4;
+    min-height: 22px;
+}
+.transcript-highlight .th-source {
+    font-size: 9px;
+    color: #4b5563;
+    margin-top: 3px;
+}
+
+/* ── Video feed items ───────────────────────────────── */
+.video-feed-item {
+    font-size: 10px;
+    padding: 3px 0;
+    display: flex; align-items: center; gap: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.video-feed-item .vf-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.video-feed-item .vf-dot.running   { background: var(--ok);  box-shadow: 0 0 4px rgba(74, 222, 128, 0.6); }
+.video-feed-item .vf-dot.pending   { background: var(--text-dim); }
+.video-feed-item .vf-dot.completed { background: #a855f7; }
+.video-feed-item .vf-title {
+    color: #c8d6e5;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.video-feed-item .vf-meta {
+    color: #6b7c93;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+/* ── Speech output section (inside audio panel) ────── */
+.speech-output-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #e879f9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+.speech-log {
+    max-height: 140px;
+    overflow-y: auto;
+    font-size: 10px;
+}
+.speech-log::-webkit-scrollbar { width: 3px; }
+.speech-log::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.2); border-radius: 2px; }
+.speech-log-entry {
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #c8d6e5;
+}
+.speech-log-entry .token {
+    color: #e879f9;
+    font-weight: 600;
+    font-size: 12px;
+}
+.speech-log-entry .conf {
+    color: #6b7c93;
+    margin-left: 4px;
+}
+.speech-log-entry .timestamp {
+    color: #4b5563;
+    font-size: 9px;
+    margin-left: auto;
+    float: right;
+}
+
+/* ── MFCC visualization ──────────────────────────── */
+.mfcc-bars {
+    display: flex; gap: 2px; height: 32px;
+    align-items: flex-end;
+    margin: 6px 0;
+}
+.mfcc-bar {
+    flex: 1;
+    background: linear-gradient(to top, #7c3aed, #a855f7);
+    border-radius: 0;
+    min-height: 2px;
+    transition: height 0.3s ease;
+}
+
+/* Self-view panel */
+.self-view {
+    position: fixed; bottom: 16px; right: 16px;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--hairline-mid);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    padding: 10px;
+    z-index: 90;
+    text-align: center;
+}
+.self-view-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+.self-view canvas {
+    width: 128px; height: 128px;
+    border: 1px solid var(--hairline);
+    border-radius: 0;
+    image-rendering: pixelated;
+}
+.self-view .no-feed {
+    width: 128px; height: 128px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim); font-size: 10px;
+    border: 1px solid var(--hairline);
+    border-radius: 0;
+}
+
+/* 3D viewport */
+#viewport {
+    position: fixed;
+    top: 48px; left: 0; right: 0; bottom: 0;
+}
+
+/* Guide panel (right side) */
+#guide-panel {
+    position: fixed; top: 60px; right: 16px;
+    width: 260px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--hairline-mid);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    padding: 14px;
+    z-index: 90;
+    font-size: 12px;
+}
+#guide-panel::-webkit-scrollbar { width: 4px; }
+#guide-panel::-webkit-scrollbar-thumb { background: var(--hairline-mid); border-radius: 0; }
+
+.guide-section { margin-bottom: 10px; }
+.guide-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.guide-btn-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.guide-btn {
+    background: var(--grad-card);
+    border: 1px solid var(--hairline);
+    border-radius: 0;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 9px;
+    cursor: pointer;
+    transition: all var(--t-base) var(--ease);
+}
+.guide-btn:hover { background: var(--grad-card-hi); border-color: var(--hairline-hi); }
+.guide-btn:active { transform: scale(0.97); }
+.guide-btn.preset { border-color: rgba(167, 139, 250, 0.4); color: #a78bfa; }
+.guide-btn.preset:hover { background: rgba(167, 139, 250, 0.12); }
+.guide-btn.push { border-color: rgba(251, 191, 36, 0.4); color: var(--warn); }
+.guide-btn.push:hover { background: rgba(251, 191, 36, 0.12); }
+.guide-btn.reward-good { border-color: rgba(74, 222, 128, 0.4); color: var(--ok); }
+.guide-btn.reward-good:hover { background: rgba(74, 222, 128, 0.12); }
+.guide-btn.reward-bad  { border-color: rgba(248, 113, 113, 0.4); color: var(--err); }
+.guide-btn.reward-bad:hover { background: rgba(248, 113, 113, 0.12); }
+.guide-btn.reset-btn {
+    width: 100%; margin-top: 8px;
+    border-color: var(--hairline);
+    color: var(--text-dim);
+    padding: 7px;
+}
+
+.guide-sliders { display: flex; flex-direction: column; gap: 5px; }
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-label {
+    width: 70px; font-size: 9px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0;
+}
+.slider-input {
+    flex: 1; height: 4px;
+    -webkit-appearance: none; appearance: none;
+    background: rgba(255,255,255,0.1);
+    border-radius: 0; outline: none;
+}
+.slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    cursor: pointer;
+}
+.slider-val {
+    width: 28px; text-align: right;
+    font-size: 10px; color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Mobile responsive ─────────────────────────────── */
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .topbar {
+        position: sticky;
+        top: 0;
+        padding: 0 12px;
+        gap: 10px;
+    }
+    .topbar .title { font-size: 13px; }
+    .topbar .patent { font-size: 9px; }
+
+    #viewport {
+        position: relative;
+        top: auto; left: auto; right: auto; bottom: auto;
+        width: 100%;
+        height: 50vh;
+    }
+
+    .hud {
+        position: relative;
+        top: auto; left: auto;
+        width: 100%;
+        border-radius: 0;
+        padding: 10px 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        align-items: center;
+        line-height: 1.4;
+        -webkit-overflow-scrolling: touch;
+    }
+    .hud > div { white-space: nowrap; }
+    .hud .divider {
+        display: none;
+    }
+    .hud > div:last-child {
+        width: 100%;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+    }
+
+    #guide-panel {
+        position: relative;
+        top: auto; right: auto;
+        width: 100%;
+        max-height: none;
+        border-radius: 0;
+        padding: 12px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .legend {
+        position: relative;
+        bottom: auto; left: auto;
+        width: 100%;
+        border-radius: 0;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 10px 12px;
+    }
+
+    .self-view {
+        position: relative;
+        bottom: auto; right: auto;
+        width: 100%;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 12px;
+    }
+    .self-view canvas {
+        width: 96px; height: 96px;
+    }
+    .self-view .no-feed {
+        width: 96px; height: 96px;
+    }
+
+    .pulse-btn,
+    .guide-btn {
+        min-height: 44px;
+        padding: 8px 12px;
+        font-size: 12px;
+        touch-action: manipulation;
+    }
+    .guide-btn.reset-btn {
+        min-height: 44px;
+        padding: 10px;
+        touch-action: manipulation;
+    }
+
+    .slider-input {
+        height: 8px;
+        touch-action: manipulation;
+    }
+    .slider-input::-webkit-slider-thumb {
+        width: 22px; height: 22px;
+    }
+
+    .audio-panel {
+        position: relative;
+        top: auto; left: auto;
+        width: 100%;
+        max-height: none;
+        border-radius: 0;
+        padding: 12px;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ─── Body dashboard rail + drawer (Phase B scaffold) ────────────
+   Mirrors reaction.html's pattern. The rail rides on the drawer's
+   outer edge (left:100% inside the drawer's transform), so it slides
+   with the drawer. Closed by default — the body viewport claims the
+   full viewport until the user opens a module. */
+.body-rail {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 95;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 0;
+    background: linear-gradient(135deg, rgba(10,10,10,0.92), rgba(20,20,20,0.92));
+    border: 1px solid rgba(255,255,255,0.18);
+    border-left: none;
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.22),
+                0 0 18px rgba(34, 211, 238, 0.28),
+                0 0 36px rgba(34, 211, 238, 0.14);
+    animation: bodyRailGlow 3s ease-in-out infinite;
+    transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.body-rail.shifted { transform: translateY(-50%) translateX(360px); }
+@keyframes bodyRailGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.22),
+                    0 0 18px rgba(34, 211, 238, 0.28),
+                    0 0 36px rgba(34, 211, 238, 0.14);
+    }
+    50% {
+        box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.40),
+                    0 0 26px rgba(34, 211, 238, 0.48),
+                    0 0 56px rgba(34, 211, 238, 0.24);
+    }
+}
+.body-rail-tab {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6a6a6a;
+    background: transparent;
+    border: none;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    position: relative;
+    user-select: none;
+    border-left: 2px solid transparent;
+    transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+.body-rail-tab:hover {
+    color: var(--c, #22d3ee);
+    background: rgba(255, 255, 255, 0.04);
+}
+.body-rail-tab.active {
+    color: var(--c, #22d3ee);
+    border-left-color: var(--c, #22d3ee);
+    background: rgba(255, 255, 255, 0.06);
+}
+.body-rail-tab::after {
+    content: attr(data-label);
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
+    padding: 6px 10px;
+    background: rgba(10, 10, 10, 0.94);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #ffffff;
+    font-family: 'SF Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+.body-rail-tab:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Drawer */
+.body-drawer {
+    position: fixed;
+    top: 48px;       /* below topbar */
+    left: 0;
+    bottom: 0;
+    width: 360px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #151515 100%);
+    border-right: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.6),
+                1px 0 0 rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 90;
+    transform: translateX(-100%);
+    transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.body-drawer.open { transform: translateX(0); }
+.body-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(135deg, #0a0a0a 0%, #151515 100%);
+    flex-shrink: 0;
+}
+.body-drawer-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #22d3ee;
+}
+.body-drawer-close {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #6a6a6a;
+    font-family: 'SF Mono', monospace;
+    font-size: 13px;
+    line-height: 1;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 200ms ease;
+}
+.body-drawer-close:hover { border-color: #22d3ee; color: #22d3ee; }
+
+.body-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0;
+}
+.body-module-body {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 0;
+}
+.body-module-body.active { display: flex; }
+
+.body-module-body .section {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.body-module-body .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #22d3ee;
+    margin-bottom: 10px;
+}
+.body-module-body .stub {
+    margin: 14px 18px;
+    padding: 8px 12px;
+    border: 1px dashed rgba(255,255,255,0.18);
+    color: #6a6a6a;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* Floating panels removed from the viewport — HUD and Legend deleted
+   (Stats module replaces them). Guide / Audio / Self-view / Demos are
+   relocated into drawer module-bodies at startup, so they don't need
+   any drawer-open transform.
+
+   Ghost-walker stays as a floating panel (bottom-left) because it's a
+   transient/conditional overlay; nudge it right when the drawer opens
+   so it doesn't get covered. */
+.hud, .legend { display: none !important; }
+/* HUD relocated into the Stats drawer module gets its floating-panel chrome
+   stripped so it lays out cleanly as just-another-section. The Stats tiles
+   above it still show Height/Falls/Sim Time/Contacts; the HUD adds Channel,
+   Outcome, Frames, and the per-channel pulse buttons. */
+.body-module-body[data-module="stats"] .hud {
+    display: block !important;
+    position: static;
+    top: auto; left: auto;
+    width: auto;
+    background: transparent;
+    backdrop-filter: none;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    margin-top: 4px;
+}
+.audio-panel,
+#guide-panel,
+.self-view,
+#demos-panel,
+#demos-toggle { display: none; }   /* JS unhides after relocation */
+
+body.body-drawer-open #ghost-panel {
+    transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transform: translateX(360px);
+}
+
+/* When a panel is hosted inside a drawer module-body, strip its
+   floating positioning so it flows naturally. Only the OUTER panel is
+   neutralized — inner sections (audio-card, speech-log, guide buttons,
+   etc.) keep their original styling. */
+.body-module-body > .audio-panel,
+.body-module-body > #guide-panel,
+.body-module-body > .self-view,
+.body-module-body > #demos-panel {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-height: none !important;
+    transform: none !important;
+    display: block !important;
+    background: transparent !important;
+    border: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    padding: 14px 18px !important;
+    z-index: auto !important;
+}
+/* Belt-and-suspenders: the speech-log must remain visible. */
+.body-module-body .speech-log {
+    display: block !important;
+    min-height: 60px;
+}
+.body-module-body .featured-phoneme {
+    display: block !important;
+}
+
+</style>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "../lib/three.module.min.js",
+        "three/addons/controls/OrbitControls.js": "../lib/OrbitControls.js"
+    }
+}
+</script>
+</head>
+
+<body>
+
+<!-- ─── Body dashboard rail + drawer (Phase B) ────────────────────
+     The rail rides on the left edge; clicking a tab opens the drawer
+     with that module's body. Mirrors the brain dashboard pattern. -->
+<div class="body-rail" id="body-rail">
+    <button class="body-rail-tab" data-module="stats" data-label="Stats"      style="--c:#22d3ee" aria-label="Stats">⚙</button>
+    <button class="body-rail-tab" data-module="joints" data-label="Joints"    style="--c:#4ade80" aria-label="Per-Joint Motor">⫳</button>
+    <button class="body-rail-tab" data-module="guide" data-label="Guide"      style="--c:#fbbf24" aria-label="Guide Controls">⌖</button>
+    <button class="body-rail-tab" data-module="selfview" data-label="Self View" style="--c:#a78bfa" aria-label="Self View">⚲</button>
+    <button class="body-rail-tab" data-module="audio" data-label="Audio"      style="--c:#f472b6" aria-label="Audio Brain">◌</button>
+    <button class="body-rail-tab" data-module="demos" data-label="Demos"      style="--c:#22d3ee" aria-label="Demonstrations">▶</button>
+    <button class="body-rail-tab" data-module="brain" data-label="Brain"      style="--c:#4ade80" aria-label="Brain Switcher">⊞</button>
+</div>
+
+<div class="body-drawer" id="body-drawer">
+    <div class="body-drawer-header">
+        <div class="body-drawer-title" id="body-drawer-title">Module</div>
+        <button class="body-drawer-close" id="body-drawer-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="body-drawer-body">
+
+        <!-- ─── Module: Stats (stub for next pass) ─────────────── -->
+        <div class="body-module-body" data-module="stats">
+            <div class="section">
+                <div class="section-label">Torso Height</div>
+                <div style="font-size:24px; font-weight:700; color:#fff; font-variant-numeric:tabular-nums;" id="bd-height">--</div>
+                <div style="font-size:9px; color:#6a6a6a; letter-spacing:1.2px; text-transform:uppercase; margin-top:4px;">metres</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Falls</div>
+                <div style="font-size:24px; font-weight:700; color:#fff; font-variant-numeric:tabular-nums;" id="bd-falls">--</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Sim Time</div>
+                <div style="font-size:14px; color:#fff; font-variant-numeric:tabular-nums;" id="bd-simtime">--</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Contacts</div>
+                <div style="font-size:14px; color:#fff; font-variant-numeric:tabular-nums;" id="bd-contacts">--</div>
+            </div>
+            <!-- HUD (channel / outcome / frames / pulse buttons) gets
+                 relocated here at startup. See relocate('#hud', 'stats')
+                 below. CSS override above strips its floating chrome. -->
+        </div>
+
+        <!-- ─── Module: Joints (absorbed from walking.html) ──────
+             Rendered dynamically from mujoco.body.info channel_actuators.
+             The brain publishes its own body manifest semantics (per the
+             iron rule), so we don't hardcode walker / humanoid / arm names
+             here — the bars rebuild whenever a new body_info arrives. -->
+        <div class="body-module-body" data-module="joints">
+            <div id="bd-joints-root"></div>
+        </div>
+
+        <!-- ─── Module hosts. Real panels are relocated into these
+             at startup so their JS hooks (BodyGuide, AudioBrainViz,
+             camera canvas, demos launcher) keep working unchanged. -->
+        <div class="body-module-body" data-module="guide"></div>
+        <div class="body-module-body" data-module="selfview"></div>
+        <div class="body-module-body" data-module="audio"></div>
+        <div class="body-module-body" data-module="demos"></div>
+
+        <!-- ─── Module: Brain switcher ────────────────────────── -->
+        <div class="body-module-body" data-module="brain">
+            <div class="section">
+                <div class="section-label">Active Brain</div>
+                <div id="bd-active-brain" style="font-size:14px;color:#fff;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">1M Production</div>
+                <div style="font-size:9px;color:#6a6a6a;letter-spacing:1px;margin-top:4px;" id="bd-brain-sub">Generalist — walker_4dof body</div>
+            </div>
+            <div class="section">
+                <div class="section-label">Switch To</div>
+                <div id="bd-brain-buttons" style="display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="topbar">
+    <a class="back" href="index.html">demos</a>
+    <div class="title">Virtual Body (MuJoCo)</div>
+    <select id="brain-select" style="
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(34,211,238,0.35);
+        border-radius: 0;
+        color: #22d3ee;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 1px;
+        padding: 4px 10px;
+        cursor: pointer;
+        outline: none;
+    ">
+        <option value="1m">1M Production</option>
+        <option value="100k">100K Locomotion</option>
+        <option value="balance">100K Balance/Recovery</option>
+        <option value="audio">100K Speech/Audio</option>
+        <option value="humanoid-stand">100K Humanoid Stand-Step</option>
+        <option value="humanoid-locomotion">100K Humanoid Locomotion</option>
+    </select>
+    <div class="patent">US Provisional 63/986,737</div>
+</div>
+
+<div id="viewport"></div>
+<div id="brain-viz-container" style="position:fixed;top:48px;left:0;right:0;bottom:0;display:none;"></div>
+
+<div class="hud" id="hud">
+    <div><span class="label">Body </span><span class="value" id="hud-body" style="color:#22d3ee;">--</span></div>
+    <div><span class="label">Status </span><span id="hud-status"><span class="status-dot idle"></span>idle</span></div>
+    <div><span class="label">Task </span><span class="value" id="hud-task">--</span></div>
+    <hr class="divider">
+    <div><span class="label">Channel </span><span class="value" id="hud-channel">--</span></div>
+    <div><span class="label">Outcome </span><span class="value" id="hud-outcome">--</span></div>
+    <hr class="divider">
+    <div><span class="label">Height </span><span class="value" id="hud-height">--</span></div>
+    <div><span class="label">Contacts </span><span class="value" id="hud-contacts">--</span></div>
+    <div><span class="label">Sim Time </span><span class="value" id="hud-simtime">--</span></div>
+    <hr class="divider">
+    <div><span class="label">Frames </span><span class="value" id="hud-frames">0</span></div>
+    <hr class="divider">
+    <div id="hud-pulse-btns" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">
+    </div>
+</div>
+
+<div class="legend" id="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:#22aaff"></div>Locomotion</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#38d97a"></div>Manipulation</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#f5c842"></div>Head</div>
+</div>
+
+<div id="guide-panel"></div>
+
+<!-- Phase 2.14a (2026-06-17): Demonstration / ghost walker viewer. Shown
+     only when a demonstration provider is publishing frames. Generic
+     skeleton renderer keyed on payload.source so future providers
+     (motion-capture, video pose, other-brain trace) can ship their own
+     payload shapes without rewriting this panel. -->
+<div id="ghost-panel" style="
+    position: fixed; left: 10px; bottom: 10px; width: 220px;
+    background: rgba(8, 12, 22, 0.85); border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 6px; padding: 10px; color: #e3e9f5;
+    font-family: 'SF Mono', monospace; font-size: 11px;
+    z-index: 50; display: none;">
+    <div style="color:#22d3ee; margin-bottom:2px; font-weight:600;">
+        Ghost demo -- <span id="ghost-source">--</span>
+    </div>
+    <div style="font-size:9px; color:#f5c842; margin-bottom:4px;">
+        EXTERNAL demo (not the brain's own body)
+    </div>
+    <canvas id="ghost-canvas" width="200" height="120"
+            style="background:#06090f; border-radius:4px; display:block;
+                   margin: 4px 0;"></canvas>
+    <div style="display:flex; justify-content:space-between; margin-top:4px;">
+        <span style="color:#6b7c93;">phase</span>
+        <span id="ghost-phase">0.00</span>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:2px;">
+        <span style="color:#6b7c93;">L hip</span>
+        <span id="ghost-hl">0.00</span>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:2px;">
+        <span style="color:#6b7c93;">R hip</span>
+        <span id="ghost-hr">0.00</span>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:2px;">
+        <span style="color:#6b7c93;">contact L/R</span>
+        <span id="ghost-contact">--/--</span>
+    </div>
+    <div style="font-size:9px; color:#6b7c93; margin-top:6px;
+                border-top:1px solid rgba(255,255,255,0.05); padding-top:4px;">
+        Demonstration trace the brain learns from
+    </div>
+</div>
+
+<!-- Phase 2.15 (2026-06-17, repositioned 2026-06-17 v2):
+     Collapsible Demonstrations launcher (top-center, near the
+     existing brain selector). Avoids stacking with the bottom-right
+     control cards (POSE / REWARD / LOCOMOTION CPG / WALKER'S EYE). -->
+<button id="demos-toggle" style="
+    position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(8, 12, 22, 0.88); color: #22d3ee;
+    border: 1px solid rgba(34,211,238,0.4); border-radius: 4px;
+    padding: 6px 14px; font-family: 'SF Mono', monospace;
+    font-size: 11px; font-weight: 600; cursor: pointer; z-index: 100;">
+    Demonstrations ▾
+</button>
+
+<!-- The actual panel, hidden by default. Opens as a centered overlay. -->
+<div id="demos-panel" style="
+    position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+    width: 360px;
+    background: rgba(8, 12, 22, 0.96); border: 1px solid rgba(34,211,238,0.35);
+    border-radius: 6px; padding: 12px; color: #e3e9f5;
+    font-family: 'SF Mono', monospace; font-size: 11px;
+    z-index: 100; max-height: 70vh; overflow-y: auto; display: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="color:#22d3ee; font-weight:600;">Demonstrations</div>
+        <button id="demos-close" style="
+            background: transparent; color:#6b7c93; border: none;
+            cursor: pointer; font-size: 16px; padding: 0 4px;">×</button>
+    </div>
+    <!-- Admin auth (Phase 2.15h, 2026-06-17): mutations require an
+         admin token when the dashboard is configured for public demo. -->
+    <div id="demos-admin-row" style="margin-bottom:6px; display:none;">
+        <button id="demos-unlock" style="
+            width:100%; padding:5px; background:#1f2937; color:#f5c842;
+            border:1px solid rgba(245,200,66,0.4); border-radius:3px;
+            cursor:pointer; font-size:11px;">Unlock admin (required to upload / select)</button>
+        <div id="demos-admin-status" style="font-size:9px; color:#6b7c93; margin-top:3px;"></div>
+    </div>
+    <div style="margin-bottom:8px;">
+        <label style="font-size:10px;color:#6b7c93;">Target brain</label>
+        <select id="demo-brain-select" style="
+            width:100%; background:#0c1220; color:#e3e9f5;
+            border:1px solid rgba(34,211,238,0.2); border-radius:3px;
+            padding:4px; margin-top:2px; font-size:11px;">
+            <option value="1m">1M (main)</option>
+            <option value="100k">100K locomotion</option>
+            <option value="balance">100K balance</option>
+            <option value="humanoid-stand">100K humanoid stand-step</option>
+            <option value="humanoid-locomotion">100K humanoid locomotion</option>
+        </select>
+    </div>
+    <div style="display:flex; gap:4px; margin-bottom:8px;">
+        <button id="demo-use-cpg" style="
+            flex:1; padding:5px; background:#1f2937; color:#22d3ee;
+            border:1px solid rgba(34,211,238,0.3); border-radius:3px;
+            cursor:pointer; font-size:11px;">Built-in CPG</button>
+        <button id="demo-stop" style="
+            flex:1; padding:5px; background:#1f2937; color:#ef4444;
+            border:1px solid rgba(239,68,68,0.3); border-radius:3px;
+            cursor:pointer; font-size:11px;">Stop ghost</button>
+    </div>
+    <label style="font-size:10px;color:#6b7c93;">Upload walking video</label>
+    <input type="file" id="demo-upload" accept="video/*" style="
+        font-size:10px; width:100%; margin-bottom:4px; color:#6b7c93;
+        background: #0c1220; padding: 4px; border-radius: 3px;">
+    <div id="demo-upload-status" style="font-size:9px;color:#6b7c93;
+         min-height:12px; margin-bottom:6px;"></div>
+    <div style="font-size:10px; color:#6b7c93; margin-bottom:4px;">Available videos:</div>
+    <div id="demo-list" style="font-size:10px;"></div>
+</div>
+
+<div class="audio-panel" id="audio-panel">
+    <!-- Header card -->
+    <div class="audio-card">
+        <div class="audio-card-title">Audio/Speech Brain</div>
+        <div class="audio-desc">
+            100K-neuron specialist learning speech through audio imitation.
+        </div>
+        <div>
+            <span class="label">Stage </span>
+            <span class="audio-stage" id="audio-stage">Babbling</span>
+            <span class="audio-metric" style="display:inline; margin-left:12px;"><span class="label">Step </span><span class="value" id="audio-step">--</span></span>
+        </div>
+    </div>
+
+    <!-- Input card -->
+    <div class="audio-card input-card">
+        <div class="audio-card-title">Input - What It Hears</div>
+        <div class="mfcc-bars" id="mfcc-bars">
+            <div class="mfcc-bar" style="height:40%"></div>
+            <div class="mfcc-bar" style="height:65%"></div>
+            <div class="mfcc-bar" style="height:80%"></div>
+            <div class="mfcc-bar" style="height:55%"></div>
+            <div class="mfcc-bar" style="height:70%"></div>
+            <div class="mfcc-bar" style="height:45%"></div>
+            <div class="mfcc-bar" style="height:60%"></div>
+            <div class="mfcc-bar" style="height:50%"></div>
+            <div class="mfcc-bar" style="height:35%"></div>
+            <div class="mfcc-bar" style="height:75%"></div>
+            <div class="mfcc-bar" style="height:55%"></div>
+            <div class="mfcc-bar" style="height:40%"></div>
+            <div class="mfcc-bar" style="height:30%"></div>
+        </div>
+        <div style="font-size:9px;color:#6b7c93;margin-bottom:6px;">13-band MFCC at 10 Hz from video audio track</div>
+        <div class="transcript-highlight" id="transcript-highlight">
+            <div class="th-label">Currently hearing</div>
+            <div class="th-text" id="transcript-text">Waiting for audio...</div>
+            <div class="th-source" id="transcript-source"></div>
+        </div>
+        <div id="audio-feed-list">
+            <div class="audio-feed-item"><span class="audio-feed-dot"></span><span style="color:#6b7c93">Waiting for video feed...</span></div>
+        </div>
+        <div class="audio-metric" style="margin-top:6px;"><span class="label">Sensory firing</span><span class="value" id="audio-sensory-wt">--</span></div>
+    </div>
+
+    <!-- Output card -->
+    <div class="audio-card output-card">
+        <div class="audio-card-title">Output - What It Says</div>
+        <div class="featured-phoneme">
+            <div class="phoneme-text" id="featured-phoneme">--</div>
+            <div class="phoneme-conf" id="featured-phoneme-conf">waiting for first utterance</div>
+        </div>
+        <div class="audio-metric"><span class="label">Tokens emitted</span><span class="value" id="speech-count">0</span></div>
+        <div class="audio-metric"><span class="label">Avg confidence</span><span class="value" id="speech-avg-conf">--</span></div>
+        <div class="audio-metric"><span class="label">DA reinforcement</span><span class="value" id="audio-da-reinforce">--</span></div>
+        <div class="audio-metric"><span class="label">Motor success rate</span><span class="value" id="audio-expr-conf">--</span></div>
+        <div class="sparkline-container"><canvas id="conf-sparkline"></canvas></div>
+        <div style="margin-top:6px;">
+            <div class="speech-output-title">Recent utterances</div>
+            <div class="speech-log" id="speech-log"></div>
+        </div>
+    </div>
+
+    <!-- Speech Curriculum card -->
+    <div class="audio-card" id="speech-curriculum-card" style="display:none;">
+        <div class="audio-card-title">Speech Curriculum</div>
+        <div id="speech-task-pills" style="margin-bottom:6px;"></div>
+        <div class="audio-metric"><span class="label">Current task</span><span class="value" id="speech-cur-task">--</span></div>
+        <div class="audio-metric"><span class="label">Successes</span><span class="value" id="speech-successes">--</span></div>
+        <div style="margin:4px 0;">
+            <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
+                <div id="speech-success-bar" style="width:0%;height:100%;background:#38d97a;border-radius:3px;transition:width 0.3s;"></div>
+            </div>
+        </div>
+        <div class="audio-metric"><span class="label">Advances</span><span class="value" id="speech-advances">0</span></div>
+        <div class="audio-metric" id="speech-concept-row" style="display:none;"><span class="label">Active concept</span><span class="value" id="speech-concept" style="color:#f5c842;">--</span></div>
+        <div id="speech-task-desc" style="margin-top:6px;font-size:10px;color:#6b7c93;line-height:1.4;"></div>
+    </div>
+
+    <!-- Network status card -->
+    <div class="audio-card status-card">
+        <div class="audio-card-title">Network</div>
+        <div class="audio-metric"><span class="label">Connection</span><span class="value" id="audio-conn-status">--</span></div>
+        <div class="audio-metric"><span class="label">Phase</span><span class="value" id="audio-phase">--</span></div>
+        <div class="audio-metric"><span class="label">Sensory wt</span><span class="value" id="audio-sensory-wt2">--</span></div>
+        <div class="audio-metric"><span class="label">Motor wt</span><span class="value" id="audio-motor-wt">--</span></div>
+        <div class="audio-metric"><span class="label">Dopamine</span><span class="value" id="audio-da-level">--</span></div>
+    </div>
+</div>
+
+<div class="self-view" id="self-view-panel">
+    <div class="self-view-title">Brain's Eye View</div>
+    <div class="no-feed" id="self-view-placeholder">Waiting for feed...</div>
+    <canvas id="self-view-canvas" width="128" height="128" style="display:none;"></canvas>
+</div>
+
+<script type="module">
+import { BodyScene } from './body-scene.js';
+import { BodyData } from './body-data.js';
+import { BodyGuide } from './body-guide.js';
+import { AudioBrainViz } from './audio-brain-canvas.js';
+
+// Detect dashboard URL
+const params = new URLSearchParams(window.location.search);
+const host = params.get('host') || window.location.hostname || 'localhost';
+const isProxied = host === 'demo.oscen.ai' || host === 'dashboard.oscen.ai';
+const port = params.get('port') || window.location.port || (isProxied ? '' : '8080');
+const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const portSuffix = port ? `:${port}` : '';
+const wsUrl = params.get('ws') || `${proto}//${host}${portSuffix}/ws`;
+const apiBase = params.get('api') || `${window.location.protocol}//${host}${portSuffix}`;
+
+// ── Public-demo UI gate (Phase 2.15j, 2026-06-23) ────────────────────
+// When OSCEN_PUBLIC_DEMO=1 on the server, strip every training-
+// interference surface from the DOM before wiring runs. Server-side
+// gates in dashboard/src/dashboard/api.py are authoritative; this
+// just keeps non-technical visitors from seeing controls that would
+// 401 anyway, and hides the curriculum (demo list / upload).
+const UI_MODE = await fetch(apiBase + '/api/ui/mode')
+    .then(r => r.ok ? r.json() : { public: false })
+    .catch(() => ({ public: false }));
+if (UI_MODE.public) {
+    const PUBLIC_HIDE = [
+        '.body-rail-tab[data-module="guide"]',
+        '.body-rail-tab[data-module="demos"]',
+        '.body-module-body[data-module="guide"]',
+        '.body-module-body[data-module="demos"]',
+        '#guide-panel',
+        '#demos-toggle',
+        '#demos-panel',
+    ];
+    for (const sel of PUBLIC_HIDE) {
+        document.querySelectorAll(sel).forEach(el => el.remove());
+    }
+}
+
+// HUD elements
+const hudBody     = document.getElementById('hud-body');
+const hudStatus   = document.getElementById('hud-status');
+const hudTask     = document.getElementById('hud-task');
+const hudChannel  = document.getElementById('hud-channel');
+const hudOutcome  = document.getElementById('hud-outcome');
+const hudHeight   = document.getElementById('hud-height');
+const hudContacts = document.getElementById('hud-contacts');
+const hudSimtime  = document.getElementById('hud-simtime');
+const hudFrames   = document.getElementById('hud-frames');
+const hudPulseBtns = document.getElementById('hud-pulse-btns');
+
+// Init scene
+const viewport = document.getElementById('viewport');
+const scene = new BodyScene(viewport);
+
+// Init data bridge
+const data = new BodyData();
+
+data.onTestPulse = ({ channel, success }) => {
+    scene.applyTestPose(channel, success);
+};
+
+// onUpdate and onStatus are defined below in the audio panel section
+
+// Build pulse buttons dynamically when body info arrives
+function buildPulseButtons(channels) {
+    hudPulseBtns.innerHTML = '';
+    const colors = { locomotion: '#22aaff', manipulation: '#38d97a', head: '#f5c842' };
+    const labels = { locomotion: 'Walk', manipulation: 'Reach', head: 'Look' };
+    for (const ch of channels) {
+        const btn = document.createElement('button');
+        btn.className = 'pulse-btn';
+        btn.dataset.ch = ch;
+        btn.style.setProperty('--c', colors[ch] || '#6b7c93');
+        btn.textContent = labels[ch] || ch;
+        btn.addEventListener('click', () => data.sendTestPulse(ch));
+        hudPulseBtns.appendChild(btn);
+    }
+}
+// Default pulse buttons until body info arrives
+buildPulseButtons(['locomotion', 'manipulation', 'head']);
+
+// Init guide panel — sends commands via WS or REST fallback.
+// In public-demo mode the panel was removed above, so substitute a
+// no-op Proxy: every downstream `guide.foo(...)` / `guide.foo = ...`
+// site keeps working without scattered null-checks.
+const guidePanel = document.getElementById('guide-panel');
+const guide = (UI_MODE.public || !guidePanel)
+    ? new Proxy({}, { get: () => () => {}, set: () => true })
+    : new BodyGuide(guidePanel, (cmdData) => {
+        // Include the selected brain so the command routes to the right NATS prefix
+        cmdData.brain = brainSelect.value;
+        // Try WebSocket first, fall back to REST
+        if (data._ws && data._ws.readyState === WebSocket.OPEN) {
+            data._ws.send(JSON.stringify({ type: 'mujoco_guide', data: cmdData }));
+        } else {
+            fetch(apiBase + '/api/mujoco/guide', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cmdData),
+            }).catch(e => console.warn('Guide REST fallback failed:', e));
+        }
+    });
+
+// Instant client-side preview when guide buttons are pressed
+guide.onPreview = (channel) => {
+    data.pauseSim(15000);  // hold preview for 15s (server response may take ~10s)
+    scene.applyTestPose(channel, true);
+    // Update HUD to reflect the preview
+    hudChannel.textContent = channel;
+    hudChannel.className = 'value channel-' + channel;
+    hudOutcome.textContent = 'PREVIEW';
+    hudOutcome.style.color = '#a78bfa';
+};
+
+// Self-view canvas — shows what the brain's body camera sees (64x64 grayscale)
+const selfViewCanvas = document.getElementById('self-view-canvas');
+const selfViewCtx = selfViewCanvas.getContext('2d');
+const selfViewPlaceholder = document.getElementById('self-view-placeholder');
+
+data.onSelfView = ({ pixels, width, height }) => {
+    // Show canvas, hide placeholder on first frame
+    if (selfViewPlaceholder.style.display !== 'none') {
+        selfViewPlaceholder.style.display = 'none';
+        selfViewCanvas.style.display = 'block';
+    }
+    // Draw grayscale pixels onto 128x128 canvas (2x upscale, pixelated via CSS)
+    const imgData = selfViewCtx.createImageData(width, height);
+    for (let i = 0; i < pixels.length; i++) {
+        const v = pixels[i];
+        imgData.data[i * 4]     = v;  // R
+        imgData.data[i * 4 + 1] = v;  // G
+        imgData.data[i * 4 + 2] = v;  // B
+        imgData.data[i * 4 + 3] = 255; // A
+    }
+    // Draw at native 64x64 then CSS scales to 128x128 with pixelated rendering
+    selfViewCanvas.width = width;
+    selfViewCanvas.height = height;
+    selfViewCtx.putImageData(imgData, 0, 0);
+};
+
+// Handle body info updates (name, joints, channels, training progress)
+const bodyNames = {
+    'pendulum': 'Pendulum (1-DOF)',
+    'arm_2dof': 'Arm (2-DOF)',
+    'walker_4dof': 'Walker (4-DOF)',
+    'humanoid_29dof': 'Humanoid (29-DOF)',
+};
+const taskNames = {
+    'pendulum_balance': 'Pendulum Balance',
+    'supported_stand': 'Supported Stand',
+    'stand': 'Stand', 'head_track': 'Head Track',
+    'balance': 'Balance', 'reach': 'Reach',
+    'reach_and_hold': 'Reach & Hold', 'precision_reach': 'Precision Reach',
+    'tracking': 'Tracking', 'sequence_reach': 'Sequence Reach',
+    'walk': 'Walk',
+    'speech_babbling': 'Babbling',
+    'speech_first_words': 'First Words',
+    'speech_tokens': 'Token Diversity',
+    'speech_repeat': 'Repeat Control',
+    'speech_association': 'Concept Binding',
+};
+const speechTaskDesc = {
+    'speech_babbling': 'Learning to activate speech neurons. Success: sustained firing rate > 0.5% for 10 consecutive evaluations.',
+    'speech_first_words': 'Producing any recognizable speech tokens. Success: at least 3 evaluations with token output in a 20-eval window.',
+    'speech_tokens': 'Producing diverse, distinct tokens. Success: 10 unique tokens with confidence > 1.5.',
+    'speech_repeat': 'Voluntary control over specific tokens. Success: produce a target token 5 times per episode.',
+    'speech_association': 'Binding concepts to speech. A word is injected as sensory input; the brain learns to produce consistent speech tokens per concept. Success: 5 concepts with 50%+ consistency.',
+};
+
+data.onBodyInfo = (info) => {
+    // Update HUD
+    hudBody.textContent = bodyNames[info.body_name] || info.body_name || '--';
+    if (info.training) {
+        const t = info.training;
+        hudTask.textContent = (taskNames[t.current_task] || t.current_task) +
+            ` (${t.successes}/${t.advance_threshold})`;
+
+        // Update speech curriculum card if speech tasks present
+        const isSpeech = t.task_list && t.task_list.some(n => n.startsWith('speech_'));
+        // Update the Stage label to show the curriculum task name
+        // instead of the developmental phase mapping
+        if (isSpeech) {
+            audioStage.textContent = taskNames[t.current_task] || t.current_task;
+        }
+        const curCard = document.getElementById('speech-curriculum-card');
+        if (isSpeech && curCard) {
+            curCard.style.display = '';
+            // Task pills
+            const pillsEl = document.getElementById('speech-task-pills');
+            if (pillsEl) {
+                pillsEl.innerHTML = t.task_list.map((name, i) => {
+                    const active = i === t.current_task_idx;
+                    const done = i < t.current_task_idx;
+                    const label = (taskNames[name] || name).replace('speech_', '');
+                    const bg = active ? 'rgba(56,217,122,0.15)' : done ? 'rgba(94,164,245,0.1)' : 'rgba(255,255,255,0.04)';
+                    const border = active ? 'rgba(56,217,122,0.5)' : done ? 'rgba(94,164,245,0.3)' : 'rgba(255,255,255,0.1)';
+                    const color = active ? '#38d97a' : done ? '#5ea4f5' : '#6b7c93';
+                    return `<span style="display:inline-block;padding:2px 7px;margin:1px;font-size:10px;border-radius:3px;background:${bg};border:1px solid ${border};color:${color};font-weight:${active?600:400};">${label}</span>`;
+                }).join('');
+            }
+            // Current task
+            const curTaskEl = document.getElementById('speech-cur-task');
+            if (curTaskEl) curTaskEl.textContent = taskNames[t.current_task] || t.current_task;
+            // Successes
+            const succEl = document.getElementById('speech-successes');
+            if (succEl) succEl.textContent = `${t.successes}/${t.advance_threshold}`;
+            // Progress bar
+            const barEl = document.getElementById('speech-success-bar');
+            if (barEl) barEl.style.width = Math.min(100, (t.successes / t.advance_threshold) * 100) + '%';
+            // Advances
+            const advEl = document.getElementById('speech-advances');
+            if (advEl) advEl.textContent = t.total_advances;
+            // Active concept
+            const conceptRow = document.getElementById('speech-concept-row');
+            const conceptEl = document.getElementById('speech-concept');
+            if (t.active_concept) {
+                if (conceptRow) conceptRow.style.display = '';
+                if (conceptEl) conceptEl.textContent = t.active_concept;
+            } else {
+                if (conceptRow) conceptRow.style.display = 'none';
+            }
+            // Task description
+            const descEl = document.getElementById('speech-task-desc');
+            if (descEl) descEl.textContent = speechTaskDesc[t.current_task] || '';
+        }
+    }
+    // Update guide panel controls
+    guide.updateBodyInfo(info);
+    // Update pulse buttons and legend to match active channels
+    if (info.channels && info.channels.length > 0) {
+        buildPulseButtons(info.channels);
+        // Update legend
+        const legendEl = document.getElementById('legend');
+        const colors = { locomotion: '#22aaff', manipulation: '#38d97a', head: '#f5c842' };
+        const labels = { locomotion: 'Locomotion', manipulation: 'Manipulation', head: 'Head' };
+        legendEl.innerHTML = info.channels.map(ch =>
+            `<div class="legend-item"><div class="legend-swatch" style="background:${colors[ch] || '#6b7c93'}"></div>${labels[ch] || ch}</div>`
+        ).join('');
+    }
+};
+
+data.onTrainingAdvance = (evt) => {
+    // Skip if curriculum_complete -- onTrainingComplete handles that case
+    if (!evt.curriculum_complete) {
+        guide.showAdvanceNotification(evt);
+    }
+    // Live-append to the Learning Journey panel regardless of whether the
+    // curriculum is complete (a completion is still a mastered task).
+    guide.appendLiveAdvance(evt);
+};
+data.onTrainingComplete = (evt) => {
+    guide.showAdvanceNotification(evt);
+    guide.appendLiveAdvance(evt);
+};
+
+// ── Audio brain panel ─────────────────────────────────────────────
+const audioPanel = document.getElementById('audio-panel');
+const speechLog = document.getElementById('speech-log');
+const speechCountEl = document.getElementById('speech-count');
+const speechAvgConf = document.getElementById('speech-avg-conf');
+const audioConnStatus = document.getElementById('audio-conn-status');
+const audioPhase = document.getElementById('audio-phase');
+const audioStep = document.getElementById('audio-step');
+const audioSensoryWt = document.getElementById('audio-sensory-wt');
+const audioMotorWt = document.getElementById('audio-motor-wt');
+const audioExprConf = document.getElementById('audio-expr-conf');
+const audioStage = document.getElementById('audio-stage');
+const audioFeedList = document.getElementById('audio-feed-list');
+const audioDaReinforce = document.getElementById('audio-da-reinforce');
+const audioDaLevel = document.getElementById('audio-da-level');
+const audioSensoryWt2 = document.getElementById('audio-sensory-wt2');
+const featuredPhoneme = document.getElementById('featured-phoneme');
+const featuredPhonemeConf = document.getElementById('featured-phoneme-conf');
+const mfccBars = document.getElementById('mfcc-bars');
+const transcriptText = document.getElementById('transcript-text');
+const transcriptSource = document.getElementById('transcript-source');
+
+// Transcript data: { videoId: [[start, end, text], ...], ... }
+let transcriptData = null;
+
+// Load transcripts.json
+fetch('./transcripts.json')
+    .then(r => r.json())
+    .then(data => { transcriptData = data; console.log('Transcripts loaded:', Object.keys(data).length, 'videos'); })
+    .catch(e => console.warn('Could not load transcripts.json:', e));
+
+// Extract YouTube video ID from filepath like "/data/videos/tier1/Bf9L8sbrFGk.mp4"
+function extractVideoId(filepath) {
+    if (!filepath) return null;
+    const fname = filepath.split('/').pop().replace(/\.mp4$/i, '');
+    return fname || null;
+}
+
+// Look up what word is being spoken at a given time position in a video
+function getTranscriptAt(videoId, posSeconds) {
+    if (!transcriptData || !videoId || posSeconds == null) return null;
+    const segments = transcriptData[videoId];
+    if (!segments) return null;
+    // Find the segment that contains this timestamp
+    for (const seg of segments) {
+        if (posSeconds >= seg[0] && posSeconds < seg[1]) {
+            return { text: seg[2], start: seg[0], end: seg[1] };
+        }
+    }
+    // If between segments, find the nearest upcoming one
+    for (const seg of segments) {
+        if (seg[0] > posSeconds) {
+            return { text: '...', start: seg[0], end: seg[1], gap: true };
+        }
+    }
+    return null;
+}
+
+// Update transcript display from current video status
+function updateTranscriptDisplay() {
+    if (!transcriptData) return;
+    // Find the currently-running video
+    const running = [...videoSessions.values()].find(v => v.status === 'running');
+    if (!running) {
+        transcriptText.textContent = 'Waiting for audio...';
+        transcriptText.style.color = '#6b7c93';
+        transcriptSource.textContent = '';
+        return;
+    }
+    const videoId = extractVideoId(running.filepath || running.title);
+    const pos = running.current_pos_s;
+    const seg = getTranscriptAt(videoId, pos);
+    if (seg && !seg.gap) {
+        transcriptText.textContent = `"${seg.text}"`;
+        transcriptText.style.color = '#c4b5fd';
+        transcriptSource.textContent = `${videoDisplayTitle(running)} - ${pos.toFixed(1)}s`;
+    } else {
+        transcriptText.textContent = seg ? '...' : '(no transcript)';
+        transcriptText.style.color = '#6b7c93';
+        transcriptSource.textContent = `${videoDisplayTitle(running)} - ${pos != null ? pos.toFixed(1) + 's' : ''}`;
+    }
+}
+
+// Brain visualization canvas
+const brainVizContainer = document.getElementById('brain-viz-container');
+const brainViz = new AudioBrainViz(brainVizContainer);
+
+// Sparkline for confidence trend
+const sparkCanvas = document.getElementById('conf-sparkline');
+const sparkCtx = sparkCanvas.getContext('2d');
+const confHistory = []; // last 30 confidence values
+
+function drawSparkline() {
+    const w = sparkCanvas.parentElement.clientWidth;
+    const h = 24;
+    sparkCanvas.width = w * (window.devicePixelRatio || 1);
+    sparkCanvas.height = h * (window.devicePixelRatio || 1);
+    sparkCanvas.style.width = w + 'px';
+    sparkCanvas.style.height = h + 'px';
+    const ctx = sparkCtx;
+    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    if (confHistory.length < 2) return;
+    ctx.beginPath();
+    const step = w / (confHistory.length - 1);
+    for (let i = 0; i < confHistory.length; i++) {
+        const x = i * step;
+        const y = h - confHistory[i] * h;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = 'rgba(232,121,249,0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Threshold line at 0.3
+    ctx.beginPath();
+    ctx.moveTo(0, h - 0.3 * h);
+    ctx.lineTo(w, h - 0.3 * h);
+    ctx.strokeStyle = 'rgba(107,124,147,0.3)';
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([3, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+let speechCount = 0;
+let speechConfSum = 0;
+let exprSuccessCount = 0; // actual DA-reinforced successes (from mujoco_state)
+let exprTotalCount = 0;
+let lastExprConf = 0;
+let daSuccessCount = 0; // DA+ outcomes
+let daFailCount = 0;    // DA- outcomes
+
+// Phoneme map: motor neuron token indices -> babbling-stage phonemes (IPA-like).
+const PHONEME_MAP = [
+    'aa', 'ba', 'da', 'ga', 'ma', 'na', 'pa', 'ta',  // 0-7
+    'ka', 'la', 'wa', 'ee', 'oo', 'ah', 'eh', 'oh',  // 8-15
+    'bb', 'dd', 'gg', 'mm', 'nn', 'pp', 'tt', 'kk',  // 16-23
+    'baa', 'daa', 'gaa', 'maa', 'naa', 'paa', 'taa', 'kaa',  // 24-31
+];
+
+function tokenToPhoneme(idx) {
+    if (idx == null || idx === '?') return '?';
+    if (idx < PHONEME_MAP.length) return PHONEME_MAP[idx];
+    const consonants = ['b','d','g','m','n','p','t','k','w','l','r','f','s','h'];
+    const vowels = ['a','e','i','o','u','aa','ee','oo'];
+    const ci = idx % consonants.length;
+    const vi = Math.floor(idx / consonants.length) % vowels.length;
+    return consonants[ci] + vowels[vi];
+}
+
+// Video title lookup (YouTube IDs -> human-readable names from transcripts)
+const VIDEO_TITLES = {
+    'Bf9L8sbrFGk': 'Apple & Fruit Words (Kids)',
+    'eUutwwoGL8Q': 'ABCs of Animals',
+    'QXhK-4jrTjs': '100 First Words for Babies',
+    'UcGm_PM2IwY': 'Learn the Fruits (Kiddos)',
+    'Wt9XXtYYmk8': 'Learn About Shapes',
+    'ZONJoCIaHlk': 'Toddler Vocabulary',
+};
+
+function videoDisplayTitle(v) {
+    // Try lookup by filename stem (strip .mp4 and path)
+    const fname = (v.title || v.filepath || '').split('/').pop().replace(/\.mp4$/i, '');
+    if (VIDEO_TITLES[fname]) return VIDEO_TITLES[fname];
+    // Crossmodal binding videos have descriptive filenames with underscores
+    if (fname.length > 20) return fname.replace(/_/g, ' ').replace(/-[\w]{11}$/, '').slice(0, 40);
+    return fname || 'Unknown';
+}
+
+// Video status tracking
+const videoSessions = new Map();
+
+function updateVideoFeedUI() {
+    const items = [...videoSessions.values()]
+        .sort((a, b) => (a.status === 'running' ? -1 : 1));
+    if (items.length === 0) {
+        audioFeedList.innerHTML = '<div class="audio-feed-item"><span class="audio-feed-dot"></span><span style="color:#6b7c93">Waiting for video feed...</span></div>';
+        return;
+    }
+    audioFeedList.innerHTML = items.map(v => {
+        const dotClass = v.status === 'running' ? 'running' : v.status === 'completed' ? 'completed' : 'pending';
+        const title = videoDisplayTitle(v);
+        let meta = v.status;
+        if (v.status === 'running' && v.loop_count != null) {
+            meta = `loop ${v.loop_count}`;
+            if (v.progress != null) meta += ` / ${Math.round(v.progress * 100)}%`;
+        }
+        if (v.learning_score > 0) {
+            meta += ` / learn: ${v.learning_score.toFixed(4)}`;
+        }
+        return `<div class="video-feed-item"><span class="vf-dot ${dotClass}"></span><span class="vf-title">${title}</span><span class="vf-meta">${meta}</span></div>`;
+    }).join('');
+}
+
+// Track expression outcomes from mujoco_state when in audio mode.
+// state.success IS the actual motor outcome that triggers DA modulation in the brain.
+const _origOnUpdate = data.onUpdate;
+data.onUpdate = (state) => {
+    // Update 3D scene only when not in audio mode (saves CPU)
+    if (brainSelect.value !== 'audio') {
+        if (state.bodies) scene.updateBodies(state.bodies, state.activeChannel, state.success, state.geoms);
+        if (state.motorRates) scene.updateMotorActivation(state.motorRates);
+    }
+
+    if (brainSelect.value === 'audio') {
+        // Track actual DA reinforcement from motor outcomes.
+        // state.success here IS the stochastic outcome that the brain uses
+        // for dopamine modulation (R-STDP three-factor learning).
+        if (state.activeChannel === 'expression' || state.activeChannel === 'locomotion') {
+            exprTotalCount++;
+            if (state.success) {
+                exprSuccessCount++;
+                daSuccessCount++;
+            } else {
+                daFailCount++;
+            }
+            const pct = ((exprSuccessCount / exprTotalCount) * 100).toFixed(0);
+            audioExprConf.textContent = `${pct}% (${exprSuccessCount}/${exprTotalCount})`;
+            audioExprConf.style.color = exprSuccessCount / exprTotalCount > 0.4 ? '#38d97a' : '#f5c842';
+            // DA reinforcement ratio
+            const total = daSuccessCount + daFailCount;
+            audioDaReinforce.textContent = `+DA ${daSuccessCount} / -DA ${daFailCount}`;
+            audioDaReinforce.style.color = daSuccessCount > daFailCount ? '#38d97a' : '#f5c842';
+        }
+        hudFrames.textContent = state.liveCount;
+        audioConnStatus.textContent = 'live';
+        audioConnStatus.style.color = '#38d97a';
+    } else {
+        // Normal HUD for other brains
+        const ch = state.activeChannel || '--';
+        const chClass = state.activeChannel ? `channel-${state.activeChannel}` : '';
+        hudChannel.className = 'value ' + chClass;
+        hudChannel.textContent = ch;
+        hudOutcome.textContent = state.activeChannel
+            ? (state.success ? 'SUCCESS' : 'FAIL') : '--';
+        hudOutcome.style.color = state.activeChannel
+            ? (state.success ? '#38d97a' : '#ef4444') : '#22d3ee';
+        hudHeight.textContent = state.torsoHeight.toFixed(3) + ' m';
+        hudContacts.textContent = state.numContacts;
+        hudSimtime.textContent = state.simTime.toFixed(1) + ' s';
+        hudFrames.textContent = state.liveCount;
+    }
+};
+
+data.onStatus = (status) => {
+    const dotClass = status.mode;
+    const labels = { live: 'live', simulated: 'idle sim', idle: 'disconnected' };
+    const label = labels[status.mode] || status.mode;
+    hudStatus.innerHTML = `<span class="status-dot ${dotClass}"></span>${label}`;
+    if (brainSelect.value === 'audio') {
+        audioConnStatus.textContent = label;
+        audioConnStatus.style.color = status.mode === 'live' ? '#38d97a' : '#6b7c93';
+    }
+};
+
+// Speech token output - phoneme mapping + confidence sparkline
+data.onSpeechEvent = (evtData, evtType) => {
+    speechCount++;
+    const action = evtData.action || evtData;
+    const tokenIdx = action.token_idx ?? '?';
+    const rawConf = action.confidence != null ? action.confidence : 0;
+    const conf = Math.min(rawConf, 1.0); // clamp peak sharpness to 0-1 for display
+    const confPct = conf > 0 ? (conf * 100).toFixed(0) + '%' : '--';
+    const phoneme = tokenToPhoneme(tokenIdx);
+    lastExprConf = conf;
+    if (conf > 0) speechConfSum += conf;
+
+    // Update featured phoneme (large display)
+    featuredPhoneme.textContent = `"${phoneme}"`;
+    featuredPhonemeConf.textContent = `confidence: ${confPct}`;
+    featuredPhoneme.style.textShadow = conf > 0.5
+        ? '0 0 16px rgba(56,217,122,0.5)'
+        : '0 0 12px rgba(232,121,249,0.4)';
+
+    // Sparkline update
+    confHistory.push(conf);
+    if (confHistory.length > 30) confHistory.shift();
+    drawSparkline();
+
+    // Update summary metrics
+    speechCountEl.textContent = speechCount;
+    const avgConf = speechConfSum / Math.max(speechCount, 1);
+    speechAvgConf.textContent = (avgConf * 100).toFixed(0) + '%';
+    speechAvgConf.style.color = avgConf > 0.5 ? '#38d97a' : avgConf > 0.2 ? '#f5c842' : '#6b7c93';
+
+    // Trigger brain viz pulse
+    brainViz.triggerSpeechPulse();
+
+    const entry = document.createElement('div');
+    entry.className = 'speech-log-entry';
+    const now = new Date();
+    const ts = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    entry.innerHTML = `<span class="token">"${phoneme}"</span><span class="conf">${confPct}</span><span class="timestamp">${ts}</span>`;
+    speechLog.prepend(entry);
+    while (speechLog.children.length > 50) speechLog.lastChild.remove();
+};
+
+// Listen for neuro_update / video_status / gateway_status via WS intercept.
+// Must survive WS reconnections - body-data.js creates a new WebSocket on
+// reconnect, losing any onmessage wrapper. We poll to re-hook when needed.
+let _hookedWs = null;
+let _hookInterval = null;
+
+function hookNeuroUpdates() {
+    // Clear any existing poll
+    if (_hookInterval) { clearInterval(_hookInterval); _hookInterval = null; }
+    // Install hook now and poll to re-install after WS reconnects
+    _installHook();
+    _hookInterval = setInterval(() => {
+        if (brainSelect.value !== 'audio') { clearInterval(_hookInterval); _hookInterval = null; return; }
+        if (data._ws && data._ws !== _hookedWs) _installHook();
+    }, 1000);
+}
+
+function _installHook() {
+    if (!data._ws) return;
+    _hookedWs = data._ws;
+    const origHandler = data._ws.onmessage;
+    data._ws.onmessage = (evt) => {
+        origHandler(evt);
+        if (brainSelect.value !== 'audio') return;
+        try {
+            const msg = JSON.parse(evt.data);
+            if (msg.brain !== 'audio') return;
+
+            if (msg.type === 'neuro_update' && msg.data) {
+                const d = msg.data;
+                audioStep.textContent = (d.step_count || 0).toLocaleString();
+
+                // Feed data to brain visualization
+                brainViz.updateMetrics(d);
+
+                if (d.neuromodulation) {
+                    const phase = d.neuromodulation.phase || '--';
+                    audioPhase.textContent = phase;
+                    // Fallback stage label from dev phase (overridden by
+                    // onBodyInfo when curriculum data arrives)
+                    if (audioStage.textContent === 'Babbling' || audioStage.textContent === '--') {
+                        const stageMap = {
+                            infant: 'Babbling',
+                            toddler: 'Phoneme Discovery',
+                            juvenile: 'Phoneme Discovery',
+                            adolescent: 'Word Binding',
+                            mature: 'Fluent',
+                        };
+                        audioStage.textContent = stageMap[phase] || phase;
+                    }
+                    // DA level display
+                    const da = d.neuromodulation.da || 0;
+                    audioDaLevel.textContent = da.toFixed(3);
+                    audioDaLevel.style.color = da > 1.2 ? '#38d97a' : da < 0.8 ? '#ef4444' : '#c4b5fd';
+                }
+                if (d.synapse_stats) {
+                    const sa = d.synapse_stats.sensory_association;
+                    const sm = d.synapse_stats.sensory_motor;
+                    if (sa) audioSensoryWt2.textContent = sa.mean_weight.toFixed(3);
+                    if (sm) audioMotorWt.textContent = sm.mean_weight.toFixed(3);
+                }
+                if (d.firing_rates) {
+                    const sr = d.firing_rates.sensory_cortex;
+                    if (sr != null) {
+                        audioSensoryWt.textContent = (sr * 100).toFixed(1) + '%';
+                    }
+                }
+            }
+
+            if (msg.type === 'video_status' && msg.data) {
+                const v = msg.data;
+                videoSessions.set(v.session_id, v);
+                updateVideoFeedUI();
+                updateTranscriptDisplay();
+            }
+
+            if (msg.type === 'gateway_status' && msg.data) {
+                audioConnStatus.textContent = 'live';
+                audioConnStatus.style.color = '#38d97a';
+            }
+
+            // Phase 2.7d / 2.13c (2026-06-17): live audio playback.
+            // Brain publishes 1 s of base64-encoded 16 kHz mono int16
+            // PCM per second on n100k-audio.dashboard.audio. We decode
+            // and queue into a Web Audio API source.
+            if (msg.type === 'audio_pcm' && msg.data && msg.brain === 'audio') {
+                handleAudioPcm(msg.data);
+            }
+        } catch (_) {}
+    };
+}
+
+// ── Demonstration / Ghost Walker viewer (Phase 2.14a, 2026-06-17) ────
+// Subscribes to ``demonstration_frame`` WS broadcasts regardless of
+// brain mode (audio panel or body view). Hooks on the SAME WebSocket
+// the body-data layer creates, surviving reconnects via a periodic
+// re-hook just like the audio handler.
+let _ghostHookedWs = null;
+let _ghostHookInterval = null;
+function hookDemonstrationFrames() {
+    if (_ghostHookInterval) { clearInterval(_ghostHookInterval); _ghostHookInterval = null; }
+    _installGhostHook();
+    _ghostHookInterval = setInterval(() => {
+        if (data._ws && data._ws !== _ghostHookedWs) _installGhostHook();
+    }, 1000);
+}
+function _installGhostHook() {
+    if (!data._ws) return;
+    _ghostHookedWs = data._ws;
+    const prior = data._ws.onmessage;
+    data._ws.onmessage = (evt) => {
+        prior(evt);
+        try {
+            const msg = JSON.parse(evt.data);
+            if (msg.type === 'demonstration_frame' && msg.data) {
+                handleDemonstrationFrame(msg.data, msg.brain);
+            }
+        } catch (_) {}
+    };
+}
+function handleDemonstrationFrame(frame, brainId) {
+    // Only show the ghost for brains we are currently viewing.
+    const sel = document.getElementById('brain-select');
+    if (sel && sel.value && sel.value !== brainId) return;
+    // Audio brain has body=speech_only (no joints) — a ghost-walker
+    // skeleton is meaningless and confusing here. Hide it.
+    if (sel && sel.value === 'audio') {
+        const panel = document.getElementById('ghost-panel');
+        if (panel) panel.style.display = 'none';
+        return;
+    }
+    const panel = document.getElementById('ghost-panel');
+    if (!panel) return;
+    panel.style.display = 'block';
+    document.getElementById('ghost-source').textContent = frame.source || 'unknown';
+    const ja = frame.joint_angles || {};
+    // Resolve hip/knee from EITHER the walker naming (hip_left/knee_left,
+    // cpg_walker) OR the humanoid naming (l_hip_pitch/l_knee, cpg_humanoid /
+    // _stand / _step / _getup). Previously this read only the walker names, so
+    // every humanoid-bodied brain (1M, humanoid-locomotion, humanoid-stand)
+    // showed a frozen 0.00 ghost that did not match its actual demonstrator.
+    // Humanoid knee flexion is NEGATIVE (opposite sign to the walker), so
+    // negate it for the positive-is-flexion stick renderer below.
+    // The stick renderer below is a LEGGED skeleton (hip/knee). If the frame
+    // carries no hip joint under either naming (e.g. a future arm/drone
+    // demonstrator), drawing it would be a misleading frozen fake walker --
+    // show the source + a note instead (same spirit as hiding it for audio).
+    const hasLegs = ja.hip_left !== undefined || ja.hip_right !== undefined
+                 || ja.l_hip_pitch !== undefined || ja.r_hip_pitch !== undefined;
+    if (!hasLegs) {
+        document.getElementById('ghost-hl').textContent = '--';
+        document.getElementById('ghost-hr').textContent = '--';
+        document.getElementById('ghost-phase').textContent =
+            (frame.phase || 0).toFixed(2);
+        document.getElementById('ghost-contact').textContent =
+            'non-legged body';
+        const c = document.getElementById('ghost-canvas');
+        if (c) { const x = c.getContext('2d'); x.fillStyle = '#06090f';
+                 x.fillRect(0, 0, c.width, c.height); }
+        return;
+    }
+    const pick = (a, b) => (a !== undefined ? a : (b !== undefined ? b : 0));
+    const hl = pick(ja.hip_left, ja.l_hip_pitch);
+    const hr = pick(ja.hip_right, ja.r_hip_pitch);
+    const kl = (ja.knee_left !== undefined) ? ja.knee_left
+             : (ja.l_knee !== undefined ? -ja.l_knee : 0);
+    const kr = (ja.knee_right !== undefined) ? ja.knee_right
+             : (ja.r_knee !== undefined ? -ja.r_knee : 0);
+    document.getElementById('ghost-hl').textContent = hl.toFixed(2) + ' rad';
+    document.getElementById('ghost-hr').textContent = hr.toFixed(2) + ' rad';
+    document.getElementById('ghost-phase').textContent =
+        (frame.phase || 0).toFixed(2);
+    const fc = frame.foot_contacts || {};
+    const lc = fc.left ? 'L' : '-';
+    const rc = fc.right ? 'R' : '-';
+    document.getElementById('ghost-contact').textContent = lc + '/' + rc;
+    // Render a tiny stick walker.
+    const canvas = document.getElementById('ghost-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = '#06090f';
+    ctx.fillRect(0, 0, W, H);
+    // Ground line
+    ctx.strokeStyle = '#1f2937';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, H - 12); ctx.lineTo(W, H - 12);
+    ctx.stroke();
+    // Hip pivot
+    const cx = W / 2, hipY = 40;
+    const hipR = 4;
+    const hipColor = '#22d3ee';
+    ctx.fillStyle = hipColor;
+    ctx.beginPath(); ctx.arc(cx, hipY, hipR, 0, 2 * Math.PI); ctx.fill();
+    // Torso
+    ctx.strokeStyle = hipColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, hipY); ctx.lineTo(cx, hipY - 24);
+    ctx.stroke();
+    // Head
+    ctx.beginPath(); ctx.arc(cx, hipY - 30, 5, 0, 2 * Math.PI); ctx.stroke();
+    // Legs. Hip angle: positive = swing forward (knee up & forward).
+    const thighLen = 30, shinLen = 28;
+    function drawLeg(hipA, kneeA, color) {
+        const hx = cx;
+        const hy = hipY;
+        const kx = hx + Math.sin(hipA) * thighLen;
+        const ky = hy + Math.cos(hipA) * thighLen;
+        const totalA = hipA - kneeA;  // knee bend folds shin behind
+        const fx = kx + Math.sin(totalA) * shinLen;
+        const fy = ky + Math.cos(totalA) * shinLen;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(hx, hy); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy);
+        ctx.stroke();
+    }
+    drawLeg(hl, kl, '#38d97a');     // left leg, green
+    drawLeg(hr, kr, '#f5c842');     // right leg, gold
+}
+
+// ── Demonstrations control (Phase 2.15, 2026-06-17) ──────────────────
+// Admin auth header helper: read token from localStorage, included in
+// all mutation requests. Server returns 401 when required + missing.
+function _adminHeaders() {
+    const t = localStorage.getItem('oscen_admin_token') || '';
+    return t ? { 'Authorization': 'Bearer ' + t } : {};
+}
+async function _checkAdminRequired() {
+    try {
+        const r = await fetch(apiBase + '/api/demonstrations/auth_info');
+        const d = await r.json();
+        const row = document.getElementById('demos-admin-row');
+        if (d.required) {
+            row.style.display = 'block';
+            const have = !!localStorage.getItem('oscen_admin_token');
+            const status = document.getElementById('demos-admin-status');
+            if (have) {
+                status.textContent = 'admin token stored locally';
+                status.style.color = '#38d97a';
+            } else {
+                status.textContent = 'no token set';
+                status.style.color = '#6b7c93';
+            }
+        } else {
+            row.style.display = 'none';
+        }
+    } catch (_) {}
+}
+
+async function refreshDemoList() {
+    const list = document.getElementById('demo-list');
+    if (!list) return;
+    try {
+        const resp = await fetch(apiBase + '/api/demonstrations/list');
+        const data = await resp.json();
+        const videos = data.videos || [];
+        if (!videos.length) {
+            list.innerHTML = '<div style="color:#6b7c93; font-style:italic;">No videos uploaded</div>';
+            return;
+        }
+        list.innerHTML = videos.map(v => {
+            const ready = v.status === 'ready';
+            const label = v.source_video || v.video_id;
+            const meta = ready
+                ? `${(v.duration_seconds || 0).toFixed(1)}s @ ${Math.round(v.fps || 0)}fps`
+                : v.status || '...';
+            const color = ready ? '#38d97a' : v.status === 'failed' ? '#ef4444' : '#f5c842';
+            return `
+                <div style="border-top:1px solid rgba(255,255,255,0.05); padding:4px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:160px;">
+                            ${label}
+                        </div>
+                        <div style="color:${color}; font-size:9px;">${meta}</div>
+                    </div>
+                    <div style="display:flex; gap:3px; margin-top:3px;">
+                        <button data-demo-play="${v.video_id}" ${ready?'':'disabled'} style="
+                            flex:1; padding:2px; background:${ready?'#22d3ee':'#1f2937'};
+                            color:${ready?'#06090f':'#6b7c93'};
+                            border:none; border-radius:2px; cursor:${ready?'pointer':'not-allowed'};
+                            font-size:9px;">Play</button>
+                        <button data-demo-delete="${v.video_id}" style="
+                            padding:2px 6px; background:#1f2937; color:#ef4444;
+                            border:1px solid rgba(239,68,68,0.2); border-radius:2px;
+                            cursor:pointer; font-size:9px;">x</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        list.querySelectorAll('button[data-demo-play]').forEach(btn => {
+            btn.onclick = () => selectDemo('video', btn.dataset.demoPlay);
+        });
+        list.querySelectorAll('button[data-demo-delete]').forEach(btn => {
+            btn.onclick = async () => {
+                await fetch(apiBase + '/api/demonstrations/' + btn.dataset.demoDelete,
+                            {method: 'DELETE'});
+                refreshDemoList();
+            };
+        });
+    } catch (e) {
+        list.innerHTML = '<div style="color:#ef4444;">List failed: ' + e + '</div>';
+    }
+}
+async function selectDemo(provider, videoId) {
+    const brain = document.getElementById('demo-brain-select').value;
+    const params = new URLSearchParams({
+        provider, video_id: videoId || '', brain,
+    });
+    try {
+        const resp = await fetch(apiBase + '/api/demonstrations/select?' + params, {
+            method: 'POST', headers: _adminHeaders(),
+        });
+        const status = document.getElementById('demo-upload-status');
+        if (resp.status === 401) {
+            status.textContent = 'admin token required (Unlock above)';
+            status.style.color = '#ef4444';
+            return;
+        }
+        const data = await resp.json();
+        if (status) {
+            status.textContent = data.ok
+                ? `selected ${provider}${videoId?':'+videoId.slice(0,8):''} for ${brain}`
+                : `select failed: ${data.error || 'unknown'}`;
+            status.style.color = data.ok ? '#38d97a' : '#ef4444';
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+function _initDemoPanel() {
+    const upload = document.getElementById('demo-upload');
+    if (upload) {
+        upload.onchange = async () => {
+            const file = upload.files[0];
+            if (!file) return;
+            const status = document.getElementById('demo-upload-status');
+            status.textContent = 'uploading ' + file.name + '...';
+            status.style.color = '#f5c842';
+            const fd = new FormData();
+            fd.append('file', file);
+            try {
+                const resp = await fetch(apiBase + '/api/demonstrations/upload', {
+                    method: 'POST', body: fd, headers: _adminHeaders(),
+                });
+                if (resp.status === 401) {
+                    status.textContent = 'admin token required (Unlock above)';
+                    status.style.color = '#ef4444';
+                    upload.value = '';
+                    return;
+                }
+                const data = await resp.json();
+                status.textContent = data.video_id
+                    ? 'queued for extraction: ' + data.video_id.slice(0,8)
+                    : 'upload failed';
+                status.style.color = data.video_id ? '#38d97a' : '#ef4444';
+                upload.value = '';
+                setTimeout(refreshDemoList, 500);
+            } catch (e) {
+                status.textContent = 'upload error: ' + e;
+                status.style.color = '#ef4444';
+            }
+        };
+    }
+    const cpgBtn = document.getElementById('demo-use-cpg');
+    if (cpgBtn) cpgBtn.onclick = () => selectDemo('cpg_walker', '');
+    const stopBtn = document.getElementById('demo-stop');
+    if (stopBtn) stopBtn.onclick = () => selectDemo('none', '');
+    // Toggle and admin unlock wiring.
+    const toggle = document.getElementById('demos-toggle');
+    const panel = document.getElementById('demos-panel');
+    const close = document.getElementById('demos-close');
+    if (toggle && panel) {
+        toggle.onclick = () => {
+            const open = panel.style.display !== 'none';
+            panel.style.display = open ? 'none' : 'block';
+            toggle.textContent = open ? 'Demonstrations ▾' : 'Demonstrations ▴';
+            if (!open) _checkAdminRequired();
+        };
+    }
+    if (close && panel) {
+        close.onclick = () => {
+            panel.style.display = 'none';
+            if (toggle) toggle.textContent = 'Demonstrations ▾';
+        };
+    }
+    const unlockBtn = document.getElementById('demos-unlock');
+    if (unlockBtn) {
+        unlockBtn.onclick = () => {
+            const cur = localStorage.getItem('oscen_admin_token') || '';
+            const tok = window.prompt(
+                'Admin token (stored locally; clear to lock):', cur);
+            if (tok === null) return; // cancelled
+            if (tok === '') {
+                localStorage.removeItem('oscen_admin_token');
+            } else {
+                localStorage.setItem('oscen_admin_token', tok);
+            }
+            _checkAdminRequired();
+        };
+    }
+    refreshDemoList();
+    // Periodic refresh in case extraction completes.
+    setInterval(refreshDemoList, 5000);
+}
+// Defer init until DOM is ready (the panel is in body, so already loaded
+// by the time this script runs at end of body). Skip entirely in
+// public-demo mode -- the panel + curriculum list are removed and
+// the upload/list endpoints are admin-gated.
+if (!UI_MODE.public) _initDemoPanel();
+
+// ── Audio playback (Phase 2.7d / 2.13c) ──────────────────────────────
+// Lazy-initialized AudioContext (browser autoplay policy requires a
+// user gesture before the context can produce sound).
+let _audioCtx = null;
+let _audioNextStart = 0;
+let _audioListenBtn = null;
+function ensureAudioCtx() {
+    if (_audioCtx) return _audioCtx;
+    try {
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+            sampleRate: 16000,
+        });
+        _audioNextStart = _audioCtx.currentTime;
+    } catch (e) {
+        console.warn('AudioContext unavailable:', e);
+    }
+    return _audioCtx;
+}
+function handleAudioPcm(payload) {
+    const rms = payload.rms || 0;
+    // Update RMS meter / placeholder text whenever audio arrives.
+    if (rms > 0.001) {
+        featuredPhonemeConf.textContent = 'RMS ' + rms.toExponential(2);
+    }
+    const ctx = ensureAudioCtx();
+    if (!ctx || ctx.state === 'suspended') {
+        // Show a one-time "tap to listen" affordance.
+        if (!_audioListenBtn) {
+            _audioListenBtn = document.createElement('button');
+            _audioListenBtn.textContent = 'Tap to listen';
+            _audioListenBtn.style.cssText =
+                'margin-top:6px;padding:4px 10px;border-radius:4px;' +
+                'background:#38d97a;color:#000;border:none;cursor:pointer;' +
+                'font-size:11px;';
+            _audioListenBtn.onclick = async () => {
+                const c = ensureAudioCtx();
+                if (c && c.state === 'suspended') await c.resume();
+                if (_audioListenBtn) _audioListenBtn.remove();
+                _audioListenBtn = null;
+            };
+            // Place into the OUTPUT card next to the phoneme conf line.
+            const outputCard = featuredPhonemeConf.parentElement.parentElement;
+            if (outputCard) outputCard.appendChild(_audioListenBtn);
+        }
+        return;
+    }
+    const b64 = payload.pcm_b64;
+    if (!b64) return;
+    // Decode base64 -> Uint8Array -> Int16Array -> Float32Array.
+    let bin;
+    try { bin = atob(b64); }
+    catch (_) { return; }
+    const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const i16 = new Int16Array(u8.buffer, u8.byteOffset, u8.byteLength >> 1);
+    const f32 = new Float32Array(i16.length);
+    for (let i = 0; i < i16.length; i++) f32[i] = i16[i] / 32767.0;
+    const sr = payload.sample_rate || 16000;
+    const buf = ctx.createBuffer(1, f32.length, sr);
+    buf.copyToChannel(f32, 0);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    // Schedule sequentially so multiple 1 s buffers concatenate cleanly.
+    const start = Math.max(_audioNextStart, ctx.currentTime);
+    src.start(start);
+    _audioNextStart = start + buf.duration;
+}
+
+// Animate MFCC bars with subtle random motion
+setInterval(() => {
+    if (brainSelect.value !== 'audio') return;
+    const bars = mfccBars.children;
+    for (let i = 0; i < bars.length; i++) {
+        const h = 20 + Math.random() * 70;
+        bars[i].style.height = h + '%';
+    }
+}, 400);
+
+// ── Brain mode switching ──────────────────────────────────────────
+function setAudioMode(isAudio) {
+    // Toggle panels. Use a helper so removed elements (e.g. guide-panel
+    // in public-demo mode) don't crash on .style access.
+    const _setDisplay = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = v;
+    };
+    _setDisplay('hud', isAudio ? 'none' : '');
+    _setDisplay('legend', isAudio ? 'none' : '');
+    _setDisplay('guide-panel', isAudio ? 'none' : '');
+    _setDisplay('self-view-panel', isAudio ? 'none' : '');
+    audioPanel.style.display = isAudio ? 'block' : 'none';
+
+    // Toggle viewport (3D body) vs brain visualization
+    document.getElementById('viewport').style.display = isAudio ? 'none' : '';
+    brainVizContainer.style.display = isAudio ? 'block' : 'none';
+
+    if (isAudio) {
+        brainViz.start();
+        // Reset tracking on switch
+        exprSuccessCount = 0;
+        exprTotalCount = 0;
+        speechCount = 0;
+        speechConfSum = 0;
+        daSuccessCount = 0;
+        daFailCount = 0;
+        confHistory.length = 0;
+        speechCountEl.textContent = '0';
+        speechAvgConf.textContent = '--';
+        audioExprConf.textContent = '--';
+        audioDaReinforce.textContent = '--';
+        featuredPhoneme.textContent = '--';
+        featuredPhonemeConf.textContent = 'waiting for first utterance';
+        speechLog.innerHTML = '';
+        videoSessions.clear();
+        updateVideoFeedUI();
+        transcriptText.textContent = 'Waiting for audio...';
+        transcriptText.style.color = '#6b7c93';
+        transcriptSource.textContent = '';
+        hookNeuroUpdates();
+    } else {
+        brainViz.stop();
+        if (_hookInterval) { clearInterval(_hookInterval); _hookInterval = null; }
+    }
+}
+
+// Brain selector
+const brainSelect = document.getElementById('brain-select');
+brainSelect.addEventListener('change', async () => {
+    const brainId = brainSelect.value;
+    data.setBrain(brainId);
+    guide.setBrain(brainId);
+    setAudioMode(brainId === 'audio');
+    // Audio brain has no walker body, so any stale ghost-walker overlay
+    // from a previous brain must be hidden immediately.
+    if (brainId === 'audio') {
+        const ghost = document.getElementById('ghost-panel');
+        if (ghost) ghost.style.display = 'none';
+    }
+    // Re-fetch body info for the selected brain
+    try {
+        const resp = await fetch(apiBase + `/api/mujoco/body-info?brain=${brainId}`);
+        const info = await resp.json();
+        if (data.onBodyInfo) data.onBodyInfo(info);
+    } catch (e) {
+        console.warn('Failed to fetch body info for brain:', brainId, e);
+    }
+});
+
+// Start
+(async () => {
+    await data.start(wsUrl, apiBase);
+    // Always build the robot -- use live geometry if available, otherwise procedural
+    scene.setModelGeometry(data.getModelGeoms() || []);
+    // Start guide (fetches body info + training history for current brain)
+    guide.start(apiBase, brainSelect.value);
+    // Phase 2.14a: ghost-walker hook stays active across brain switches.
+    hookDemonstrationFrames();
+})();
+
+// ─── Phase B: Body dashboard rail + drawer + Joints module ──────
+// Rail / drawer scaffold + per-joint motor activity bars absorbed
+// from walking.html. Hooks into the existing data.onUpdate chain so
+// the bars stay live without a second NATS subscription.
+(function setupBodyRail() {
+    const rail   = document.getElementById('body-rail');
+    const drawer = document.getElementById('body-drawer');
+    const closeBtn = document.getElementById('body-drawer-close');
+    const titleEl  = document.getElementById('body-drawer-title');
+    const tabs   = rail ? rail.querySelectorAll('.body-rail-tab') : [];
+    const bodies = drawer ? drawer.querySelectorAll('.body-module-body') : [];
+    if (!rail || !drawer || tabs.length === 0) return;
+
+    const MODULES = {
+        stats:    { name: 'Stats' },
+        joints:   { name: 'Per-Joint Motor' },
+        guide:    { name: 'Guide Controls' },
+        selfview: { name: "Walker's-Eye View" },
+        audio:    { name: 'Audio / Speech' },
+        demos:    { name: 'Demonstrations' },
+        brain:    { name: 'Brain Switcher' },
+    };
+    let activeModule = null;
+
+    function openModule(id) {
+        const cfg = MODULES[id];
+        if (!cfg) return;
+        activeModule = id;
+        titleEl.textContent = cfg.name;
+        bodies.forEach((b) => b.classList.toggle('active', b.dataset.module === id));
+        tabs.forEach((t)   => t.classList.toggle('active',   t.dataset.module === id));
+        drawer.classList.add('open');
+        rail.classList.add('shifted');
+        document.body.classList.add('body-drawer-open');
+    }
+    function closeDrawer() {
+        activeModule = null;
+        drawer.classList.remove('open');
+        rail.classList.remove('shifted');
+        document.body.classList.remove('body-drawer-open');
+        tabs.forEach((t) => t.classList.remove('active'));
+    }
+    tabs.forEach((t) => {
+        t.addEventListener('click', () => {
+            if (activeModule === t.dataset.module) closeDrawer();
+            else openModule(t.dataset.module);
+        });
+    });
+    closeBtn.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+    });
+
+    // ─── Joints module: per-joint motor activity bars ────────────
+    // Driven by `mujoco.body.info` (via data.onBodyInfo). The brain
+    // publishes channel -> actuator-name from its own body manifest;
+    // we render whatever it sends. Walker, arm, humanoid, drone all
+    // work without code change. Bodies with zero actuators (e.g.
+    // speech_only) render a placeholder.
+    const jointsRoot = document.getElementById('bd-joints-root');
+    let QVEL_ACTUATOR_MAP = [];
+    let barElements = {};
+    let lastBodyChannelKey = '';   // dedupe rebuilds when info repeats
+
+    // Channel colour hints. Unknown channels fall back to neutral. We do
+    // NOT hardcode behaviour around the names -- just visual variety.
+    const CHANNEL_COLOR_HINTS = {
+        locomotion: '#22d3ee', manipulation: '#a855f7',
+        head: '#4ade80', speech: '#fbbf24', expression: '#fb7185',
+    };
+
+    function makeBar(name) {
+        const row = document.createElement('div');
+        row.className = 'bd-actuator-row';
+        row.style.cssText = 'display:flex;align-items:center;margin-bottom:4px;gap:8px;';
+        const label = document.createElement('span');
+        label.style.cssText = 'font-size:9px;width:110px;text-align:right;color:#6a6a6a;flex-shrink:0;';
+        label.textContent = name.replace(/_m$/, '').replace(/_/g, ' ');
+        const track = document.createElement('div');
+        track.style.cssText = 'flex:1;height:14px;background:rgba(255,255,255,0.04);overflow:hidden;position:relative;';
+        const fill = document.createElement('div');
+        fill.style.cssText = 'height:100%;width:0%;transition:width 0.3s ease,background 0.3s ease;min-width:1px;background:#22d3ee;';
+        track.appendChild(fill);
+        const mark = document.createElement('div');
+        mark.style.cssText = 'position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.12);';
+        track.appendChild(mark);
+        const val = document.createElement('span');
+        val.style.cssText = 'font-size:9px;width:36px;text-align:right;color:#6a6a6a;flex-shrink:0;font-variant-numeric:tabular-nums;';
+        val.textContent = '0.00';
+        row.appendChild(label); row.appendChild(track); row.appendChild(val);
+        return { row, fill, value: val };
+    }
+
+    function rebuildJointsFromBodyInfo(info) {
+        if (!jointsRoot) return;
+        const channelActuators = (info && info.channel_actuators) || {};
+        // Cheap signature so a repeated 10-second body_info push doesn't
+        // tear down + rebuild the entire DOM each tick.
+        const key = JSON.stringify(channelActuators);
+        if (key === lastBodyChannelKey) return;
+        lastBodyChannelKey = key;
+
+        jointsRoot.innerHTML = '';
+        barElements = {};
+        QVEL_ACTUATOR_MAP = [];
+
+        const channels = Object.keys(channelActuators);
+        const totalActuators = channels.reduce(
+            (n, ch) => n + (channelActuators[ch] || []).length, 0,
+        );
+
+        if (totalActuators === 0) {
+            const empty = document.createElement('div');
+            empty.style.cssText = 'padding:14px 8px;font-size:11px;color:#6a6a6a;line-height:1.55;';
+            empty.textContent = (info && info.body_name)
+                ? 'No actuators reported for ' + info.body_name + ' (likely a speech / sensory-only body).'
+                : 'Waiting for body info...';
+            jointsRoot.appendChild(empty);
+            return;
+        }
+
+        // Joint velocity offset depends on whether the root is a freejoint.
+        // mujoco_body publishes the joints list with type==freejoint when
+        // present; default to 6 if we can't tell (matches the prior shape).
+        const hasFreejoint = Array.isArray(info && info.joints)
+            ? info.joints.some(j => (j.type || '').toLowerCase() === 'freejoint')
+            : true;
+        let qvelIdx = hasFreejoint ? 6 : 0;
+
+        channels.forEach((channel) => {
+            const acts = channelActuators[channel] || [];
+            if (acts.length === 0) return;
+            const section = document.createElement('div');
+            section.className = 'section channel-section ' + channel;
+            const labelRow = document.createElement('div');
+            labelRow.className = 'channel-label';
+            const colorHint = CHANNEL_COLOR_HINTS[channel] || '#9ca3af';
+            labelRow.innerHTML = '<span style="color:' + colorHint + '">' + channel + '</span>'
+                + ' <span class="count">' + acts.length + ' actuator' + (acts.length === 1 ? '' : 's') + '</span>';
+            section.appendChild(labelRow);
+            const barsHolder = document.createElement('div');
+            acts.forEach((name) => {
+                const bar = makeBar(name);
+                bar.fill.style.background = colorHint;
+                barElements[name] = { fill: bar.fill, value: bar.value };
+                QVEL_ACTUATOR_MAP.push({ idx: qvelIdx, name });
+                qvelIdx++;
+                barsHolder.appendChild(bar.row);
+            });
+            section.appendChild(barsHolder);
+            jointsRoot.appendChild(section);
+        });
+    }
+
+    // First paint with a friendly empty state; gets overwritten the
+    // moment the first mujoco.body.info lands (every 10 seconds).
+    rebuildJointsFromBodyInfo({});
+
+    // Chain onto the existing onBodyInfo handler so the existing one
+    // (status pill etc., wired earlier in this file) keeps running.
+    const _prevBodyInfo = data.onBodyInfo;
+    data.onBodyInfo = (info) => {
+        if (_prevBodyInfo) _prevBodyInfo(info);
+        rebuildJointsFromBodyInfo(info);
+    };
+
+    // ─── Relocate existing floating panels into drawer modules ────
+    // Move the DOM nodes — their JS hooks (BodyGuide, AudioBrainViz,
+    // camera canvas, demos launcher) keep working because they hold
+    // references to the same elements, not their positions.
+    function relocate(panelSelector, moduleAttr) {
+        const panel = document.querySelector(panelSelector);
+        const target = document.querySelector('.body-module-body[data-module="' + moduleAttr + '"]');
+        if (!panel || !target) return;
+        target.appendChild(panel);
+        panel.style.display = '';
+        // Clear inline `display:none` the panel may have had so the
+        // body-module-body controls visibility instead.
+    }
+    relocate('#guide-panel',  'guide');
+    relocate('.audio-panel',  'audio');
+    relocate('.self-view',    'selfview');
+    relocate('#demos-panel',  'demos');
+    relocate('#hud',          'stats');
+
+    // ─── Brain switcher module: mirror the topbar dropdown ────────
+    const brainSelectEl = document.getElementById('brain-select');
+    const brainButtonsEl = document.getElementById('bd-brain-buttons');
+    const activeBrainEl  = document.getElementById('bd-active-brain');
+    const brainSubEl     = document.getElementById('bd-brain-sub');
+    const BRAIN_META = {
+        '1m':      { label: '1M Production',   sub: 'Generalist — walker_4dof' },
+        '100k':    { label: '100K Locomotion', sub: 'Gait specialist — walker_4dof' },
+        'balance': { label: '100K Balance',    sub: 'Stability + recovery — walker_4dof' },
+        'audio':   { label: '100K Speech',     sub: 'Audio brain — speech_only' },
+        'humanoid-stand':      { label: '100K Humanoid Stand-Step', sub: 'Stand→step→stand — humanoid_29dof' },
+        'humanoid-locomotion': { label: '100K Humanoid Locomotion', sub: 'Humanoid gait donor — humanoid_29dof' },
+    };
+    function refreshBrainModule() {
+        const v = brainSelectEl ? brainSelectEl.value : '1m';
+        const meta = BRAIN_META[v] || { label: v, sub: '' };
+        if (activeBrainEl) activeBrainEl.textContent = meta.label;
+        if (brainSubEl)    brainSubEl.textContent    = meta.sub;
+        if (!brainButtonsEl) return;
+        brainButtonsEl.innerHTML = '';
+        for (const [val, m] of Object.entries(BRAIN_META)) {
+            const btn = document.createElement('button');
+            btn.style.cssText = 'padding:10px 12px;background:' + (val === v ? '#22d3ee' : 'transparent')
+                + ';border:1px solid ' + (val === v ? '#22d3ee' : 'rgba(255,255,255,0.18)')
+                + ';color:' + (val === v ? '#000' : '#e6e6e6')
+                + ';font-family:inherit;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;'
+                + 'font-weight:700;cursor:pointer;text-align:left;transition:all 200ms ease;';
+            btn.innerHTML = '<div>' + m.label + '</div>'
+                + '<div style="font-size:8px;color:' + (val === v ? '#000' : '#6a6a6a')
+                + ';letter-spacing:1px;margin-top:3px;font-weight:400;text-transform:none;">' + m.sub + '</div>';
+            btn.addEventListener('click', () => {
+                if (brainSelectEl) {
+                    brainSelectEl.value = val;
+                    brainSelectEl.dispatchEvent(new Event('change'));
+                }
+                refreshBrainModule();
+            });
+            brainButtonsEl.appendChild(btn);
+        }
+    }
+    if (brainSelectEl) brainSelectEl.addEventListener('change', refreshBrainModule);
+    refreshBrainModule();
+
+    // Stats fields
+    const statsEls = {
+        height:   document.getElementById('bd-height'),
+        falls:    document.getElementById('bd-falls'),
+        simtime:  document.getElementById('bd-simtime'),
+        contacts: document.getElementById('bd-contacts'),
+    };
+    let bdFallCount = 0;
+    let lastTorsoH = 1.0;
+
+    // Hook the existing onUpdate chain. body.html already wraps it once
+    // (_origOnUpdate at line ~1279); we extend that wrapper here.
+    const _prev = data.onUpdate;
+    data.onUpdate = (state) => {
+        if (_prev) _prev(state);
+
+        // Joints bars
+        if (state.jointVelocities && state.jointVelocities.length > 0) {
+            const jv = state.jointVelocities;
+            const scale = 0.5; // 2 rad/s = full intensity
+            for (const entry of QVEL_ACTUATOR_MAP) {
+                if (entry.idx >= jv.length) continue;
+                const el = barElements[entry.name];
+                if (!el) continue;
+                const intensity = Math.min(1.0, Math.abs(jv[entry.idx]) * scale);
+                const pct = intensity * 100;
+                el.fill.style.width = pct + '%';
+                const hue = (1 - intensity) * 120;
+                el.fill.style.background = 'hsl(' + hue + ', 70%, 50%)';
+                el.value.textContent = intensity.toFixed(2);
+            }
+        }
+
+        // Stats fields
+        if (typeof state.torsoHeight === 'number') {
+            const h = state.torsoHeight;
+            // Crude fall detector: large drop from previous reading.
+            if (lastTorsoH > 0.6 && h < 0.4) bdFallCount++;
+            lastTorsoH = h;
+            if (statsEls.height) statsEls.height.textContent = h.toFixed(2);
+        }
+        if (statsEls.falls)    statsEls.falls.textContent = bdFallCount;
+        if (statsEls.simtime && typeof state.simTime === 'number') {
+            statsEls.simtime.textContent = state.simTime.toFixed(1) + 's';
+        }
+        if (statsEls.contacts && typeof state.numContacts === 'number') {
+            statsEls.contacts.textContent = state.numContacts;
+        }
+    };
+})();
+</script>
+</body>
+</html>

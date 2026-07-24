@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSCEN Brain — Live Neural Activity</title>
+    <title>OSCEN Brain. Live Neural Activity.</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="demos/oscen-demo.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #0a0e1a;
-            color: #c8d0e0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: var(--mono);
             overflow: hidden;
             width: 100vw;
             height: 100vh;
@@ -30,42 +29,44 @@
         }
         #hud.hidden { display: none; }
         .hud-title {
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 2px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2.4px;
             text-transform: uppercase;
-            color: #5ea4f5;
-            margin-bottom: 8px;
+            color: var(--accent);
+            margin-bottom: 10px;
         }
         .hud-stat {
-            font-size: 12px;
-            color: #7e8a9e;
+            font-size: 11px;
+            color: var(--text-dim);
             margin-bottom: 4px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-family: var(--mono);
         }
         .hud-stat .val {
-            color: #c8d0e0;
-            font-weight: 500;
+            color: var(--text-bright);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
         }
         .hud-phase {
             display: inline-block;
-            margin-top: 8px;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 1px;
+            margin-top: 10px;
+            padding: 4px 12px;
+            border-radius: 0;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
+            border: 1px solid var(--hairline-mid);
         }
-        .hud-phase.infant { background: rgba(244,114,182,0.2); color: #f472b6; }
-        .hud-phase.toddler { background: rgba(34,211,238,0.2); color: #22d3ee; }
-        .hud-phase.juvenile { background: rgba(56,217,122,0.2); color: #38d97a; }
-        .hud-phase.adolescent { background: rgba(245,166,35,0.2); color: #f5a623; }
-        .hud-phase.mature { background: rgba(94,164,245,0.2); color: #5ea4f5; }
+        .hud-phase.infant     { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+        .hud-phase.toddler    { background: rgba(34, 211, 238, 0.15);  color: #22d3ee; }
+        .hud-phase.juvenile   { background: rgba(74, 222, 128, 0.15);  color: var(--ok); }
+        .hud-phase.adolescent { background: rgba(251, 191, 36, 0.15);  color: var(--warn); }
+        .hud-phase.mature     { background: var(--accent-soft);        color: var(--accent); }
 
         /* Neuromodulator mini-bars */
         .neuromod-hud {
-            margin-top: 12px;
+            margin-top: 14px;
             display: flex;
             gap: 8px;
         }
@@ -73,18 +74,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 4px;
         }
         .nm-label {
-            font-size: 9px;
-            color: #7e8a9e;
-            letter-spacing: 0.5px;
+            font-size: 8px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         .nm-track {
             width: 4px;
             height: 40px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0;
             position: relative;
             overflow: hidden;
         }
@@ -92,36 +94,39 @@
             position: absolute;
             bottom: 0;
             width: 100%;
-            border-radius: 2px;
+            border-radius: 0;
             transition: height 0.8s ease;
         }
-        .nm-fill.da { background: #f5a623; }
-        .nm-fill.ach { background: #22d3ee; }
-        .nm-fill.ne { background: #f44; }
+        .nm-fill.da  { background: var(--warn); }
+        .nm-fill.ach { background: var(--accent); }
+        .nm-fill.ne  { background: var(--err); }
         .nm-fill.sht { background: #a78bfa; }
-        .nm-fill.ot { background: #f472b6; }
+        .nm-fill.ot  { background: #f472b6; }
 
         /* Connection status toggle button */
         #connection-status {
             position: absolute;
             top: 20px; right: 20px;
-            font-size: 11px;
-            padding: 5px 12px;
-            border-radius: 10px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 0;
             z-index: 10;
-            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-family: var(--mono);
+            font-weight: 600;
             cursor: pointer;
             pointer-events: auto;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
+            border: 1px solid var(--hairline-mid);
+            transition: all var(--t-base) var(--ease);
             user-select: none;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         #connection-status:hover {
-            filter: brightness(1.3);
-            border-color: rgba(255,255,255,0.15);
+            filter: brightness(1.25);
+            border-color: var(--hairline-hi);
         }
         #connection-status .status-dot {
             width: 6px; height: 6px;
@@ -129,25 +134,29 @@
             display: inline-block;
         }
         #connection-status.status-live {
-            background: rgba(56,217,122,0.15);
-            color: #38d97a;
+            background: rgba(74, 222, 128, 0.12);
+            color: var(--ok);
+            border-color: rgba(74, 222, 128, 0.3);
         }
-        #connection-status.status-live .status-dot { background: #38d97a; }
+        #connection-status.status-live .status-dot { background: var(--ok); }
         #connection-status.status-simulated {
-            background: rgba(245,166,35,0.15);
-            color: #f5a623;
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--warn);
+            border-color: rgba(251, 191, 36, 0.3);
         }
-        #connection-status.status-simulated .status-dot { background: #f5a623; }
+        #connection-status.status-simulated .status-dot { background: var(--warn); }
         #connection-status.status-connecting {
-            background: rgba(94,164,245,0.15);
-            color: #5ea4f5;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: rgba(34, 211, 238, 0.3);
         }
-        #connection-status.status-connecting .status-dot { background: #5ea4f5; animation: pulse 1s infinite; }
+        #connection-status.status-connecting .status-dot { background: var(--accent); animation: pulse 1s infinite; }
         #connection-status.status-disconnected {
-            background: rgba(244,63,63,0.15);
-            color: #f44;
+            background: rgba(248, 113, 113, 0.12);
+            color: var(--err);
+            border-color: rgba(248, 113, 113, 0.3);
         }
-        #connection-status.status-disconnected .status-dot { background: #f44; }
+        #connection-status.status-disconnected .status-dot { background: var(--err); }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         /* Region labels */
@@ -156,38 +165,62 @@
             pointer-events: auto;
             cursor: pointer;
             font-size: 10px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            color: rgba(200, 208, 224, 0.7);
+            font-family: var(--mono);
+            color: rgba(230, 230, 230, 0.75);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             white-space: nowrap;
-            padding: 3px 8px;
-            border-radius: 4px;
-            background: rgba(10, 14, 26, 0.7);
+            padding: 4px 9px;
+            border-radius: 0;
+            background: rgba(10, 10, 10, 0.7);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(94, 164, 245, 0.1);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            border: 1px solid var(--hairline);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
             transition: color 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
         .region-label:hover {
-            color: #fff;
-            background: rgba(10, 14, 26, 0.85);
-            border-color: rgba(94, 164, 245, 0.4);
-            box-shadow: 0 0 12px rgba(94, 164, 245, 0.2);
+            color: var(--text-bright);
+            background: rgba(10, 10, 10, 0.9);
+            border-color: rgba(34, 211, 238, 0.4);
+            box-shadow: 0 0 12px var(--accent-glow);
             z-index: 100;
         }
         .region-label.active {
-            color: rgba(220, 228, 240, 0.95);
-            background: rgba(10, 14, 26, 0.75);
-            border-color: rgba(94, 164, 245, 0.25);
-            text-shadow: 0 0 6px rgba(94, 164, 245, 0.4), 0 1px 3px rgba(0,0,0,0.8);
+            color: var(--text-bright);
+            background: rgba(10, 10, 10, 0.78);
+            border-color: rgba(34, 211, 238, 0.3);
+            text-shadow: 0 0 6px var(--accent-glow), 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+        /* Module-focus states. Driven by brain-scene.js _setLabelDim().
+           dimmed: non-target regions fade back; focused: target region pops. */
+        .region-label.dimmed {
+            opacity: 0.18;
+            transition: opacity 0.5s ease;
+        }
+        .region-label.focused {
+            color: var(--text-bright);
+            border-color: var(--accent);
+            background: rgba(10, 10, 10, 0.92);
+            box-shadow: 0 0 14px var(--accent-glow), 0 0 28px rgba(34, 211, 238, 0.18);
+            transition: opacity 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease;
+            z-index: 110;
+        }
+        .region-label.focused .rate {
+            color: var(--accent-hi);
+        }
+        /* Beliefs Mode (set by brain-scene.js when constellation is up):
+           neurons / synapses are hidden, so the region labels are
+           meaningless — hide them entirely. */
+        body.oscen-beliefs-mode .region-label {
+            display: none !important;
         }
         .region-label .rate {
             font-size: 8px;
-            color: rgba(94, 164, 245, 0.7);
-            margin-left: 4px;
-            font-weight: 600;
+            color: var(--accent);
+            margin-left: 5px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
         }
 
         /* Hover tooltip */
@@ -198,13 +231,13 @@
             left: 50%;
             transform: translateX(-50%);
             width: 260px;
-            padding: 12px 14px;
-            background: rgba(10, 14, 26, 0.92);
+            padding: 14px 16px;
+            background: rgba(10, 10, 10, 0.94);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(94, 164, 245, 0.25);
-            border-radius: 8px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(94, 164, 245, 0.1);
+            border: 1px solid var(--hairline-hi);
+            border-radius: 0;
+            box-shadow: var(--shadow-lg);
             pointer-events: none;
             z-index: 200;
             white-space: normal;
@@ -218,39 +251,38 @@
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-top-color: rgba(94, 164, 245, 0.25);
+            border-top-color: var(--hairline-hi);
         }
         .region-tooltip.flipped::after {
             top: auto;
             bottom: 100%;
             border-top-color: transparent;
-            border-bottom-color: rgba(94, 164, 245, 0.25);
+            border-bottom-color: var(--hairline-hi);
         }
-        .region-label:hover .region-tooltip {
-            display: block;
-        }
+        .region-label:hover .region-tooltip { display: block; }
         .region-tooltip .tt-name {
             font-size: 12px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 4px;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
         }
         .region-tooltip .tt-neurons {
             font-size: 10px;
-            color: rgba(94, 164, 245, 0.8);
-            margin-bottom: 6px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
         }
         .region-tooltip .tt-desc {
             font-size: 11px;
-            color: rgba(200, 208, 224, 0.85);
-            line-height: 1.5;
+            color: var(--text);
+            line-height: 1.55;
         }
         .region-tooltip .tt-connections {
             margin-top: 6px;
             font-size: 9px;
-            color: rgba(200, 208, 224, 0.5);
+            color: var(--text-dim);
         }
         /* Mobile responsive */
         @media (max-width: 768px) {
@@ -338,6 +370,9 @@
         <span class="status-text">CONNECTING...</span>
     </div>
 
+    <!-- Version toggle removed 2026-07-24: Cinematic is the only version now. -->
+
+
     <script type="importmap">
     {
         "imports": {
@@ -348,11 +383,31 @@
             "three/addons/postprocessing/UnrealBloomPass.js": "./lib/UnrealBloomPass.js",
             "three/addons/postprocessing/ShaderPass.js": "./lib/ShaderPass.js",
             "three/addons/shaders/CopyShader.js": "./lib/CopyShader.js",
-            "three/addons/shaders/LuminosityHighPassShader.js": "./lib/LuminosityHighPassShader.js"
+            "three/addons/shaders/LuminosityHighPassShader.js": "./lib/LuminosityHighPassShader.js",
+            "three/addons/loaders/GLTFLoader.js": "./lib/GLTFLoader.js",
+            "three/addons/environments/RoomEnvironment.js": "./lib/RoomEnvironment.js"
         }
     }
     </script>
 
-    <script type="module" src="./brain-scene.js?v=6"></script>
+    <!--
+      Bootstrap. The Cinematic scene is the ONLY brain-viz version now (the old
+      "classic" point-cloud renderer was retired 2026-07-24, see PROGRESS.md).
+      Any ?ver= param is ignored -- we always load Cinematic. A failed dynamic
+      import falls back to the base scene so the page never renders blank. Embed
+      mode (?embed=true) is read by the scene itself to hide the HUD for clean
+      iframe embedding (what the marketing site uses).
+    -->
+    <script type="module">
+        const CINEMATIC = './brain-scene-cinematic.js?v=16';
+        const FALLBACK  = './brain-scene.js?v=18';   // emergency only, if Cinematic import throws
+
+        import(CINEMATIC)
+            .then((m) => m.boot())
+            .catch((err) => {
+                console.warn('[brain-viz] cinematic scene failed to load, using base fallback:', err);
+                return import(FALLBACK).then((m) => m.boot());
+            });
+    </script>
 </body>
 </html>

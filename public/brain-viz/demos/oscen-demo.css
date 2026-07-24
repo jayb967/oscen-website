@@ -1,0 +1,393 @@
+/*
+ * OSCEN Demo Suite — shared stylesheet (single source of truth).
+ *
+ * Carbon / black aesthetic, minimal white text, teal accent, sharp corners,
+ * minimal white drop shadows. Bold and crisp.
+ *
+ * Linked from every file in oscen/brain-viz/demos/*.html. Per-demo overrides
+ * should be limited to layout-specific rules; never redefine these tokens.
+ */
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ---------- Design tokens ---------- */
+:root {
+    /* Surfaces */
+    --bg:            #000000;
+    --panel:         #0a0a0a;
+    --panel-hi:      #111111;
+    --panel-elev:    #141414;
+
+    /* Card gradients — diagonal black to dark gray for lift off the bg */
+    --grad-card:     linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+    --grad-card-hi:  linear-gradient(135deg, #141414 0%, #232323 100%);
+    --grad-panel:    linear-gradient(135deg, #0a0a0a 0%, #151515 100%);
+
+    /* Hairlines (white at low opacity, no blue tint) */
+    --hairline:      rgba(255, 255, 255, 0.06);
+    --hairline-mid:  rgba(255, 255, 255, 0.10);
+    --hairline-hi:   rgba(255, 255, 255, 0.18);
+
+    /* Accent — teal */
+    --accent:        #22d3ee;
+    --accent-hi:     #67e8f9;
+    --accent-dim:    rgba(34, 211, 238, 0.60);
+    --accent-soft:   rgba(34, 211, 238, 0.10);
+    --accent-glow:   rgba(34, 211, 238, 0.25);
+
+    /* Text */
+    --text:          #e6e6e6;
+    --text-bright:   #ffffff;
+    --text-dim:      #6a6a6a;
+    --text-mute:     #4a4a4a;
+
+    /* Status colors (kept for charts / state semantics — desaturated for carbon look) */
+    --ok:            #4ade80;
+    --warn:          #fbbf24;
+    --err:           #f87171;
+    --info:          var(--accent);
+
+    /* Shadows — minimal, white top edge + soft black drop */
+    --shadow-sm:     0 1px 0 rgba(255,255,255,0.03);
+    --shadow:        0 1px 0 rgba(255,255,255,0.04),
+                     0 8px 24px rgba(0,0,0,0.55);
+    --shadow-lg:     0 1px 0 rgba(255,255,255,0.06),
+                     0 16px 48px rgba(0,0,0,0.70);
+    --shadow-accent: 0 0 0 1px var(--accent-glow),
+                     0 8px 32px rgba(34,211,238,0.10);
+
+    /* Geometry — sharp corners everywhere */
+    --radius:        0;
+    --radius-tag:    0;
+
+    /* Fonts */
+    --mono:          'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    --sans:          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+
+    /* Motion */
+    --t-fast:        120ms;
+    --t-base:        200ms;
+    --t-slow:        320ms;
+    --ease:          cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ---------- Base ---------- */
+html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    min-height: 100vh;
+}
+
+::selection {
+    background: var(--accent);
+    color: #000;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: var(--hairline-mid);
+    border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--hairline-hi); }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hi); }
+
+/* ---------- Header / branding ---------- */
+.oscen-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+.oscen-logo {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 12px;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+}
+.oscen-logo .accent { color: var(--accent); }
+.oscen-subtitle {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+.oscen-patent {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    margin-top: 12px;
+    padding: 5px 14px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+/* ---------- Stats bar ---------- */
+.oscen-stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    padding: 24px 32px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    background: var(--grad-panel);
+    box-shadow: var(--shadow-sm);
+}
+.oscen-stat { text-align: center; }
+.oscen-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-bright);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+}
+.oscen-stat-value.accent { color: var(--accent); }
+.oscen-stat-value.ok     { color: var(--ok); }
+.oscen-stat-value.warn   { color: var(--warn); }
+.oscen-stat-value.err    { color: var(--err); }
+.oscen-stat-label {
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-top: 6px;
+}
+
+/* ---------- Panels / cards ---------- */
+.oscen-panel {
+    background: var(--grad-panel);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 24px;
+}
+
+.oscen-card {
+    background: var(--grad-card);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 26px 24px 24px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition:
+        border-color var(--t-base) var(--ease),
+        background var(--t-base) var(--ease),
+        transform var(--t-base) var(--ease),
+        box-shadow var(--t-base) var(--ease);
+}
+.oscen-card::before {
+    /* top hairline accent — teal across all demos */
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.55;
+    transition: opacity var(--t-base) var(--ease);
+}
+.oscen-card:hover {
+    border-color: var(--hairline-hi);
+    background: var(--grad-card-hi);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+.oscen-card:hover::before { opacity: 1; }
+
+.oscen-card-num {
+    font-size: 9px;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    color: var(--accent);
+}
+.oscen-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 10px;
+    letter-spacing: 0.4px;
+    line-height: 1.3;
+}
+.oscen-card-desc {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    line-height: 1.75;
+}
+.oscen-card-tag {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 8px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: var(--radius-tag);
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--hairline);
+}
+
+/* ---------- Grid ---------- */
+/* Default grid (legacy, kept for any future multi-card surface). */
+.oscen-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 1280px;
+    width: 100%;
+}
+@media (max-width: 1100px) {
+    .oscen-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 820px) {
+    .oscen-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+    .oscen-grid { grid-template-columns: 1fr; }
+}
+
+/* Hero grid: the consolidated demo index shows only two dashboards
+   (Brain + Body). Big, bold, side-by-side. */
+.oscen-grid--hero {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    max-width: 1100px;
+}
+@media (max-width: 820px) {
+    .oscen-grid--hero { grid-template-columns: 1fr; gap: 18px; }
+}
+
+.oscen-card--hero {
+    padding: 40px 36px 32px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+.oscen-card--hero .oscen-card-num {
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 18px;
+}
+.oscen-card--hero .oscen-card-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    line-height: 1.15;
+    margin-bottom: 14px;
+}
+.oscen-card--hero .oscen-card-desc {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 20px;
+    flex: 1;
+}
+.oscen-card-modules {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 18px;
+}
+.oscen-card-modules span {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border: 1px solid var(--hairline-mid);
+    color: var(--text-dim);
+    transition: color var(--t-base) var(--ease), border-color var(--t-base) var(--ease);
+}
+.oscen-card--hero:hover .oscen-card-modules span {
+    color: var(--accent);
+    border-color: var(--accent-soft);
+}
+.oscen-card--hero .oscen-card-tag {
+    align-self: flex-start;
+}
+
+/* ---------- Buttons ---------- */
+.oscen-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--text-bright);
+    border: 1px solid var(--hairline-hi);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--t-base) var(--ease);
+}
+.oscen-btn:hover {
+    background: var(--panel-hi);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.oscen-btn.primary {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+}
+.oscen-btn.primary:hover {
+    background: var(--accent-hi);
+    color: #000;
+}
+
+/* ---------- Footer ---------- */
+.oscen-footer {
+    margin-top: 50px;
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--hairline);
+    width: 100%;
+    max-width: 1200px;
+}
+.oscen-footer p {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+.oscen-footer a { color: var(--accent); }
+
+/* ---------- Utilities ---------- */
+.oscen-hairline { border-color: var(--hairline) !important; }
+.oscen-mono     { font-family: var(--mono); }
+.oscen-sans     { font-family: var(--sans); }
+.oscen-dim      { color: var(--text-dim); }
+.oscen-bright   { color: var(--text-bright); }
+.oscen-accent   { color: var(--accent); }
+
+/* ---------- Layout helper for the demo index ---------- */
+.oscen-page-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 56px 40px 40px;
+}

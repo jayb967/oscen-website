@@ -10,11 +10,11 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 import { DataBridge, REGIONS } from './data-bridge.js?v=5';
-import { BrainRegions } from './brain-regions.js';
+import { BrainRegions } from './brain-regions.js?v=4';
 import { BrainSynapses } from './brain-synapses.js';
-import { BrainPulses } from './brain-pulses.js';
+import { BrainPulses } from './brain-pulses.js?v=5';
 
-class BrainScene {
+export class BrainScene {
     constructor() {
         this.container = document.getElementById('canvas-container');
         this.clock = new THREE.Clock();
@@ -63,8 +63,8 @@ class BrainScene {
             statusBtn.addEventListener('click', () => this._toggleMode());
         }
 
-        // Default to live mode when a ws URL is known; otherwise simulated.
-        if (params.get('mode') === 'sim' || !this._liveWsUrl) {
+        // Default to live mode — fall back to simulated if connection fails
+        if (params.get('mode') === 'sim') {
             this.dataBridge.startSimulated();
         } else {
             this.dataBridge.startLive(this._liveWsUrl);
@@ -73,6 +73,15 @@ class BrainScene {
         // Region labels (HTML overlay)
         this._createRegionLabels();
 
+        // postMessage focus handler (option 10: morphing brain). Lets a
+        // parent page (e.g. reaction.html module switcher) request the
+        // camera glide to a specific region and dim the rest.
+        this._initFocusHandler();
+
+        // Subclass extension seam (cinematic version adds the GLB shell / IBL
+        // / cinematic post here). No-op in the classic scene.
+        this._initEnhancements();
+
         // Handle resize
         window.addEventListener('resize', () => this._onResize());
 
@@ -80,12 +89,23 @@ class BrainScene {
         this._animate();
     }
 
+    /**
+     * Extension hooks for the cinematic subclass. Base scene is a no-op so the
+     * classic look is unchanged. Called at end of constructor (`_initEnhancements`)
+     * and each frame before render (`_updateEnhancements`).
+     */
+    _initEnhancements() {}
+    _updateEnhancements(_dt) {}
+
     _detectLiveWsUrl() {
-        if (window.location.hostname === 'demo.oscen.ai') {
-            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            return `${proto}//demo.oscen.ai/ws`;
+        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.hostname;
+        // demo.oscen.ai: nginx on standard port proxies /ws to dashboard
+        if (host === 'demo.oscen.ai') {
+            return `${proto}//${host}/ws`;
         }
-        return null;
+        // Direct access: dashboard on port 8080
+        return `${proto}//${host}:8080/ws`;
     }
 
     _toggleMode() {
@@ -429,23 +449,222 @@ class BrainScene {
         requestAnimationFrame(() => this._animate());
         const dt = Math.min(this.clock.getDelta(), 0.05); // Cap dt to avoid jumps
 
-        // Update components
+        // Smooth glide controls.target toward _focusTarget if one is set.
+        // OrbitControls handles the camera position dampened around the new
+        // target, so we get a free cinematic pan.
+        if (this._focusTarget) {
+            this.controls.target.lerp(this._focusTarget, 0.06);
+        }
+
+        // Update components. While Beliefs Mode is active we skip the
+        // synapse update so no new pulses spawn and the existing tubes
+        // stay hidden (per setDim(1.0)).
         this.controls.update();
         this.brainRegions.update(dt);
-        this.brainSynapses.update(dt);
+        if (!this._beliefsMode) this.brainSynapses.update(dt);
         this._updateNeuromodEffects(dt);
+        if (this._brainBeliefs) this._brainBeliefs.update(dt);
 
         // Update region labels
         this._updateRegionLabels();
 
+        // Subclass per-frame hook (cinematic shell rotation, cross-section, etc.)
+        this._updateEnhancements(dt);
+
         // Render with post-processing
         this.composer.render();
     }
+
+    // ─── Module focus handler (option 10) ──────────────────────────
+    // Parent page postMessages `{ type: 'oscen.focusRegion', region: <label> }`
+    // when the user switches modules. `region` is the human-readable label
+    // from REGIONS (e.g. "Motor Cortex"); null resets to the default view.
+    _initFocusHandler() {
+        // Stash the defaults so we can restore on null/clear.
+        this._defaultTarget = new THREE.Vector3(0, 0.5, -0.5);
+        this._defaultAutoRotate = this.controls.autoRotate;
+        this._focusTarget = null;            // Vector3 the camera target lerps to
+        this._focusedRegionId = null;        // For label dim/highlight
+        this._beliefsMode = false;
+        this._beliefsToken = 0;              // Race-safe lazy show/hide guard
+        this._raycaster = new THREE.Raycaster();
+        this._mouseNdc = new THREE.Vector2();
+        this._mouseDownPos = null;
+
+        window.addEventListener('message', (event) => {
+            const msg = event.data;
+            if (!msg) return;
+            if (msg.type === 'oscen.focusRegion') {
+                this._focusOnRegion(msg.region);
+            } else if (msg.type === 'oscen.beliefs.show') {
+                this._showBeliefs();
+            } else if (msg.type === 'oscen.beliefs.hide') {
+                this._hideBeliefs();
+            } else if (msg.type === 'oscen.beliefs.cascade') {
+                if (this._brainBeliefs && this._brainBeliefs.isVisible()) {
+                    this._brainBeliefs.pulseCascade(msg.beliefIds || [], msg.color);
+                }
+            }
+        });
+
+        // Click → raycast against belief constellation (only when visible).
+        // Track mousedown position so an orbit-drag doesn't fire a click.
+        const dom = this.renderer.domElement;
+        dom.addEventListener('mousedown', (e) => {
+            this._mouseDownPos = { x: e.clientX, y: e.clientY };
+        });
+        dom.addEventListener('mouseup', (e) => {
+            if (!this._mouseDownPos) return;
+            const dx = e.clientX - this._mouseDownPos.x;
+            const dy = e.clientY - this._mouseDownPos.y;
+            this._mouseDownPos = null;
+            if (dx * dx + dy * dy > 25) return;   // moved >5px = drag, not click
+            this._handleSceneClick(e);
+        });
+    }
+
+    _handleSceneClick(e) {
+        if (!this._brainBeliefs || !this._brainBeliefs.isVisible()) return;
+        const meshes = this._brainBeliefs.getNodeMeshes();
+        if (!meshes || meshes.length === 0) return;
+
+        const rect = this.renderer.domElement.getBoundingClientRect();
+        this._mouseNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        this._mouseNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        this._raycaster.setFromCamera(this._mouseNdc, this.camera);
+        const hits = this._raycaster.intersectObjects(meshes, false);
+        if (hits.length === 0) {
+            this._brainBeliefs.highlight(null);
+            this._postToParent({ type: 'oscen.beliefs.nodeCleared' });
+            return;
+        }
+        const belief = hits[0].object.userData.belief;
+        this._brainBeliefs.highlight(belief.id);
+        this._postToParent({ type: 'oscen.beliefs.nodeClicked', belief });
+    }
+
+    _postToParent(msg) {
+        try {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage(msg, '*');
+            }
+        } catch (_) {}
+    }
+
+    // ─── Beliefs constellation (lazy-loaded module) ───────────────
+    // Race-safe via a monotonically-incrementing token. The async show()
+    // can be raced by a fast user (open Beliefs → Esc → open Probe).
+    // After each await, we re-check the token; if it changed, bail.
+    async _showBeliefs() {
+        const myToken = ++this._beliefsToken;
+        if (!this._brainBeliefs) {
+            try {
+                const mod = await import('./brain-beliefs.js?v=2');
+                if (myToken !== this._beliefsToken) return;
+                this._brainBeliefs = new mod.BrainBeliefs(this.scene, this.brainRegions);
+            } catch (err) {
+                console.warn('[BrainScene] failed to load brain-beliefs.js:', err);
+                return;
+            }
+        }
+        await this._brainBeliefs.show();
+        if (myToken !== this._beliefsToken) {
+            this._brainBeliefs.hide();
+            return;
+        }
+        this._enterBeliefsMode();
+    }
+
+    _hideBeliefs() {
+        this._beliefsToken = (this._beliefsToken || 0) + 1;
+        if (this._brainBeliefs) this._brainBeliefs.hide();
+        this._exitBeliefsMode();
+    }
+
+    /** Dim the cortex + synapse tubes + region labels, stop autorotate.
+     *  Also drop bloom strength so additive material residue doesn't
+     *  bleed across the belief constellation. */
+    _enterBeliefsMode() {
+        if (this._beliefsMode) return;
+        this._beliefsMode = true;
+        this.brainRegions.setDim(1.0);
+        if (this.brainSynapses && this.brainSynapses.setDim) this.brainSynapses.setDim(1.0);
+        document.body.classList.add('oscen-beliefs-mode');
+        this.controls.autoRotate = false;
+        if (this.bloomPass) {
+            this._savedBloomStrength = this.bloomPass.strength;
+            this.bloomPass.strength = 0.18;
+        }
+    }
+    _exitBeliefsMode() {
+        if (!this._beliefsMode) return;
+        this._beliefsMode = false;
+        this.brainRegions.setDim(0);
+        if (this.brainSynapses && this.brainSynapses.setDim) this.brainSynapses.setDim(0);
+        document.body.classList.remove('oscen-beliefs-mode');
+        if (this.bloomPass && this._savedBloomStrength != null) {
+            this.bloomPass.strength = this._savedBloomStrength;
+            this._savedBloomStrength = null;
+        }
+        // Restore autorotate only if no focus is locked (focus also kills autorotate).
+        if (!this._focusedRegionId) this.controls.autoRotate = this._defaultAutoRotate;
+    }
+
+    _focusOnRegion(regionLabel) {
+        // Null / empty → restore the default wide view.
+        if (!regionLabel) {
+            this._focusTarget = this._defaultTarget.clone();
+            this._focusedRegionId = null;
+            this.controls.autoRotate = this._defaultAutoRotate;
+            this._setLabelDim(null);
+            return;
+        }
+
+        // Look up the region by its display label.
+        const region = REGIONS.find(
+            (r) => r.label.toLowerCase() === String(regionLabel).toLowerCase(),
+        );
+        if (!region) return;
+
+        const center = this.brainRegions.getCenter(region.id);
+        if (!center) return;
+
+        // Stop auto-rotate so the focus sticks; lerp will glide the target
+        // there over ~30 frames (controlled by the 0.06 lerp factor).
+        this.controls.autoRotate = false;
+        this._focusTarget = center.clone();
+        this._focusedRegionId = region.id;
+        this._setLabelDim(region.id);
+    }
+
+    _setLabelDim(focusedId) {
+        if (!this.regionLabels) return;
+        for (const id in this.regionLabels) {
+            const entry = this.regionLabels[id];
+            if (!entry || !entry.el) continue;
+            if (focusedId == null) {
+                entry.el.classList.remove('dimmed', 'focused');
+            } else if (id === focusedId) {
+                entry.el.classList.remove('dimmed');
+                entry.el.classList.add('focused');
+            } else {
+                entry.el.classList.remove('focused');
+                entry.el.classList.add('dimmed');
+            }
+        }
+    }
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new BrainScene());
-} else {
-    new BrainScene();
+/**
+ * Boot entry used by the version-aware bootstrap in index.html.
+ * (Auto-construction moved out of module scope so the cinematic subclass can
+ * import BrainScene without spawning a second classic scene.)
+ */
+export function boot() {
+    if (document.readyState === 'loading') {
+        return new Promise((resolve) => {
+            document.addEventListener('DOMContentLoaded', () => resolve(new BrainScene()));
+        });
+    }
+    return new BrainScene();
 }

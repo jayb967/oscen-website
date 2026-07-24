@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- TEMPORARY frame-verification harness (2026-07-24 v3 frame fix).
+     Feeds real MuJoCo v3 xpos/xquat (pose-check-data.json, generated
+     offline) into BodyScene to verify the procedural humanoid renders
+     correctly. Safe to delete along with pose-check-data.json. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>html,body{margin:0;height:100%;background:#0a0e1a}#c{width:100vw;height:100vh}</style>
+<script type="importmap">
+{
+    "imports": {
+        "three": "../lib/three.module.min.js",
+        "three/addons/controls/OrbitControls.js": "../lib/OrbitControls.js"
+    }
+}
+</script>
+</head>
+<body>
+<div id="c"></div>
+<script type="module">
+import { BodyScene } from './body-scene.js';
+
+const params = new URLSearchParams(window.location.search);
+const poseName = params.get('pose') || 'stand';
+const cam = params.get('cam') || 'front';
+
+const data = await (await fetch('./pose-check-data.json')).json();
+const bodies = data[poseName];
+
+const scene = new BodyScene(document.getElementById('c'));
+scene.updateBodies(bodies, null, false, null);
+// Re-apply after rebuild to be safe
+scene.updateBodies(bodies, null, false, null);
+
+// Camera presets: robot faces +X (three.js). front = looking at its face.
+const cams = {
+    front:  [2.4, 1.2, 0.0],
+    side:   [0.0, 1.2, 2.4],   // robot's right side toward camera
+    threeq: [1.8, 1.4, 1.8],
+};
+const p = cams[cam] || cams.front;
+scene.camera.position.set(p[0], p[1], p[2]);
+scene.controls.target.set(0, 0.8, 0);
+scene.controls.update();
+window.__poseReady = true;
+</script>
+</body>
+</html>

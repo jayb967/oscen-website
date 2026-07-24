@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSCEN - Belief Graph</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="oscen-demo.css">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+    /* Demo-specific edge semantics, kept for D3 link colors */
+    --edge-supports:    var(--ok);
+    --edge-contradicts: var(--err);
+    --edge-entails:     var(--accent);
+    --edge-refines:     #a78bfa;
+}
+body { font-size: 12px; overflow: hidden; }
+
+/* Top bar */
+#top-bar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 20px;
+    background: var(--grad-panel);
+    border-bottom: 1px solid var(--hairline);
+    box-shadow: var(--shadow-sm);
+}
+#top-bar a { color: var(--accent); text-decoration: none; }
+#top-bar .title { color: var(--text-bright); font-weight: 700; font-size: 14px; flex: 1; letter-spacing: 1px; }
+#top-bar .status { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+#top-bar .btn {
+    padding: 5px 14px;
+    background: transparent;
+    border: 1px solid var(--hairline-hi);
+    border-radius: 0;
+    color: var(--text-bright);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all var(--t-base) var(--ease);
+}
+#top-bar .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--panel-hi); }
+
+/* Layout */
+#main { display: grid; grid-template-columns: 280px 1fr; gap: 0; height: calc(100vh - 42px); }
+#sidebar {
+    background: var(--grad-panel);
+    border-right: 1px solid var(--hairline);
+    padding: 18px;
+    overflow-y: auto;
+}
+#graph-area { position: relative; }
+
+.section-title {
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--hairline);
+}
+
+/* Node detail */
+.node-detail { margin-bottom: 20px; }
+.nd-label { color: var(--text-dim); font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; }
+.nd-value { color: var(--text-bright); font-size: 12px; margin-bottom: 10px; word-wrap: break-word; }
+.nd-bar { height: 4px; border-radius: 0; background: rgba(255, 255, 255, 0.06); margin-bottom: 4px; }
+.nd-bar-fill { height: 100%; border-radius: 0; transition: width 0.3s; }
+
+/* Legend */
+.legend { margin-bottom: 20px; }
+.legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 11px; color: var(--text); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* Audit log */
+.audit-log { max-height: 220px; overflow-y: auto; }
+.audit-entry {
+    padding: 6px 8px;
+    margin-bottom: 3px;
+    border-radius: 0;
+    border-left: 2px solid var(--hairline-mid);
+    background: rgba(255, 255, 255, 0.02);
+    font-size: 10px;
+}
+.audit-entry .badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 6px;
+}
+.audit-entry .badge.allow     { background: rgba(74, 222, 128, 0.12); color: var(--ok); }
+.audit-entry .badge.deny      { background: rgba(248, 113, 113, 0.12); color: var(--err); }
+.audit-entry .badge.transform { background: rgba(251, 191, 36, 0.12); color: var(--warn); }
+
+/* Stats row */
+.stats-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-box {
+    background: var(--grad-card);
+    border: 1px solid var(--hairline);
+    border-radius: 0;
+    padding: 10px 12px;
+    flex: 1;
+    min-width: 60px;
+    box-shadow: var(--shadow-sm);
+}
+.stat-box .sval { font-size: 18px; font-weight: 700; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.stat-box .slabel { font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 2px; }
+
+/* SVG graph */
+svg { width: 100%; height: 100%; }
+.link { stroke-opacity: 0.55; fill: none; }
+.link.supports     { stroke: var(--edge-supports); }
+.link.contradicts  { stroke: var(--edge-contradicts); stroke-dasharray: 4, 3; }
+.link.entails      { stroke: var(--edge-entails); }
+.link.refines      { stroke: var(--edge-refines); }
+.node-label { font-family: var(--mono); font-size: 9px; fill: var(--text); pointer-events: none; }
+.node circle { cursor: pointer; stroke-width: 2; transition: r 0.2s; }
+.node circle:hover { stroke-width: 3; }
+</style>
+</head>
+<body>
+
+<div id="top-bar">
+    <a href="/brain-viz/demos/index.html">All Demos</a>
+    <span class="title">Belief Graph</span>
+    <span class="status" id="status">Loading...</span>
+    <button class="btn" id="refresh-btn">Refresh</button>
+</div>
+
+<div id="main">
+    <div id="sidebar">
+        <div class="section-title">Overview</div>
+        <div class="stats-row">
+            <div class="stat-box"><div class="sval" id="s-nodes">-</div><div class="slabel">Nodes</div></div>
+            <div class="stat-box"><div class="sval" id="s-edges">-</div><div class="slabel">Edges</div></div>
+        </div>
+        <div class="stats-row">
+            <div class="stat-box"><div class="sval" id="s-values">-</div><div class="slabel">Values</div></div>
+            <div class="stat-box"><div class="sval" id="s-norms">-</div><div class="slabel">Norms</div></div>
+            <div class="stat-box"><div class="sval" id="s-facts">-</div><div class="slabel">Facts</div></div>
+        </div>
+
+        <div class="section-title">Legend</div>
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Values (immutable)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>Norms (behavioral)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#22d3ee"></div>Facts (learned)</div>
+            <div class="legend-item"><svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#4ade80" stroke-width="2"/></svg>Supports</div>
+            <div class="legend-item"><svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#f87171" stroke-width="2" stroke-dasharray="4,3"/></svg>Contradicts</div>
+            <div class="legend-item"><svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#67e8f9" stroke-width="2"/></svg>Entails</div>
+        </div>
+
+        <div class="section-title">Selected Node</div>
+        <div class="node-detail" id="node-detail">
+            <div style="color:var(--text-dim); font-size:11px;">Click a node to inspect</div>
+        </div>
+
+        <div class="section-title">Kernel Decisions</div>
+        <div class="audit-log" id="audit-log">
+            <div style="color:var(--text-dim); font-size:11px;">No decisions yet</div>
+        </div>
+    </div>
+
+    <div id="graph-area">
+        <svg id="graph-svg"></svg>
+    </div>
+</div>
+
+<script>
+const TYPE_COLORS = { value: '#f87171', norm: '#fbbf24', fact: '#22d3ee' };
+const TYPE_RADIUS = { value: 16, norm: 12, fact: 10 };
+const EDGE_COLORS = { supports: '#4ade80', contradicts: '#f87171', entails: '#67e8f9', refines: '#a78bfa' };
+
+let simulation, graphData = null;
+
+async function fetchGraph() {
+    document.getElementById('status').textContent = 'Fetching...';
+    try {
+        const res = await fetch('/api/beliefs/graph');
+        const data = await res.json();
+        if (data.graph) {
+            graphData = data.graph;
+            renderGraph(graphData);
+            updateStats(graphData);
+            document.getElementById('status').textContent = data.cached ? 'Cached' : 'Live';
+        } else {
+            document.getElementById('status').textContent = data.error || 'No data';
+        }
+    } catch (e) {
+        document.getElementById('status').textContent = 'Error: ' + e.message;
+    }
+}
+
+function updateStats(graph) {
+    const nodes = graph.nodes || [];
+    const edges = graph.edges || [];
+    document.getElementById('s-nodes').textContent = nodes.length;
+    document.getElementById('s-edges').textContent = edges.length;
+    let vals = 0, norms = 0, facts = 0;
+    for (const n of nodes) {
+        if (n.type === 'value') vals++;
+        else if (n.type === 'norm') norms++;
+        else if (n.type === 'fact') facts++;
+    }
+    document.getElementById('s-values').textContent = vals;
+    document.getElementById('s-norms').textContent = norms;
+    document.getElementById('s-facts').textContent = facts;
+}
+
+function renderGraph(graph) {
+    const svg = d3.select('#graph-svg');
+    svg.selectAll('*').remove();
+
+    const container = document.getElementById('graph-area');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const nodes = graph.nodes.map(n => ({
+        ...n,
+        radius: TYPE_RADIUS[n.type] || 10,
+        color: TYPE_COLORS[n.type] || '#888',
+    }));
+
+    const nodeMap = {};
+    nodes.forEach(n => { nodeMap[n.id] = n; });
+
+    const links = (graph.edges || [])
+        .filter(e => nodeMap[e.source] && nodeMap[e.target])
+        .map(e => ({
+            ...e,
+            source: e.source,
+            target: e.target,
+            color: EDGE_COLORS[e.type] || '#555',
+        }));
+
+    // Zoom
+    const g = svg.append('g');
+    svg.call(d3.zoom()
+        .scaleExtent([0.3, 4])
+        .on('zoom', (e) => g.attr('transform', e.transform)));
+
+    // Arrow markers
+    const defs = svg.append('defs');
+    for (const [type, color] of Object.entries(EDGE_COLORS)) {
+        defs.append('marker')
+            .attr('id', 'arrow-' + type)
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', 20)
+            .attr('refY', 0)
+            .attr('markerWidth', 6)
+            .attr('markerHeight', 6)
+            .attr('orient', 'auto')
+            .append('path')
+            .attr('d', 'M0,-5L10,0L0,5')
+            .attr('fill', color);
+    }
+
+    // Links
+    const link = g.append('g').selectAll('line')
+        .data(links)
+        .join('line')
+        .attr('class', d => 'link ' + d.type)
+        .attr('stroke', d => d.color)
+        .attr('stroke-width', d => Math.max(1, d.strength * 3))
+        .attr('marker-end', d => 'url(#arrow-' + d.type + ')');
+
+    // Nodes
+    const node = g.append('g').selectAll('g')
+        .data(nodes)
+        .join('g')
+        .attr('class', 'node')
+        .call(d3.drag()
+            .on('start', dragStart)
+            .on('drag', dragging)
+            .on('end', dragEnd));
+
+    node.append('circle')
+        .attr('r', d => d.radius)
+        .attr('fill', d => d.color + '33')
+        .attr('stroke', d => d.color)
+        .on('click', (e, d) => showNodeDetail(d));
+
+    // Confidence ring (arc around node)
+    node.append('circle')
+        .attr('r', d => d.radius + 3)
+        .attr('fill', 'none')
+        .attr('stroke', d => d.color)
+        .attr('stroke-width', 2)
+        .attr('stroke-dasharray', d => {
+            const circ = 2 * Math.PI * (d.radius + 3);
+            const filled = circ * (d.confidence || 0);
+            return filled + ' ' + (circ - filled);
+        })
+        .attr('stroke-dashoffset', d => {
+            const circ = 2 * Math.PI * (d.radius + 3);
+            return circ * 0.25; // start from top
+        })
+        .attr('opacity', 0.6);
+
+    // Labels
+    node.append('text')
+        .attr('class', 'node-label')
+        .attr('dy', d => d.radius + 14)
+        .attr('text-anchor', 'middle')
+        .text(d => {
+            const label = d.id.replace(/^(value|norm|capability|fact|milestone)\./, '');
+            return label.length > 20 ? label.substring(0, 18) + '..' : label;
+        });
+
+    // Simulation
+    simulation = d3.forceSimulation(nodes)
+        .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+        .force('charge', d3.forceManyBody().strength(-200))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collision', d3.forceCollide().radius(d => d.radius + 10))
+        .on('tick', () => {
+            link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+            node.attr('transform', d => `translate(${d.x},${d.y})`);
+        });
+}
+
+function dragStart(e, d) {
+    if (!e.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x; d.fy = d.y;
+}
+function dragging(e, d) { d.fx = e.x; d.fy = e.y; }
+function dragEnd(e, d) {
+    if (!e.active) simulation.alphaTarget(0);
+    d.fx = null; d.fy = null;
+}
+
+function showNodeDetail(d) {
+    const el = document.getElementById('node-detail');
+    const conf = (d.confidence * 100).toFixed(1);
+    const barColor = TYPE_COLORS[d.type] || '#888';
+    const meta = d.metadata || {};
+    let metaHtml = '';
+    if (meta.brains) {
+        const brains = Object.entries(meta.brains).map(([k, v]) =>
+            `<span style="color:var(--accent)">${k}</span>: ${v.advance_count || 0} advances`
+        ).join('<br>');
+        metaHtml = `<div class="nd-label">Per-Brain</div><div class="nd-value">${brains}</div>`;
+    }
+
+    el.innerHTML = `
+        <div class="nd-label">ID</div>
+        <div class="nd-value">${d.id}</div>
+        <div class="nd-label">Type</div>
+        <div class="nd-value" style="color:${barColor}">${d.type.toUpperCase()}</div>
+        <div class="nd-label">Content</div>
+        <div class="nd-value">${d.content}</div>
+        <div class="nd-label">Confidence</div>
+        <div class="nd-bar"><div class="nd-bar-fill" style="width:${conf}%; background:${barColor}"></div></div>
+        <div class="nd-value">${conf}%</div>
+        <div class="nd-label">Source</div>
+        <div class="nd-value">${d.source || 'unknown'}</div>
+        ${metaHtml}
+    `;
+}
+
+// Kernel audit via WebSocket
+let ws;
+function connectWS() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(`${proto}://${location.host}/ws`);
+    ws.onmessage = (e) => {
+        try {
+            const msg = JSON.parse(e.data);
+            if (msg.type === 'kernel_decision') appendAudit(msg.data);
+        } catch (_) {}
+    };
+    ws.onclose = () => setTimeout(connectWS, 3000);
+}
+
+function appendAudit(entry) {
+    const log = document.getElementById('audit-log');
+    if (log.querySelector('div[style]')) log.innerHTML = '';
+
+    const dtype = (entry.decision || entry.type || '?').toLowerCase();
+    const cls = dtype === 'allow' ? 'allow' : dtype === 'deny' ? 'deny' : 'transform';
+    const reason = entry.reason || '';
+
+    const div = document.createElement('div');
+    div.className = 'audit-entry';
+    div.innerHTML = `<span class="badge ${cls}">${dtype}</span>${reason.substring(0, 80)}`;
+    log.insertBefore(div, log.firstChild);
+    while (log.children.length > 50) log.removeChild(log.lastChild);
+}
+
+// Auto-refresh every 30s
+setInterval(fetchGraph, 30000);
+
+document.getElementById('refresh-btn').addEventListener('click', fetchGraph);
+fetchGraph();
+connectWS();
+</script>
+</body>
+</html>
