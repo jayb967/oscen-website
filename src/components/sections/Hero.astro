@@ -13,7 +13,7 @@
 
   <!-- Content. Deliberately sparse. -->
   <div class="relative text-center max-w-4xl mx-auto px-6 hero-backdrop">
-    <p id="hero-eyebrow" class="hud-label !tracking-[0.35em] mb-6 text-scrim">
+    <p id="hero-eyebrow" class="hud-label !tracking-[0.35em] mb-6 text-scrim" style="color: var(--color-text-primary);">
       Brain software for robots
     </p>
     <h1 id="hero-title" class="font-display text-[clamp(3.5rem,9vw,9rem)] leading-[0.85] tracking-tight text-scrim">
@@ -45,8 +45,10 @@
 </section>
 
 <style>
+  /* Darker scrim than v1: the eyebrow and stat line were washing out
+     over bright clusters on mobile (Phase 2 legibility leftover). */
   .hero-backdrop {
-    background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(5, 8, 16, 0.72) 0%, rgba(5, 8, 16, 0.38) 55%, transparent 80%);
+    background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(5, 8, 16, 0.82) 0%, rgba(5, 8, 16, 0.52) 55%, transparent 82%);
     padding: 3rem 2rem;
     border-radius: 2rem;
   }

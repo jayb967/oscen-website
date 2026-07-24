@@ -5,6 +5,7 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
 import SupportThankYou from "../components/SupportThankYou.astro";
 import ContributorWall from "../components/ContributorWall.astro";
 import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support";
@@ -83,14 +84,14 @@ import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support"
           </p>
         </div>
         <div class="reveal glass rounded-xl p-5">
-          <div class="text-2xl font-tech text-accent-cyan">Sensors</div>
+          <div class="text-2xl font-tech text-accent-blue">Sensors</div>
           <div class="text-xs text-text-muted mt-1">Cameras, IMUs, mics</div>
           <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">
             Real bodies need real sensors. Every contribution buys the brain new ways to feel the world.
           </p>
         </div>
         <div class="reveal glass rounded-xl p-5">
-          <div class="text-2xl font-tech text-accent-amber">Runway</div>
+          <div class="text-2xl font-tech text-accent-blue">Runway</div>
           <div class="text-xs text-text-muted mt-1">Time to keep building</div>
           <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">
             We are not VC-funded yet. Every supporter buys days of focused work on the brain instead of consulting.
@@ -110,12 +111,12 @@ import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support"
           <h3 class="text-sm font-medium text-accent-blue group-hover:text-text-primary transition-colors">Build with us →</h3>
           <p class="text-xs text-text-secondary mt-1 leading-relaxed">Engineers, neuroscientists, roboticists. If you want to put hands on a real brain, come work on it.</p>
         </a>
-        <a href="/invest" class="reveal glass rounded-xl p-5 block group hover:border-accent-amber/30 transition-all duration-300">
-          <h3 class="text-sm font-medium text-accent-amber group-hover:text-text-primary transition-colors">Invest →</h3>
+        <a href="/invest" class="reveal glass rounded-xl p-5 block group hover:border-accent-blue/30 transition-all duration-300">
+          <h3 class="text-sm font-medium text-accent-blue group-hover:text-text-primary transition-colors">Invest →</h3>
           <p class="text-xs text-text-secondary mt-1 leading-relaxed">Accredited investors. We're raising to extend runway and scale the body program.</p>
         </a>
-        <a href="mailto:info@oscen.ai" class="reveal glass rounded-xl p-5 block group hover:border-accent-cyan/30 transition-all duration-300">
-          <h3 class="text-sm font-medium text-accent-cyan group-hover:text-text-primary transition-colors">Just say hi →</h3>
+        <a href="mailto:info@oscen.ai" class="reveal glass rounded-xl p-5 block group hover:border-accent-blue/30 transition-all duration-300">
+          <h3 class="text-sm font-medium text-accent-blue group-hover:text-text-primary transition-colors">Just say hi →</h3>
           <p class="text-xs text-text-secondary mt-1 leading-relaxed">info@oscen.ai. Critique, encouragement, an introduction. All of it helps.</p>
         </a>
       </div>
@@ -127,4 +128,5 @@ import { SUPPORT_TIERS, SUPPORT_LINKS_CONFIGURED, ACCENT } from "../lib/support"
       <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
+  <Footer />
 </Base>

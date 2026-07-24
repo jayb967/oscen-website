@@ -1,9 +1,9 @@
 ---
 /**
- * Final section. poetic close, single newsletter form, footer.
+ * Final section. poetic close + single newsletter form.
  *
- * The three conversion paths live in <ThreePaths /> above; this section is
- * just the email-capture finale + legal/footer.
+ * The three conversion paths live in <ThreePaths /> above; the legal/
+ * contact footer is now the site-wide <Footer /> (Phase 6).
  */
 import { BUTTONDOWN_ACTION } from "../../lib/forms";
 ---
@@ -40,17 +40,6 @@ import { BUTTONDOWN_ACTION } from "../../lib/forms";
       <p id="subscribe-status" class="text-center text-sm font-tech mt-3 hidden"></p>
     </div>
 
-    <footer class="mt-28 text-center">
-      <div class="divider max-w-16 mx-auto mb-8"></div>
-      <p class="text-xs text-text-muted font-tech">
-        OSCEN &nbsp;&middot;&nbsp; Patent Pending &nbsp;&middot;&nbsp; US 63/986,737 &nbsp;&middot;&nbsp; &copy; {new Date().getFullYear()}
-      </p>
-      <div class="mt-3 flex items-center justify-center gap-4 flex-wrap">
-        <a href="mailto:info@oscen.ai" class="text-[10px] text-text-muted/60 hover:text-accent-blue transition-colors font-tech">info@oscen.ai</a>
-        <a href="/architecture" class="text-[10px] text-text-muted/60 hover:text-accent-blue transition-colors font-tech">Docs</a>
-        <a href="/support" class="text-[10px] text-text-muted/60 hover:text-accent-amber transition-colors font-tech">Support</a>
-      </div>
-    </footer>
   </div>
 </section>
 

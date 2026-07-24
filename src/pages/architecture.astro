@@ -6,6 +6,7 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
 import SupportStrip from "../components/SupportStrip.astro";
 import { REGIONS, SYNAPSE_PATHWAYS, BRAIN_STATS, formatNeurons, rgbToHex } from "../data/brain";
 
@@ -20,39 +21,39 @@ const learningRules = [
     name: "Eligibility Traces",
     desc: "Temporal credit assignment",
     detail: "STDP marks synapses as eligible for change. Traces decay over ~1000ms, waiting for a neuromodulatory signal to convert potential into actual weight change. Bridges the gap between spike timing and delayed reward.",
-    accent: "accent-cyan",
+    accent: "accent-blue",
   },
   {
     name: "BCM Metaplasticity",
     desc: "Sliding plasticity threshold",
     detail: "Per-postsynaptic-neuron theta that tracks recent activity. Highly active neurons become harder to potentiate, preventing runaway excitation and creating competition between inputs.",
-    accent: "accent-green",
+    accent: "accent-blue",
   },
   {
     name: "Neuromodulation",
     desc: "4-channel gating system",
     detail: "Dopamine (reward), Acetylcholine (attention), Norepinephrine (arousal), and Serotonin (mood) gate when and how strongly eligibility traces convert to weight changes. Each channel has phase-dependent baselines.",
-    accent: "accent-amber",
+    accent: "accent-blue",
   },
   {
     name: "Synaptic Scaling",
     desc: "Homeostatic normalization",
     detail: "Per-neuron multiplicative normalization prevents weight explosion or collapse. Reduced during high-plasticity developmental phases to allow rapid reorganization.",
-    accent: "accent-pink",
+    accent: "accent-blue",
   },
   {
     name: "R-STDP",
     desc: "Reward-modulated learning",
     detail: "Prediction error scales STDP weight changes on motor pathways. When the brain's prediction matches reality, motor learning is reinforced. When it doesn't, pathways weaken.",
-    accent: "accent-purple",
+    accent: "accent-blue",
   },
 ];
 
 const compartments = [
-  { name: "Apical Distal", role: "Top-down context and feedback", color: "accent-purple" },
+  { name: "Apical Distal", role: "Top-down context and feedback", color: "accent-blue" },
   { name: "Apical Proximal", role: "Prediction signals", color: "accent-blue" },
-  { name: "Basal", role: "Feedforward sensory input", color: "accent-cyan" },
-  { name: "Perisomatic", role: "Inhibitory control", color: "accent-pink" },
+  { name: "Basal", role: "Feedforward sensory input", color: "accent-blue" },
+  { name: "Perisomatic", role: "Inhibitory control", color: "accent-blue" },
 ];
 
 const phases = [
@@ -64,12 +65,12 @@ const phases = [
 ];
 
 const motorRanges = [
-  { range: "0–30%", name: "Locomotion", color: "accent-green" },
+  { range: "0–30%", name: "Locomotion", color: "accent-blue" },
   { range: "30–60%", name: "Manipulation", color: "accent-blue" },
-  { range: "60–80%", name: "Head Control", color: "accent-cyan" },
-  { range: "80–83%", name: "Speech", color: "accent-amber" },
-  { range: "83–85%", name: "Expression", color: "accent-pink" },
-  { range: "85–100%", name: "Cognitive Action", color: "accent-purple" },
+  { range: "60–80%", name: "Head Control", color: "accent-blue" },
+  { range: "80–83%", name: "Speech", color: "accent-blue" },
+  { range: "83–85%", name: "Expression", color: "accent-blue" },
+  { range: "85–100%", name: "Cognitive Action", color: "accent-blue" },
 ];
 ---
 
@@ -126,11 +127,11 @@ const motorRanges = [
       <div class="reveal flex items-center gap-2 mb-12 text-[10px] font-tech text-text-muted overflow-x-auto pb-2">
         <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70 whitespace-nowrap">STDP</span>
         <span class="text-text-muted/30">→</span>
-        <span class="px-3 py-1.5 rounded-full border border-accent-cyan/20 text-accent-cyan/70 whitespace-nowrap">Eligibility Trace</span>
+        <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70 whitespace-nowrap">Eligibility Trace</span>
         <span class="text-text-muted/30">→</span>
-        <span class="px-3 py-1.5 rounded-full border border-accent-amber/20 text-accent-amber/70 whitespace-nowrap">Neuromodulator</span>
+        <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70 whitespace-nowrap">Neuromodulator</span>
         <span class="text-text-muted/30">→</span>
-        <span class="px-3 py-1.5 rounded-full border border-accent-green/20 text-accent-green/70 whitespace-nowrap">Weight Update</span>
+        <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70 whitespace-nowrap">Weight Update</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -209,7 +210,7 @@ const motorRanges = [
 
       <div class="space-y-2">
         {phases.map((p, i) => (
-          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-purple);`}>
+          <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
             <div class="flex items-center gap-4">
               <span class="text-[10px] font-tech text-text-muted w-6">{String(i + 1).padStart(2, '0')}</span>
               <h3 class="text-sm font-medium text-text-primary">{p.name}</h3>
@@ -235,12 +236,12 @@ const motorRanges = [
       <div class="reveal glass rounded-xl p-6">
         <div class="space-y-3">
           {[
-            { layer: "Sensory Cortex", n: "200K", role: "Raw input encoding: vision, audio, touch, proprioception", color: "accent-cyan" },
-            { layer: "Feature Layer", n: "20K", role: "Edge, texture, and phoneme extraction", color: "accent-green" },
+            { layer: "Sensory Cortex", n: "200K", role: "Raw input encoding: vision, audio, touch, proprioception", color: "accent-blue" },
+            { layer: "Feature Layer", n: "20K", role: "Edge, texture, and phoneme extraction", color: "accent-blue" },
             { layer: "Association Cortex", n: "500K", role: "Cross-modal binding via spike-timing coincidence", color: "accent-blue" },
-            { layer: "Concept Layer", n: "5K", role: "Sparse winner-take-all abstract representations", color: "accent-amber" },
-            { layer: "Predictive Layer", n: "100K", role: "Sequence learning and world model", color: "accent-purple" },
-            { layer: "Meta Controller", n: "3K", role: "Executive attention and learning gating", color: "accent-pink" },
+            { layer: "Concept Layer", n: "5K", role: "Sparse winner-take-all abstract representations", color: "accent-blue" },
+            { layer: "Predictive Layer", n: "100K", role: "Sequence learning and world model", color: "accent-blue" },
+            { layer: "Meta Controller", n: "3K", role: "Executive attention and learning gating", color: "accent-blue" },
           ].map((l, i) => (
             <div class="flex items-center gap-4">
               <span class={`w-2 h-2 rounded-full bg-${l.color}`}></span>
@@ -293,7 +294,7 @@ const motorRanges = [
             { step: "06", label: "STDP learning", desc: "Brain learns. No query needed next time" },
           ].map((s) => (
             <div class="text-center">
-              <div class="text-lg font-tech text-accent-purple/50">{s.step}</div>
+              <div class="text-lg font-tech text-accent-blue/50">{s.step}</div>
               <div class="text-xs text-text-primary mt-1">{s.label}</div>
               <p class="text-[10px] text-text-muted mt-1 leading-relaxed">{s.desc}</p>
             </div>
@@ -311,15 +312,15 @@ const motorRanges = [
 
       <div class="reveal glass rounded-xl p-6">
         <div class="flex items-center justify-center gap-3 flex-wrap text-[11px] font-tech">
-          <span class="px-3 py-1.5 rounded-full border border-accent-green/20 text-accent-green/70">Motor fires</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70">Motor fires</span>
           <span class="text-text-muted/30">→</span>
           <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70">Actuator moves</span>
           <span class="text-text-muted/30">→</span>
-          <span class="px-3 py-1.5 rounded-full border border-accent-cyan/20 text-accent-cyan/70">Sensor feedback</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70">Sensor feedback</span>
           <span class="text-text-muted/30">→</span>
-          <span class="px-3 py-1.5 rounded-full border border-accent-amber/20 text-accent-amber/70">R-STDP learns</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70">R-STDP learns</span>
           <span class="text-text-muted/30">→</span>
-          <span class="px-3 py-1.5 rounded-full border border-accent-green/20 text-accent-green/70">Better motor</span>
+          <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70">Better motor</span>
         </div>
         <p class="text-xs text-text-secondary text-center mt-6 leading-relaxed max-w-lg mx-auto">
           Sensors supported: Camera, Microphone, IMU/Gyro, Joint Encoders, Force Sensors, Serial (ESP32/Arduino).
@@ -336,6 +337,7 @@ const motorRanges = [
       <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
+  <Footer />
 </Base>
 
 <script>

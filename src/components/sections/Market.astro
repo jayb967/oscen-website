@@ -2,57 +2,10 @@
 /**
  * Section: Market - Competitive landscape and market opportunity.
  * Numbers-first. Comparison table. The "why now" case.
+ * Copy in src/data/sections.ts. Table greens = OSCEN advantage
+ * (semantic); VLA flaw cards are red (warnings); stats are blue.
  */
-const competitors = [
-  { name: "Prometheus (Bezos)", approach: "VLA Transformer (Industrial)", learning: "Retrain", edge: "No", energy: "GPU-scale", funding: "$18.2B" },
-  { name: "AMI Labs (LeCun)", approach: "JEPA World Models", learning: "Retrain", edge: "No", energy: "50-200W", funding: "$1.03B" },
-  { name: "Figure AI", approach: "VLA Transformer (Helix)", learning: "Static", edge: "No", energy: "50-200W", funding: "$1.9B" },
-  { name: "Google DeepMind", approach: "Gemini Robotics VLA", learning: "Retrain", edge: "Partial", energy: "50-200W", funding: "Internal" },
-  { name: "Physical Intelligence", approach: "3B param VLA", learning: "Static", edge: "Cloud", energy: "50-200W", funding: "$1.1B" },
-  { name: "OSCEN", approach: "Spiking Neural Net", learning: "Continual", edge: "Yes", energy: "<5W*", funding: "Bootstrapped" },
-];
-
-const vlaLimits = [
-  {
-    icon: "&#x26A0;",
-    label: "Frozen at birth",
-    stat: "0",
-    statLabel: "new skills learned after deployment",
-    body: "VLAs are trained on millions of demonstrations, then deployed static. They can only do what they've already seen. A new door handle, an unexpected obstacle, a different lighting condition. Anything outside training data is a failure. Retraining costs hundreds of thousands of dollars and weeks of GPU time.",
-    accent: "accent-red",
-  },
-  {
-    icon: "&#x26A1;",
-    label: "GPU-hungry",
-    stat: "50-200W",
-    statLabel: "per inference, every 100ms",
-    body: "Every robot action requires a full forward pass through billions of parameters. At 10Hz control rate, that's 30 billion matrix multiplications per second, continuously. A warehouse fleet of 100 robots consumes 5-20kW just thinking. OSCEN targets under 5W total through sparse, event-driven activation. The same power as an LED bulb.",
-    accent: "accent-amber",
-  },
-  {
-    icon: "&#x2601;",
-    label: "Tethered to the cloud",
-    stat: "50-500ms",
-    statLabel: "round-trip latency on cloud inference",
-    body: "Most VLAs are too large to run on-device efficiently. Physical Intelligence requires cloud. When your robot arm is holding a baby or a surgical tool, 200ms of network latency isn't an engineering tradeoff. It's a liability. OSCEN runs entirely on-edge. No internet, no latency, no data leaving the device.",
-    accent: "accent-purple",
-  },
-  {
-    icon: "&#x1F9F1;",
-    label: "Catastrophic forgetting",
-    stat: "100%",
-    statLabel: "of old skills at risk when fine-tuning",
-    body: "Fine-tune a VLA on new tasks and it forgets old ones. This is a fundamental limitation of gradient-based learning in large models. OSCEN's homeostatic synaptic scaling, myelination, and identity tagging (Patent Claim 6) explicitly solve this. Learned skills are preserved even as new ones are acquired.",
-    accent: "accent-pink",
-  },
-];
-
-const stats = [
-  { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
-  { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3x increase from 2024", color: "text-accent-amber" },
-  { value: "73-109x", label: "Energy advantage", sub: "Published spiking-network benchmarks", color: "text-accent-green" },
-  { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
-];
+import { COMPETITORS, VLA_LIMITS, MARKET_STATS } from "@data/sections";
 ---
 
 <section id="market" class="section relative">
@@ -67,11 +20,11 @@ const stats = [
 
     <!-- Market stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
-      {stats.map((s, i) => (
-        <div class="flip-card reveal h-36" tabindex="0" role="button" aria-label={`${s.value}: ${s.label}`} style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${s.color.replace('text-', '')});`}>
+      {MARKET_STATS.map((s, i) => (
+        <div class="flip-card reveal h-36" tabindex="0" role="button" aria-label={`${s.value}: ${s.label}`} style={`--glow-delay: ${i * 1.5}s;`}>
           <div class="flip-inner w-full h-full">
             <div class="flip-front w-full h-full glass-bright glass-ticks rounded-xl p-4 flex flex-col items-center justify-center text-center">
-              <div class={`text-xl md:text-2xl font-tech font-bold ${s.color}`}>{s.value}</div>
+              <div class="text-xl md:text-2xl font-tech font-bold text-accent-blue">{s.value}</div>
               <div class="text-[10px] text-text-muted mt-2 uppercase tracking-wider leading-tight">{s.label}</div>
             </div>
             <div class="flip-back w-full h-full glass glass-ticks rounded-xl p-4 flex items-center justify-center text-center">
@@ -96,7 +49,7 @@ const stats = [
             </tr>
           </thead>
           <tbody>
-            {competitors.map((row) => {
+            {COMPETITORS.map((row) => {
               const isOscen = row.name === "OSCEN";
               return (
                 <tr class={`border-b border-border/50 ${isOscen ? 'bg-accent-blue/[0.03]' : ''}`}>
@@ -129,20 +82,20 @@ const stats = [
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
-      {vlaLimits.map((item, i) => (
-        <div class="expand-card reveal glass glass-ticks rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${item.accent});`}>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {VLA_LIMITS.map((item, i) => (
+        <div class="expand-card reveal glass glass-ticks rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-red);`}>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class={`text-xl text-${item.accent}`} set:html={item.icon} />
-              <h4 class={`text-base font-medium text-${item.accent} group-hover:text-text-primary transition-colors duration-300`}>
+              <span class="text-xl text-accent-red" set:html={item.icon} />
+              <h4 class="text-base font-medium text-accent-red group-hover:text-text-primary transition-colors duration-300">
                 {item.label}
               </h4>
             </div>
-            <span class={`expand-indicator text-${item.accent}/40 text-lg`}>+</span>
+            <span class="expand-indicator text-accent-red/40 text-lg">+</span>
           </div>
           <div class="flex items-baseline gap-2 mt-3">
-            <span class={`text-2xl font-tech font-bold text-${item.accent}`}>{item.stat}</span>
+            <span class="text-2xl font-tech font-bold text-accent-red">{item.stat}</span>
             <span class="text-[10px] text-text-muted uppercase tracking-wider">{item.statLabel}</span>
           </div>
           <div class="expand-body mt-4">
@@ -151,9 +104,6 @@ const stats = [
         </div>
       ))}
     </div>
-
-    <!-- Answer strip removed in the Q4 trim: every number in it already
-         appears in the OSCEN table row, the VLA cards, or Proof. -->
   </div>
 </section>
 

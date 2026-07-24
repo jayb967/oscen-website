@@ -1,0 +1,86 @@
+---
+/**
+ * Typographic footer (Phase 6, ref-unfor-footer style): giant solid +
+ * outline type, then a 3-column contact grid and link row. Pure
+ * typography on near-black, one accent. Echoes the Phase 5 reveal
+ * captions: "One brain. Any body."
+ *
+ * Contact facts are real only: info@oscen.ai is the sole public email;
+ * there are no social profiles yet, so FOLLOW points at the newsletter.
+ */
+const links = [
+  { label: "Architecture", href: "/architecture" },
+  { label: "Research", href: "/research" },
+  { label: "Build", href: "/build" },
+  { label: "Invest", href: "/invest" },
+  { label: "Contact", href: "/contact" },
+  { label: "Support", href: "/support" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+];
+---
+
+<footer class="relative z-10 bg-void border-t border-border overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6 md:px-10 pt-24 pb-12">
+    <!-- Giant type moment -->
+    <div class="mb-20 select-none" aria-hidden="true">
+      <p class="ft-solid font-tech font-bold text-text-primary leading-[0.95]">One brain.</p>
+      <p class="ft-outline font-tech font-bold leading-[0.95]">Any body.</p>
+    </div>
+
+    <!-- Contact grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
+      <div>
+        <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-text-muted mb-3">Email</p>
+        <a href="mailto:info@oscen.ai" class="text-sm font-tech text-text-primary hover:text-accent-blue transition-colors">
+          info@oscen.ai
+        </a>
+      </div>
+      <div>
+        <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-text-muted mb-3">Follow</p>
+        <a href="/#email-capture" class="text-sm font-tech text-text-primary hover:text-accent-blue transition-colors">
+          Follow the build →
+        </a>
+      </div>
+      <div>
+        <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-text-muted mb-3">Status</p>
+        <p class="text-sm font-tech text-text-primary">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse mr-2 align-middle"></span>Brain training 24/7 · Patent Pending
+        </p>
+      </div>
+    </div>
+
+    <!-- Link row + legal -->
+    <div class="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+        {links.map((l) => (
+          <a href={l.href} class="text-[11px] font-tech uppercase tracking-wider text-text-muted hover:text-accent-blue transition-colors">
+            {l.label}
+          </a>
+        ))}
+      </nav>
+      <p class="text-[10px] font-tech text-text-muted/60 whitespace-nowrap">
+        OSCEN · US 63/986,737 · &copy; {new Date().getFullYear()} Rio Bold LLC
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ft-solid {
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    letter-spacing: -0.02em;
+  }
+  .ft-outline {
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    letter-spacing: -0.02em;
+    /* Fallback where text-stroke is unsupported */
+    color: var(--color-text-muted);
+  }
+  @supports (-webkit-text-stroke: 1px black) {
+    .ft-outline {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(226, 232, 244, 0.45);
+    }
+  }
+</style>

@@ -1,35 +1,9 @@
 ---
 /**
  * Section 4: Proof. This is real. This is running. Flip cards for depth.
+ * Copy in src/data/sections.ts. Green pulse = live status (semantic).
  */
-const proofs = [
-  {
-    value: "~850M",
-    label: "plastic synapses",
-    back: "1,156,800 neurons across 15 brain regions. 66 synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning.",
-    color: "text-accent-blue",
-  },
-  {
-    value: "6",
-    label: "learning rules",
-    back: "STDP, eligibility traces, BCM metaplasticity, neuromodulation, homeostatic scaling, and reward-modulated learning. All running simultaneously, every step.",
-    color: "text-accent-cyan",
-  },
-  {
-    value: "7 months",
-    label: "training continuously",
-    back: "Started as a blank slate. Watching video, listening to audio. Forming associations through temporal correlation. Growing through developmental phases.",
-    color: "text-accent-amber",
-  },
-  {
-    value: "Patent pending",
-    label: "US 63/986,737",
-    back: "Filed February 20, 2026. 6 core claims covering the complete architecture. 258 prior art patents searched, zero overlap. 20 continuation patents planned.",
-    color: "text-accent-purple",
-    link: "/invest",
-    linkLabel: "Patent details",
-  },
-];
+import { PROOF_CARDS } from "@data/sections";
 ---
 
 <section id="proof" class="section relative">
@@ -44,17 +18,17 @@ const proofs = [
 
     <!-- Flip cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-      {proofs.map((p, i) => (
-        <div class="flip-card reveal h-48" tabindex="0" role="button" aria-label={`${p.value} ${p.label}. Hover for details.`} style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${p.color.replace('text-', '')});`}>
+      {PROOF_CARDS.map((p, i) => (
+        <div class="flip-card reveal h-48" tabindex="0" role="button" aria-label={`${p.value} ${p.label}. Hover for details.`} style={`--glow-delay: ${i * 1.5}s;`}>
           <div class="flip-inner w-full h-full">
             <div class="flip-front w-full h-full glass-bright glass-ticks rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-              <div class={`text-2xl md:text-3xl font-tech font-bold tracking-tight ${p.color}`}>{p.value}</div>
+              <div class="text-2xl md:text-3xl font-tech font-bold tracking-tight text-accent-blue">{p.value}</div>
               <div class="text-xs text-text-muted mt-2 uppercase tracking-wider">{p.label}</div>
             </div>
             <div class="flip-back w-full h-full glass glass-ticks rounded-2xl p-5 flex flex-col items-center justify-center text-center">
               <p class="text-xs text-text-secondary leading-relaxed">{p.back}</p>
               {p.link && (
-                <a href={p.link} class="text-[10px] font-tech text-accent-purple/70 hover:text-accent-purple mt-2 transition-colors">
+                <a href={p.link} class="text-[10px] font-tech text-accent-blue/70 hover:text-accent-blue mt-2 transition-colors">
                   {p.linkLabel} →
                 </a>
               )}

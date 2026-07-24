@@ -3,49 +3,9 @@
  * Section 5: Vision. Where this goes -- merged with the old FounderVision
  * section (Q4 consolidation, 2026-07-24): three pillars, then the
  * three-phase roadmap, one ghost-text close. The picture that makes
- * investors lean forward.
+ * investors lean forward. Copy in src/data/sections.ts.
  */
-const pillars = [
-  {
-    icon: "◎",
-    title: "Any intelligence",
-    body: "From 1 million neurons today to eventually 86 billion, like humans. From baby videos to embodied manipulation. From one brain to a fleet sharing learned experiences.",
-    accent: "accent-blue",
-  },
-  {
-    icon: "◈",
-    title: "Any hardware",
-    body: "Software simulation today. Purpose-built low-power compute tomorrow. Optimized for sparse, event-driven inference at the edge. Massive energy reduction without dependency on third-party hardware roadmaps.",
-    accent: "accent-cyan",
-  },
-  {
-    icon: "◇",
-    title: "Any body",
-    body: "Robot arms. Humanoids. Surgical assistants. Any sensor, any actuator, any form factor. The brain travels between bodies. The body is interchangeable.",
-    accent: "accent-purple",
-  },
-];
-
-const phases = [
-  {
-    phase: "Now",
-    title: "The universal robot brain",
-    desc: "License OSCEN to robotics companies worldwide. Your robots, our brain. Every manufacturer gets adaptive intelligence that learns on the job, without building their own AI team.",
-    accent: "accent-blue",
-  },
-  {
-    phase: "Next",
-    title: "Our own robots",
-    desc: "Build integrated robots with OSCEN at the core. Purpose-built hardware optimized for sparse, event-driven inference. Robots that learn from day one and never stop improving.",
-    accent: "accent-cyan",
-  },
-  {
-    phase: "Future",
-    title: "Elevate human life",
-    desc: "Free humans from labor that machines can do better. Not to replace people, but to give them back their time. A world where intelligence handles the work, and humans choose how to live.",
-    accent: "accent-purple",
-  },
-];
+import { VISION_PILLARS, VISION_PHASES } from "@data/sections";
 ---
 
 <section id="vision" class="section relative">
@@ -60,11 +20,11 @@ const phases = [
 
     <!-- Three pillars -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24">
-      {pillars.map((p, i) => (
-        <div class="expand-card reveal glass glass-ticks rounded-2xl p-6 cursor-pointer group text-center" tabindex="0" style={`--glow-delay: ${i * 2}s; --glow-color: var(--color-${p.accent});`}>
-          <span class={`text-2xl text-${p.accent}/50 group-hover:text-${p.accent} transition-colors duration-300`}>{p.icon}</span>
+      {VISION_PILLARS.map((p, i) => (
+        <div class="expand-card reveal glass glass-ticks rounded-2xl p-6 cursor-pointer group text-center" tabindex="0" style={`--glow-delay: ${i * 2}s;`}>
+          <span class="text-2xl text-accent-blue/50 group-hover:text-accent-blue transition-colors duration-300">{p.icon}</span>
           <h3 class="text-text-primary font-medium mt-3">{p.title}</h3>
-          <span class={`expand-indicator inline-block mt-2 text-${p.accent}/30 text-sm`}>+</span>
+          <span class="expand-indicator inline-block mt-2 text-accent-blue/30 text-sm">+</span>
           <div class="expand-body mt-3">
             <p class="text-sm text-text-secondary leading-relaxed">{p.body}</p>
           </div>
@@ -74,17 +34,17 @@ const phases = [
 
     <!-- Three-phase roadmap (from the old FounderVision section) -->
     <div class="relative mb-24">
-      <div class="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-accent-blue/20 via-accent-cyan/20 to-accent-purple/20 hidden md:block"></div>
+      <div class="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-accent-blue/30 to-accent-blue/5 hidden md:block"></div>
 
       <div class="space-y-4">
-        {phases.map((p, i) => (
-          <div class="expand-card reveal glass glass-ticks rounded-xl p-6 cursor-pointer group md:ml-16 relative" tabindex="0" style={`--glow-delay: ${(i + 3) * 2}s; --glow-color: var(--color-${p.accent});`}>
-            <div class={`hidden md:block absolute -left-[calc(4rem+5px)] top-7 w-2.5 h-2.5 rounded-full bg-${p.accent}/40 group-hover:bg-${p.accent} transition-colors duration-300 ring-4 ring-abyss`}></div>
+        {VISION_PHASES.map((p, i) => (
+          <div class="expand-card reveal glass glass-ticks rounded-xl p-6 cursor-pointer group md:ml-16 relative" tabindex="0" style={`--glow-delay: ${(i + 3) * 2}s;`}>
+            <div class="hidden md:block absolute -left-[calc(4rem+5px)] top-7 w-2.5 h-2.5 rounded-full bg-accent-blue/40 group-hover:bg-accent-blue transition-colors duration-300 ring-4 ring-abyss"></div>
 
             <div class="flex items-center gap-4">
-              <span class={`text-[10px] font-tech text-${p.accent} uppercase tracking-wider w-12`}>{p.phase}</span>
+              <span class="text-[10px] font-tech text-accent-blue uppercase tracking-wider w-12">{p.phase}</span>
               <h3 class="text-lg font-medium text-text-primary group-hover:text-white transition-colors">{p.title}</h3>
-              <span class={`expand-indicator text-${p.accent}/40 text-sm ml-auto`}>+</span>
+              <span class="expand-indicator text-accent-blue/40 text-sm ml-auto">+</span>
             </div>
             <div class="expand-body mt-3 ml-16">
               <p class="text-sm text-text-secondary leading-relaxed">{p.desc}</p>

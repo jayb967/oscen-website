@@ -5,6 +5,7 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
 import SupportStrip from "../components/SupportStrip.astro";
 ---
 
@@ -43,31 +44,31 @@ import SupportStrip from "../components/SupportStrip.astro";
             mechanism: "Eligibility Traces",
             basis: "Izhikevich (2007), Gerstner et al. (2018)",
             note: "Three-factor learning rules where STDP creates a 'tag' that neuromodulators later convert to permanent change. Bridges millisecond spike timing with second-scale reward signals.",
-            accent: "accent-cyan",
+            accent: "accent-blue",
           },
           {
             mechanism: "BCM Theory",
             basis: "Bienenstock, Cooper & Munro (1982)",
             note: "Sliding threshold for synaptic modification. Active neurons become harder to excite further. Creates competition and selectivity in neural responses.",
-            accent: "accent-green",
+            accent: "accent-blue",
           },
           {
             mechanism: "Neuromodulation",
             basis: "Schultz (1998), Hasselmo (2006)",
             note: "Dopaminergic reward prediction error, cholinergic attention gating, noradrenergic arousal modulation, serotonergic mood regulation. Each modeled as a global gain channel.",
-            accent: "accent-amber",
+            accent: "accent-blue",
           },
           {
             mechanism: "Synaptic Scaling",
             basis: "Turrigiano et al. (1998)",
             note: "Multiplicative homeostatic plasticity that normalizes total synaptic input per neuron. Prevents runaway excitation while preserving relative weight distributions.",
-            accent: "accent-pink",
+            accent: "accent-blue",
           },
           {
             mechanism: "Critical Periods",
             basis: "Hensch (2005), Knudsen (2004)",
             note: "Experience-dependent windows of heightened plasticity. Our adolescent phase models the reminiscence bump: a period of rapid pruning, myelination, and identity formation.",
-            accent: "accent-purple",
+            accent: "accent-blue",
           },
         ].map((item, i) => (
           <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${item.accent});`}>
@@ -174,7 +175,7 @@ import SupportStrip from "../components/SupportStrip.astro";
         <p class="text-xs text-text-secondary leading-relaxed">
           <span class="text-text-primary font-medium">Our position:</span> OSCEN doesn't compete with LLMs on language benchmarks.
           We compete on <span class="text-accent-blue">continual learning</span>, <span class="text-accent-green">energy efficiency</span>,
-          and <span class="text-accent-cyan">real-time adaptation</span>. The exact capabilities robotics needs and LLMs can't provide.
+          and <span class="text-accent-blue">real-time adaptation</span>. The exact capabilities robotics needs and LLMs can't provide.
         </p>
       </div>
     </section>
@@ -292,6 +293,7 @@ import SupportStrip from "../components/SupportStrip.astro";
       <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
+  <Footer />
 </Base>
 
 <script>

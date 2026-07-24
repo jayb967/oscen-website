@@ -2,38 +2,9 @@
 /**
  * Section 3: The Solution. What OSCEN IS, not how it works.
  * Four expand-on-hover cards. No equations. No jargon.
- * Technical depth lives on /architecture.
+ * Technical depth lives on /architecture. Copy in src/data/sections.ts.
  */
-const features = [
-  {
-    title: "Learns from experience",
-    body: "Like a kid learning to catch a ball, the brain rewires itself with every try. No instruction manual. No giant training run. A million neurons, learning the way yours did.",
-    link: "/architecture",
-    linkLabel: "Explore the architecture",
-    accent: "accent-blue",
-  },
-  {
-    title: "Runs on a sip of power",
-    body: "Today's robot brains burn power like a space heater. OSCEN sips it like a phone charger. Up to 109x less energy on the right chip. That means robots that work all day on one battery.",
-    link: "/research",
-    linkLabel: "See the benchmarks",
-    accent: "accent-green",
-  },
-  {
-    title: "Grows up in stages",
-    body: "Like a baby becoming a toddler becoming a kid, OSCEN moves through five stages of growth. Each one rewires what it can learn next. Old skills stay even as new ones come in.",
-    link: "/research",
-    linkLabel: "Read the science",
-    accent: "accent-amber",
-  },
-  {
-    title: "Works with any body",
-    body: "Cameras, microphones, motors, speakers. OSCEN doesn't care what body you bolt it to. The brain is the product. The body plugs in.",
-    link: "/architecture",
-    linkLabel: "View the integration",
-    accent: "accent-purple",
-  },
-];
+import { SOLUTION_FEATURES } from "@data/sections";
 ---
 
 <section id="solution" class="section relative">
@@ -48,19 +19,19 @@ const features = [
 
     <!-- Expand cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {features.map((f, i) => (
-        <div class="expand-card reveal glass glass-ticks rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${f.accent});`}>
+      {SOLUTION_FEATURES.map((f, i) => (
+        <div class="expand-card reveal glass glass-ticks rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s;`}>
           <div class="flex items-center justify-between">
-            <h3 class={`text-lg font-medium text-${f.accent} group-hover:text-text-primary transition-colors duration-300`}>
+            <h3 class="text-lg font-medium text-accent-blue group-hover:text-text-primary transition-colors duration-300">
               {f.title}
             </h3>
-            <span class={`expand-indicator text-${f.accent}/40 text-lg`}>+</span>
+            <span class="expand-indicator text-accent-blue/40 text-lg">+</span>
           </div>
           <div class="expand-body mt-4">
             <p class="text-sm text-text-secondary leading-relaxed">{f.body}</p>
             <a
               href={f.link}
-              class={`inline-block mt-4 text-xs font-tech text-${f.accent}/70 hover:text-${f.accent} transition-colors`}
+              class="inline-block mt-4 text-xs font-tech text-accent-blue/70 hover:text-accent-blue transition-colors"
             >
               {f.linkLabel} →
             </a>

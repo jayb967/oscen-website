@@ -15,6 +15,7 @@
  */
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
 import { FORMSPREE, SEGMENTS } from "../lib/forms";
 ---
 
@@ -23,7 +24,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
   <main class="pt-32 pb-24">
     <!-- 1. Hook -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Path A · Investors</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
         Everyone is building the body.<br />
@@ -35,13 +36,13 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 2. Market signals (public-safe) -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
-          { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3× from 2024", color: "text-accent-amber" },
+          { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3× from 2024", color: "text-accent-blue" },
           { value: "1.15M", label: "Neurons training live", sub: "Today, not pitched", color: "text-accent-green" },
-          { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-purple" },
+          { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-blue" },
         ].map((stat) => (
           <div class="reveal glass-bright rounded-xl p-4 text-center">
             <div class={`text-xl md:text-2xl font-tech font-bold ${stat.color}`}>{stat.value}</div>
@@ -53,7 +54,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 3. Why now. AMI validates the thesis -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">Why now</h2>
       <p class="reveal text-sm text-text-secondary mb-6 max-w-xl">
         The market is moving beyond LLMs. The biggest names in AI agree, but their solutions still have the same old problems.
@@ -61,7 +62,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
       <div class="reveal glass-bright rounded-2xl p-6 md:p-8 mb-4">
         <div class="flex items-start gap-4 mb-4">
-          <span class="px-3 py-1 rounded-full bg-accent-amber/10 border border-accent-amber/30 text-accent-amber text-[10px] font-tech uppercase tracking-wider shrink-0">March 2026</span>
+          <span class="px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/30 text-accent-blue text-[10px] font-tech uppercase tracking-wider shrink-0">March 2026</span>
           <div>
             <p class="text-sm text-text-primary font-medium">Yann LeCun's AMI Labs raises $1.03B for "world models"</p>
             <p class="text-xs text-text-secondary mt-1 leading-relaxed">The Turing Award winner left Meta to build JEPA, world models that go beyond LLMs. Nvidia, Toyota, Samsung, Jeff Bezos invested. The thesis: <span class="text-text-primary">LLMs are not enough for robots.</span></p>
@@ -69,7 +70,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
         </div>
         <div class="divider mb-4"></div>
         <div class="flex items-start gap-4">
-          <span class="px-3 py-1 rounded-full bg-accent-amber/10 border border-accent-amber/30 text-accent-amber text-[10px] font-tech uppercase tracking-wider shrink-0">June 2026</span>
+          <span class="px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/30 text-accent-blue text-[10px] font-tech uppercase tracking-wider shrink-0">June 2026</span>
           <div>
             <p class="text-sm text-text-primary font-medium">Jeff Bezos's Project Prometheus raises $12B at $41B valuation</p>
             <p class="text-xs text-text-secondary mt-1 leading-relaxed">Bezos + Vik Bajaj as co-CEOs. JPMorgan, Goldman Sachs, BlackRock in. Founding advisors include Ashish Vaswani and Jakob Uszkoreit, two of the original "Attention Is All You Need" authors. Pitched as "physical AI" for industrial design and manufacturing. <span class="text-text-primary">Wall-Street-scale capital is now pouring into physical AI.</span></p>
@@ -111,7 +112,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 4. The energy problem -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">The energy problem</h2>
       <p class="reveal text-sm text-text-secondary mb-6 max-w-xl">
         Current AI is unsustainable for edge deployment. Robots need intelligence that runs on batteries, not data centers.
@@ -122,7 +123,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
           {[
             { label: "GPT-4o", value: "~0.3 Wh per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
             { label: "Gemini", value: "~0.24 Wh per prompt", source: "Google official", bar: 80, color: "accent-amber" },
-            { label: "GPU Robot Brain", value: "50-200W continuous", source: "Industry standard", bar: 90, color: "accent-pink" },
+            { label: "GPU Robot Brain", value: "50-200W continuous", source: "Industry standard", bar: 90, color: "accent-red" },
             { label: "OSCEN (event-driven)", value: "<5W continuous", source: "Spiking-network benchmarks", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
@@ -147,13 +148,13 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 5. Patent protection -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">Patent protection</h2>
       <p class="reveal text-sm text-text-secondary mb-6 max-w-xl">The architecture is protected. The IP moat is real.</p>
 
       <div class="reveal glass-bright rounded-2xl p-6 md:p-8 mb-4">
         <div class="flex flex-wrap items-center gap-4 mb-6">
-          <span class="px-3 py-1 rounded-full bg-accent-purple/10 border border-accent-purple/30 text-accent-purple text-[10px] font-tech uppercase tracking-wider">Patent Pending</span>
+          <span class="px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/30 text-accent-blue text-[10px] font-tech uppercase tracking-wider">Patent Pending</span>
           <span class="text-sm text-text-primary font-tech">US 63/986,737</span>
           <span class="text-xs text-text-muted">Filed February 20, 2026</span>
         </div>
@@ -169,7 +170,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
           ].map((c) => (
             <div class="glass rounded-xl p-4">
               <div class="flex items-center gap-2 mb-2">
-                <span class="text-xs font-tech text-accent-purple">Claim {c.claim}</span>
+                <span class="text-xs font-tech text-accent-blue">Claim {c.claim}</span>
                 <span class="text-sm text-text-primary">{c.title}</span>
               </div>
               <p class="text-[11px] text-text-secondary leading-relaxed">{c.desc}</p>
@@ -188,14 +189,14 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
           <div class="text-[10px] text-text-secondary mt-1">Overlapping claims found</div>
         </div>
         <div class="reveal glass rounded-xl p-4 text-center">
-          <div class="text-xl font-tech text-accent-amber font-bold">20</div>
+          <div class="text-xl font-tech text-accent-blue font-bold">20</div>
           <div class="text-[10px] text-text-secondary mt-1">Continuation patents planned</div>
         </div>
       </div>
     </section>
 
     <!-- 6. What's built -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">What's built</h2>
       <p class="reveal text-sm text-text-secondary mb-6 max-w-xl">This is not a pitch deck. The brain is running.</p>
 
@@ -234,13 +235,13 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 7. Built with conviction -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">Built with conviction</h2>
 
       <div class="reveal glass rounded-xl p-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
-            <div class="text-lg font-tech text-accent-green font-bold">3,500+ hours</div>
+            <div class="text-lg font-tech text-accent-blue font-bold">3,500+ hours</div>
             <div class="text-[10px] text-text-secondary mt-1">Dedicated R&D</div>
           </div>
           <div>
@@ -248,11 +249,11 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             <div class="text-[10px] text-text-secondary mt-1">Research & development</div>
           </div>
           <div>
-            <div class="text-lg font-tech text-accent-amber font-bold">Live</div>
+            <div class="text-lg font-tech text-accent-green font-bold">Live</div>
             <div class="text-[10px] text-text-secondary mt-1">Brain training daily</div>
           </div>
           <div>
-            <div class="text-lg font-tech text-accent-purple font-bold">CPU today</div>
+            <div class="text-lg font-tech text-accent-blue font-bold">CPU today</div>
             <div class="text-[10px] text-text-secondary mt-1">Low-power next</div>
           </div>
         </div>
@@ -264,7 +265,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 8. What funding enables -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">What funding enables</h2>
 
       <div class="space-y-2">
@@ -290,13 +291,13 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 9. Founders -->
-    <section class="max-w-5xl mx-auto px-6 mb-10">
+    <section class="max-w-5xl mx-auto px-6 mb-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">Founders</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="reveal glass rounded-xl p-6">
           <div class="flex flex-col gap-4 items-start">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-purple/20 border border-border-bright flex items-center justify-center shrink-0">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-blue/5 border border-border-bright flex items-center justify-center shrink-0">
               <span class="text-2xl font-display text-text-primary">RB</span>
             </div>
             <div>
@@ -316,7 +317,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
         <div class="reveal glass rounded-xl p-6">
           <div class="flex flex-col gap-4 items-start">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-amber/20 to-accent-pink/20 border border-border-bright flex items-center justify-center shrink-0">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-blue/5 border border-border-bright flex items-center justify-center shrink-0">
               <span class="text-2xl font-display text-text-primary">AH</span>
             </div>
             <div>
@@ -337,7 +338,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     </section>
 
     <!-- 10. The form. the conversion point -->
-    <section id="investor-form" class="max-w-3xl mx-auto px-6 mb-10 scroll-mt-24">
+    <section id="investor-form" class="max-w-3xl mx-auto px-6 mb-24 scroll-mt-24">
       <h2 class="reveal font-display text-[clamp(2rem,4.5vw,3rem)] text-text-primary leading-tight mb-3">
         Start the conversation.
       </h2>
@@ -367,7 +368,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
               name="name"
               required
               autocomplete="name"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all"
             />
           </label>
           <label class="block">
@@ -377,7 +378,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
               name="email"
               required
               autocomplete="email"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all"
             />
           </label>
         </div>
@@ -398,7 +399,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             ].map((opt) => (
               <label class="cursor-pointer">
                 <input type="radio" name="accreditation" value={opt.value} required class="peer sr-only" />
-                <span class="block px-4 py-3 rounded-lg border border-border-bright bg-deep text-sm text-text-secondary text-center hover:border-accent-amber/40 hover:text-text-primary peer-checked:border-accent-amber peer-checked:bg-accent-amber/15 peer-checked:text-accent-amber peer-focus-visible:ring-2 peer-focus-visible:ring-accent-amber/40 transition-all">
+                <span class="block px-4 py-3 rounded-lg border border-border-bright bg-deep text-sm text-text-secondary text-center hover:border-accent-blue/40 hover:text-text-primary peer-checked:border-accent-blue peer-checked:bg-accent-blue/15 peer-checked:text-accent-blue peer-focus-visible:ring-2 peer-focus-visible:ring-accent-blue/40 transition-all">
                   {opt.label}
                 </span>
               </label>
@@ -412,7 +413,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             <span class="text-[11px] font-tech text-text-secondary uppercase tracking-wider">Check size (optional)</span>
             <select
               name="check_size"
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all"
             >
               <option value="">Select range</option>
               <option value="25-100k">$25K - $100K</option>
@@ -429,7 +430,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
               name="linkedin"
               inputmode="url"
               placeholder="https://linkedin.com/in/..."
-              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all"
+              class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all"
             />
             <span class="text-[10px] text-text-muted mt-1 block">Helps us reply quickly. Not required but recommended.</span>
           </label>
@@ -440,19 +441,19 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
           <textarea
             name="message"
             rows="3"
-            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:outline-none transition-all resize-none"
+            class="mt-2 w-full px-4 py-2.5 rounded-lg bg-deep border border-border-bright text-sm text-text-primary placeholder-text-muted focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/30 focus:outline-none transition-all resize-none"
           ></textarea>
         </label>
 
         <label class="flex items-start gap-3 text-xs text-text-muted">
-          <input type="checkbox" name="consent" required class="mt-0.5" style="accent-color: var(--color-accent-amber);" />
+          <input type="checkbox" name="consent" required class="mt-0.5" style="accent-color: var(--color-accent-blue);" />
           <span>I consent to OSCEN contacting me about this inquiry. We won't share your info.</span>
         </label>
 
         <button
           type="submit"
           id="investor-submit"
-          class="w-full px-7 py-3 rounded-full bg-accent-amber/15 border border-accent-amber/30 text-accent-amber font-medium hover:bg-accent-amber/25 hover:border-accent-amber/50 transition-all duration-300 cursor-pointer disabled:opacity-50"
+          class="w-full px-7 py-3 rounded-full bg-accent-blue/15 border border-accent-blue/30 text-accent-blue font-medium hover:bg-accent-blue/25 hover:border-accent-blue/50 transition-all duration-300 cursor-pointer disabled:opacity-50"
         >
           Send
         </button>
@@ -477,6 +478,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
       <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
+  <Footer />
 </Base>
 
 <script>

@@ -233,18 +233,30 @@ Target: `docs/reference/humanoid-target-fullbody.png` + `humanoid-target-closeup
 
 ## Phase 5 -- The reveal: brain -> head (2-3 days, the signature moment)
 
-- [ ] Pinned transition section: brain scales down (~50x, animate group scale +
-      camera dolly simultaneously so it reads as "camera pulls back"), glides to
-      the humanoid's head position as she fades/assembles in; head shell goes
-      x-ray; bloom tightens; captions explain "one brain, any body".
-- [ ] Camera then orbits the head closeup (match humanoid-target-closeup.png
-      framing), brain pulsing inside the skull.
-- [ ] Pull-back to full body in the concrete environment (match fullbody framing);
-      environment lights up from black as the camera retreats.
-- [ ] Scroll-scrub the whole thing (no autoplay) with soft snap points; reversible.
-- [ ] Perf gate: brain (reduced LOD when small) + skinned humanoid + env must hold
-      60fps desktop / 30fps mobile; else LOD swap (instanced spheres -> points)
-      when brain is head-sized.
+BUILT 2026-07-24: `src/three/humanoid/humanoid-reveal.js` (choreography) +
+`Reveal.astro` (pinned section, degrades to plain copy) + experience.ts
+wiring. Shared modules extracted so /dev/humanoid and the reveal use one
+implementation: `humanoid-figure.js` (model/materials/head-tracking/eyes)
++ `humanoid-environment.js` (concrete room, fadeable).
+
+- [x] Pinned transition: brain shrinks 13x (scale 1 -> 0.066, about visual
+      center = origin) while camera dives; figure assembles as fresnel
+      hologram; head-only x-ray via world-space neck mask in the hybrid
+      shader. Captions in src/data/reveal.ts.
+- [x] Head closeup orbit, brain pulsing inside the translucent skull,
+      eye glows lit (matches humanoid-target-closeup framing).
+- [x] Pull-back to full body; room fades up from black (fadeable
+      buildConcreteRoom, x-offset -3 so the door glow sits off-left);
+      body materializes hologram -> porcelain-lit.
+- [x] Scroll-scrubbed + reversible: onLeaveBack resets fully (scale 1,
+      camera released to idle orbit); onLeave sets a dimmed backdrop state
+      so later sections read over a quiet figure. GLB lazy-loads ~2
+      viewports before arrival (never in the critical path).
+- [x] Perf gate: 84fps at the heaviest frame (desktop). No LOD swap
+      needed yet; revisit on real mobile hardware.
+- [ ] Soft snap points between segments (nice-to-have polish).
+- NOTE fast-jump edge case: deep-linking straight past the section before
+      the GLB loads leaves the normal brain backdrop (by design, no-op).
 
 ## Phase 6 -- Content sections + full redesign pass (3-4 days)
 
@@ -261,8 +273,22 @@ Target: `docs/reference/humanoid-target-fullbody.png` + `humanoid-target-closeup
       scroll-animations.ts selector. JetBrains Mono dropped from the Google
       Fonts load (no code blocks exist site-wide); --font-mono token now
       system-mono only.
-- [ ] Remaining re-skin: typographic footer (ref-unfor style), spacing
-      normalization, one-accent enforcement, remaining section polish.
+- [x] Typographic footer: `src/components/Footer.astro` ("One brain." solid
+      / "Any body." outline stroke, echoes the reveal captions; EMAIL /
+      FOLLOW / STATUS grid with real links only, link row, Rio Bold LLC
+      legal). Wired into index + all 8 inner pages; CTA's old mini-footer
+      removed.
+- [x] Copy rehousing: landing section copy moved to `src/data/sections.ts`
+      (+ reveal captions in `src/data/reveal.ts`). Interpolated accent
+      class fragments replaced with literal Tailwind classes.
+- [x] One-accent enforcement, landing + inner pages: decorative accents ->
+      blue. KEPT semantic color: red = problem/VLA flaws/energy severity,
+      green = live status/OSCEN advantage/excitatory, pink = inhibitory
+      (architecture 80/20 pair), amber = warnings (Stripe note, retrain
+      severity). invest.astro form identity amber -> blue; inner-page
+      section spacing mb-10 -> mb-24.
+- [x] Phase 2 eyebrow legibility: hero scrim strengthened (radial 0.82/
+      0.52) + eyebrow bumped to text-primary.
 - [ ] Rehouse section copy into `src/data/` while porting (audit finding: copy is
       currently inline in 13 .astro files).
 - [ ] Inner pages (architecture, research, invest, build, contact, support, legal,
