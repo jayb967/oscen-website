@@ -127,6 +127,7 @@
       <button data-mat="source" class="active">SOURCE</button>
       <button data-mat="porcelain">PORCELAIN</button>
       <button data-mat="xray">XRAY</button>
+      <button data-mat="xray-head">XRAY HEAD</button>
     </div>
     <div id="drop">drop a .glb to preview</div>
 
@@ -191,7 +192,8 @@
             stage.frame(btn.dataset.frame);
             setActive("frame", btn);
           } else if (btn.dataset.mat) {
-            stage.setMaterialMode(btn.dataset.mat);
+            if (btn.dataset.mat === "xray-head") stage.setHeadXray(1);
+            else stage.setMaterialMode(btn.dataset.mat);
             setActive("mat", btn);
           }
         });
@@ -212,6 +214,14 @@
       bindSlider("key", (v) => (stage.keyLight.intensity = v));
       bindSlider("exp", (v) => {
         stage.renderer.toneMappingExposure = v;
+      });
+
+      // Cursor head-tracking (composes with OrbitControls; subtle).
+      window.addEventListener("mousemove", (e) => {
+        stage.setPointer(
+          (e.clientX / window.innerWidth) * 2 - 1,
+          (e.clientY / window.innerHeight) * 2 - 1,
+        );
       });
 
       // Drag-and-drop a GLB for cleanup-pass iteration.

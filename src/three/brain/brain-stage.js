@@ -72,6 +72,7 @@ export class BrainStage {
             wsUrl: this.opts.wsUrl,
         });
         this.scene.add(this.module.group);
+        this._updatables = [];   // extra scene actors (Phase 5 humanoid)
 
         this._smoothNm = { da: 1.2, ne: 1.2, serotonin: 1.0, oxytocin: 0.8 };
 
@@ -251,6 +252,16 @@ export class BrainStage {
         this._baseBloom = s;
     }
 
+    /** Register an object with update(dt), ticked inside the render loop. */
+    addUpdatable(obj) {
+        if (!this._updatables.includes(obj)) this._updatables.push(obj);
+    }
+
+    removeUpdatable(obj) {
+        const i = this._updatables.indexOf(obj);
+        if (i >= 0) this._updatables.splice(i, 1);
+    }
+
     // ── loop ───────────────────────────────────────────────────────
 
     _animate() {
@@ -289,6 +300,7 @@ export class BrainStage {
         }
 
         this.module.update(dt);
+        for (const u of this._updatables) u.update(dt);
         this._updateNeuromodEffects(dt);
         this.composer.render();
     }

@@ -17,6 +17,7 @@ declare global {
         __experience?: {
             stage: BrainStage;
             audio: AudioController;
+            reveal?: any;
         };
     }
 }
@@ -67,6 +68,7 @@ function init() {
         initSmoothScroll();
         initHeroScene(stage);
         initHowItWorksScene(stage);
+        initRevealScene(stage);
     }
 }
 
@@ -200,6 +202,108 @@ function initHowItWorksScene(stage: BrainStage) {
                 captions.length - 1,
                 Math.floor(self.progress * captions.length),
             );
+            if (i !== active) showCaption(i);
+        },
+    });
+}
+
+/**
+ * The Reveal (Phase 5): pinned 3.5-viewport scrub. The brain shrinks
+ * into the humanoid's head (humanoid-reveal.js owns the 3D choreography;
+ * this owns the ScrollTrigger, lazy loading, and caption swaps).
+ * The 5.4MB GLB loads only when the visitor approaches the section.
+ */
+function initRevealScene(stage: BrainStage) {
+    const section = document.getElementById("reveal");
+    if (!section) return;
+    const captions = Array.from(section.querySelectorAll<HTMLElement>("[data-step]"));
+    if (!captions.length) return;
+
+    section.classList.add("rvl-pinned");
+
+    let reveal: any = null;
+    let loadStarted = false;
+    let lastProgress = 0;
+    let entered = false;
+
+    const ensureLoaded = () => {
+        if (loadStarted) return;
+        loadStarted = true;
+        import("../three/humanoid/humanoid-reveal.js")
+            .then((m) => m.createReveal(stage))
+            .then((r) => {
+                reveal = r;
+                if (window.__experience) window.__experience.reveal = r;
+                // Scrub may already be mid-flight when the GLB lands.
+                if (entered) {
+                    reveal.enter();
+                    reveal.setProgress(lastProgress);
+                }
+            })
+            .catch((err) => console.error("[reveal] humanoid load failed", err));
+    };
+
+    // Preload well before arrival (~two viewports out).
+    ScrollTrigger.create({
+        trigger: section,
+        start: "top bottom+=200%",
+        once: true,
+        onEnter: ensureLoaded,
+    });
+
+    // Caption boundaries align with the choreography segments.
+    const STEP_RANGES = [0.0, 0.4, 0.7];
+    let active = -1;
+    const header = section.querySelector<HTMLElement>(".rvl-header");
+
+    const showCaption = (i: number) => {
+        const prev = captions[active];
+        const next = captions[i];
+        active = i;
+        if (prev) {
+            gsap.to(prev, { opacity: 0, y: -24, duration: 0.35, ease: "power2.in", overwrite: true });
+        }
+        gsap.fromTo(
+            next,
+            { opacity: 0, y: 32 },
+            { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", delay: prev ? 0.15 : 0, overwrite: true },
+        );
+        if (header) {
+            gsap.to(header, { opacity: i === 0 ? 1 : 0, duration: 0.5, overwrite: true });
+        }
+    };
+
+    ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: () => "+=" + 3.5 * window.innerHeight,
+        pin: true,
+        scrub: true,
+        onEnter: () => {
+            entered = true;
+            ensureLoaded();
+            reveal?.enter();
+        },
+        onEnterBack: () => {
+            entered = true;
+            reveal?.enter();
+        },
+        onLeave: () => {
+            entered = false;
+            reveal?.setBackdrop();
+        },
+        onLeaveBack: () => {
+            entered = false;
+            reveal?.reset();
+            applyMood(stage, MOODS.backdrop);
+        },
+        onUpdate: (self) => {
+            lastProgress = self.progress;
+            reveal?.setProgress(self.progress);
+            let i = 0;
+            for (let s = STEP_RANGES.length - 1; s >= 0; s--) {
+                if (self.progress >= STEP_RANGES[s]) { i = s; break; }
+            }
             if (i !== active) showCaption(i);
         },
     });

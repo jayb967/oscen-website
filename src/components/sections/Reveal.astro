@@ -1,0 +1,71 @@
+---
+/**
+ * Section: The Reveal (Phase 5, the signature moment). The brain on the
+ * persistent canvas shrinks into the humanoid's head; captions swap as
+ * the camera dives, orbits the skull, and pulls back to the full figure.
+ *
+ * Copy lives in src/data/reveal.ts; choreography in
+ * src/scripts/experience.ts + src/three/humanoid/humanoid-reveal.js
+ * (queries [data-step] markup). Without JS or with reduced motion this
+ * renders as a plain readable copy stack -- no 3D dependency.
+ */
+import { REVEAL_STEPS } from "@data/reveal";
+---
+
+<section id="reveal" class="relative">
+  <div class="rvl-frame max-w-6xl mx-auto w-full px-6 md:px-10 py-24">
+    <div class="rvl-header text-center mb-16">
+      <p class="reveal hud-label !text-[10px] !tracking-[0.3em] mb-6 text-text-muted">The Reveal</p>
+      <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+        Watch it take<br />
+        <span class="italic gradient-text">a body.</span>
+      </h2>
+    </div>
+
+    <div class="rvl-steps relative">
+      {REVEAL_STEPS.map((s, i) => (
+        <div class="rvl-step mb-14" data-step data-index={i}>
+          <p class="rvl-num hud-label !text-[11px] mb-3 text-scrim text-accent-blue">
+            {String(i + 1).padStart(2, "0")} / {String(REVEAL_STEPS.length).padStart(2, "0")}
+          </p>
+          <h3 class="rvl-title text-text-primary text-scrim" style="font-family: var(--font-tech); font-weight: 700; font-size: clamp(3rem, 8vw, 7rem); line-height: 0.95; letter-spacing: -0.02em;">
+            {s.verb}
+          </h3>
+          <p class="rvl-desc mt-5 text-text-primary/90 text-scrim text-[clamp(0.95rem,1.3vw,1.15rem)] leading-relaxed max-w-md">
+            {s.desc}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Pinned mode (experience.ts adds .rvl-pinned when it takes over):
+     one viewport, captions stacked bottom-left over the live scene. */
+  :global(#reveal.rvl-pinned) .rvl-frame {
+    height: 100vh;
+    max-width: none;
+    padding: 0;
+    display: block;
+  }
+  :global(#reveal.rvl-pinned) .rvl-header {
+    position: absolute;
+    top: 7rem;
+    left: 0;
+    right: 0;
+    margin: 0;
+  }
+  :global(#reveal.rvl-pinned) .rvl-steps {
+    position: absolute;
+    inset: 0;
+  }
+  :global(#reveal.rvl-pinned) .rvl-step {
+    position: absolute;
+    left: clamp(1.5rem, 6vw, 6rem);
+    bottom: clamp(5rem, 14vh, 9rem);
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
