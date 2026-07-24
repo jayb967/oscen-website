@@ -1,27 +1,28 @@
 /**
  * HumanoidReveal -- Phase 5, the signature moment. Mounts the shared
- * HumanoidFigure + concrete room INTO BrainStage's scene and drives the
+ * HumanoidFigure INTO BrainStage's scene and drives the
  * whole brain->head choreography from one scrubbed progress value:
  *
  *   p 0.00-0.40  the brain shrinks ~13x while the camera dives after it;
  *                the android assembles in as a fresnel hologram, the
  *                brain landing inside her translucent skull
  *   p 0.40-0.70  closeup orbit around the head (brain pulsing inside),
- *                body materializing from hologram to porcelain
- *   p 0.70-1.00  camera pulls back to the full figure; the concrete room
- *                lights up from black; bloom tightens to photographic
+ *                body materializing from hologram to solid
+ *   p 0.70-1.00  camera pulls back to the full figure on black; bloom
+ *                tightens to photographic
+ *
+ * The figure stands alone on black -- no environment (the concrete room
+ * lives only in /dev/humanoid's HumanoidStage now, per feedback).
  *
  * World scale: the figure is built HEIGHT=7 brain-units tall and
  * positioned so her head center sits at the brain's shrink destination
  * (the origin). Loaded lazily -- never in the critical path.
  */
 import { HumanoidFigure } from './humanoid-figure.js';
-import { buildConcreteRoom } from './humanoid-environment.js';
 
 const HEIGHT = 7;                 // figure height in brain-world units
 const BRAIN_END_SCALE = 0.066;    // brain radius 5.5 -> ~0.36, inside a ~0.44 head
 const CRANIUM_LIFT = 0.16;        // head-bone origin sits low; center brain in the cranium
-const ROOM_SCALE = HEIGHT / 1.75; // room was authored around a 1.75m figure
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -43,16 +44,6 @@ export class HumanoidReveal {
         stage.scene.add(this.figure.group);
         stage.addUpdatable(this.figure);
 
-        this.room = buildConcreteRoom({ fadeable: true });
-        this.room.group.scale.setScalar(ROOM_SCALE);
-        // Door glow sits off-left of the figure (target-fullbody framing);
-        // without the shift she silhouettes against the bright panel. The
-        // contact disc counter-shifts to stay under her feet.
-        this.room.group.position.x = -3;
-        this.room.disc.position.x = 3 / ROOM_SCALE;
-        this.room.setIntensity(0);
-        stage.scene.add(this.room.group);
-
         this._entry = null;      // camera pose captured when the scrub begins
         this._active = false;
     }
@@ -63,7 +54,6 @@ export class HumanoidReveal {
         // scaling about its own origin.
         const head = this.figure.headCenterLocal();
         this.figure.group.position.set(-head.x, -(head.y + CRANIUM_LIFT), -head.z);
-        this.room.group.position.y = this.figure.group.position.y;
         this.figure.setMaterialMode('xray');
         this.figure.setXray({ head: 0, body: 0 });
     }
@@ -101,7 +91,6 @@ export class HumanoidReveal {
             const holo = smooth(clamp01((p - 0.06) / 0.34));
             fig.setXray({ head: holo, body: holo * 0.85 });
             stage.setBloomStrength(lerp(0.45, 0.6, t));
-            this.room.setIntensity(0);
         } else if (p < 0.7) {
             // B -- closeup orbit, body materializing.
             const t = smooth((p - 0.4) / 0.3);
@@ -115,9 +104,8 @@ export class HumanoidReveal {
             tgt.y = lerp(0, 0.05, t);
             fig.setXray({ head: 1, body: lerp(0.85, 0.3, t) });
             stage.setBloomStrength(lerp(0.6, 0.42, t));
-            this.room.setIntensity(0);
         } else {
-            // C -- the pull-back: room fades up from black, she goes solid.
+            // C -- the pull-back: she goes solid against black.
             const t = smooth((p - 0.7) / 0.3);
             stage.module.setScale(BRAIN_END_SCALE);
             const az = lerp(0.75, 0.18, t);
@@ -128,7 +116,6 @@ export class HumanoidReveal {
             tgt.y = lerp(0.05, -2.6, t);
             fig.setXray({ head: lerp(1, 0.35, t), body: lerp(0.3, 0, t) });
             stage.setBloomStrength(lerp(0.42, 0.18, t));
-            this.room.setIntensity(smooth(clamp01((t - 0.1) / 0.9)));
         }
 
         stage.setCameraPose(cam, tgt);
@@ -140,7 +127,6 @@ export class HumanoidReveal {
      */
     setBackdrop() {
         this._active = false;
-        this.room.setIntensity(0.15);
         this.figure.setXray({ head: 0.25, body: 0 });
         this.stage.setBloomStrength(0.25);
     }
@@ -151,7 +137,6 @@ export class HumanoidReveal {
         this._entry = null;
         this.figure.group.visible = false;
         this.figure.setXray({ head: 0, body: 0 });
-        this.room.setIntensity(0);
         this.stage.module.setScale(1);
         this.stage.releaseCameraPose();
     }
