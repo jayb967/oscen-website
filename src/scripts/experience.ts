@@ -67,6 +67,7 @@ function init() {
     if (!prefersReduced) {
         initSmoothScroll();
         initHeroScene(stage);
+        initCopyAsideScene(stage);
         initHowItWorksScene(stage);
         initRevealScene(stage);
     }
@@ -126,6 +127,34 @@ function initHeroScene(stage: BrainStage) {
                 backTitle.style.opacity = String(Math.max(0, 1 - p * 1.6));
             }
         },
+    });
+}
+
+/**
+ * Copy sections (Problem -> Proof): the dimmed brain glides to the right
+ * side of the viewport so the centered text and stat cards stay clear,
+ * holds there, then glides back to center as the How It Works
+ * explanation section scrolls in. Both moves are scrubbed, never snapped.
+ */
+const COPY_ASIDE_PAN = 13; // world units of camera strafe at orbit radius ~23
+function initCopyAsideScene(stage: BrainStage) {
+    const slideOut = document.getElementById("problem");
+    const slideBack = document.getElementById("how-it-works");
+    if (!slideOut || !slideBack) return;
+
+    ScrollTrigger.create({
+        trigger: slideOut,
+        start: "top bottom",
+        end: "top top",
+        scrub: true,
+        onUpdate: (self) => stage.setLateralOffset(COPY_ASIDE_PAN * self.progress),
+    });
+    ScrollTrigger.create({
+        trigger: slideBack,
+        start: "top bottom",
+        end: "top top",
+        scrub: true,
+        onUpdate: (self) => stage.setLateralOffset(COPY_ASIDE_PAN * (1 - self.progress)),
     });
 }
 

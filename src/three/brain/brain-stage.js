@@ -53,6 +53,7 @@ export class BrainStage {
         this._orbitHeight = DEFAULT_CAMERA_POS.y;
         this._pointer = { x: 0, y: 0 };          // -1..1 parallax input
         this._smoothPointer = { x: 0, y: 0 };
+        this._lateralOffset = 0;                 // world units; + pushes brain screen-right
         this._externalPose = false;              // true once scroll owns the camera
         this._reducedMotion =
             this.opts.respectReducedMotion &&
@@ -229,6 +230,17 @@ export class BrainStage {
         if (height !== undefined) this._orbitHeight = height;
     }
 
+    /**
+     * Screen-space slide for the idle orbit: the camera strafes along its
+     * own right axis so the brain drifts toward one side of the viewport
+     * (+x = brain moves screen-right). Scrubbed by the copy sections so
+     * their text columns stay clear. Ignored while a scroll scene owns
+     * the camera via setCameraPose.
+     */
+    setLateralOffset(x) {
+        this._lateralOffset = x;
+    }
+
     /** Hand the camera back to the idle auto-orbit. */
     releaseCameraPose() {
         this._externalPose = false;
@@ -295,6 +307,13 @@ export class BrainStage {
                 Math.cos(angle) * this._orbitRadius,
             );
             this.camera.lookAt(this._target);
+            if (this._lateralOffset) {
+                // Strafe AFTER aiming so the view direction is preserved
+                // and the brain slides off-center instead of re-centering.
+                this._panVec ??= new THREE.Vector3();
+                this._panVec.set(1, 0, 0).applyQuaternion(this.camera.quaternion);
+                this.camera.position.addScaledVector(this._panVec, -this._lateralOffset);
+            }
         } else {
             this.camera.lookAt(this._target);
         }
