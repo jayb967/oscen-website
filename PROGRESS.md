@@ -12,6 +12,71 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-07-24 SESSION HANDOFF -- START HERE
+
+**State**: branch `redesign-v2` (NOT pushed), 7 commits ahead of `main`, all
+builds green. Phases 0-3 complete; Phase 4 staged but blocked on Higgsfield
+credits (see Phase 4 box). All open questions Q1-Q6 answered (see bottom).
+
+**Working setup**: `cd oscen-website && npm run dev` -> localhost:4321
+(landing experience) and localhost:4321/dev/brain (raw brain module harness).
+
+**What exists now (files created this session):**
+- `src/three/brain/` -- data-bridge.js / brain-regions.js / brain-pulses.js
+  (ported from canonical `oscen/brain-viz/`, do NOT edit the website's stale
+  `public/brain-viz/` copy) + `brain-module.js` (BrainModule: portable
+  THREE.Group) + `brain-stage.js` (BrainStage: container shell; scroll hooks
+  `setOrbit/setCameraPose/focusRegion/setBloomStrength/setPointer`).
+- `src/scripts/experience.ts` -- owns the persistent canvas + Lenis +
+  ScrollTrigger choreography (hero scene + pinned HowItWorks scene, shared
+  `MOODS` states). Exposed as `window.__experience`.
+- `src/scripts/audio-controller.ts` -- ambient player; activates when
+  `public/audio/ambient.mp3` exists (autoplay + gesture unlock + HUD toggle).
+- `src/components/ExperienceHUD.astro` -- live ticker (listens to
+  `oscen:metrics` / `oscen:datamode` window events) + sound toggle.
+- `src/data/how-it-works.ts` -- pipeline copy + step->brain-region mapping.
+- `src/pages/dev/brain.astro` -- parity/debug harness (noindex).
+- Rewritten: `Hero.astro` (no iframe), `HowItWorks.astro` (pinned scene,
+  degrades to list), `index.astro` (experience layer + HUD), `global.css`
+  (--font-tech, main>section z-10, .hud-label, .text-scrim).
+
+**Critical gotchas (learned the hard way, do not rediscover):**
+1. `three` is PINNED to 0.160.0. r185 blows out the bloom into a white core.
+   Any upgrade requires re-tuning UnrealBloom + re-verifying visually.
+2. The bloom EffectComposer writes OPAQUE alpha -- content stacked UNDER the
+   canvas can never show through. The giant OSCEN hero type therefore sits
+   ABOVE the canvas with `mix-blend-mode: screen`. Don't retry under-canvas.
+3. Layer contract: `#experience` fixed z-1 (canvas + ghost title),
+   `main > section` relative z-10 (global.css). New sections need no extra
+   work; new fixed chrome goes z-20+.
+4. Copy sections between hero and HowItWorks intentionally show the DIMMED
+   brain behind them (MOODS.backdrop). Pinned scenes brighten to MOODS.focus.
+5. The site's `public/brain-viz/` is a STALE copy kept only for
+   investor-pitch/demo. Canonical source = `oscen/brain-viz/`. Phase 7
+   deletes the stale copy.
+6. Playwright MCP browser sometimes wedges with "Browser is already in use":
+   kill via `ps ax -o pid,command | grep mcp-chrome | awk '{print $1}' | xargs kill`.
+
+**Next steps in order:**
+1. (Jesus) Top up Higgsfield credits -> run the staged Phase 4 generation
+   (media_ids + exact params in the Phase 4 box below), poll job_status,
+   download the GLB to `public/models/humanoid.glb` (draco-compress if >8MB).
+2. Build `/dev/humanoid` harness + concrete-room environment + matte-porcelain
+   material tuning against `docs/reference/humanoid-target-*.png`.
+3. Phase 5 reveal choreography (brain group scale ~50x down into the head;
+   BrainModule.setScale exists for this).
+4. Phase 6 restyle pass (glass corner-tick cards, font-tech sweep across ALL
+   pages incl. inner, copy consolidation per Q4 -- KEEP competitor table).
+5. Phase 2 leftovers: mobile perf verification; eyebrow legibility polish.
+6. Phase 7 hardening/launch checklist as written.
+
+**Reminders owed to Jesus** (surface these when relevant):
+- After landing launch: revisit inner pages (architecture/research/invest).
+- At Phase 6: ask for the ambient audio track (player is already wired).
+- Push `redesign-v2` when he wants a Netlify branch preview.
+
+---
+
 ## Architecture decision (recommended, pending founder sign-off)
 
 **Rebuild IN THIS REPO on a branch (`redesign-v2`), keep Astro, go vanilla three.js.**
