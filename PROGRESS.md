@@ -12,6 +12,48 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-07-24 FEEDBACK ROUND 2 -- PERF + REVEAL FIXES (latest, post-swap)
+
+Jesus's testing round surfaced: HIW step lag/freezes, reveal jumping +
+flashes + "brain too low", general site lag. All root-caused and fixed,
+3 commits (perf / reveal / public-copy sync):
+
+**Perf root causes (instrumented, not guessed):**
+1. regions.setDim spammed material.needsUpdate on 17 materials on every
+   tick of every mood tween -> initMaterial/program-cache pass storm =
+   the per-step HIW freeze.
+2. regions.update animated ~15k HIDDEN instanced particles per frame in
+   cinematic mode (sines + matrix writes for meshes nobody renders).
+3. Glass backdrop-filter blur re-blurred the live canvas under every
+   card every frame -- replaced with more-opaque flat fill (CSS-only).
+4. Megapixel budget caps the drawing buffer (3.8/2.6/1.6 MP by tier);
+   big desktop windows at DPR 2 were rendering 8+ MP.
+5. Point-cloud vert shader: direct uniform indexing replaces the
+   15-iteration loop x 330k points.
+After: full-page continuous-scroll scan shows ZERO frames over 50ms.
+
+**Reveal root causes:**
+1. Camera fight: focusRegion(null) left _focusTarget set; _animate
+   lerped the target back to the brain every frame under the external
+   pose -> jitter while scrolling, re-aim (figure to bottom-left) on
+   stop. setCameraPose clears it; lerp gated on !_externalPose.
+2. "Brain too low" was three stacked issues: brain arrived at backdrop
+   dim (invisible; only EYE glows read -> looked like a low brain);
+   anatomy lay ear-to-ear (figure faces +Z, shell anterior +X) and
+   z-culled behind the depth-writing x-ray face (visible only where it
+   poked out). Now: yaw -90deg during the dive (turns WITH the head in
+   the outro), scale 0.038 + CRANIUM_LIFT 0.37 seats it in the cranium,
+   scrub owns dim (0 in-skull), sprites scale k^0.6 (luminance), and
+   shell/points/arcs render depthTest-off over the skull (renderOrder
+   0 figure / 1 shell+arcs / 2 points). Screenshot refs at workspace
+   root: fix-seat-closeup-v7.png (closeup), fix-outro-v2.png (outro).
+
+Shared-file fixes synced to canonical oscen/brain-viz working tree
+(regions/pointcloud/pulses; NOT committed there) + public/brain-viz.
+brain-shell.js stays site-divergent (DRACO + depthTest additions).
+
+---
+
 ## 2026-07-24 CINEMATIC BRAIN SWAP -- EXECUTED (late night session)
 
 Both phases of the plan below are DONE, verified in Playwright, committed
