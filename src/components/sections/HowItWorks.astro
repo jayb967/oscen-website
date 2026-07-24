@@ -1,76 +1,50 @@
 ---
 /**
- * Section: How It Works. 5-step processing pipeline.
- * Sense → Encode → Think → Act → Learn. Clean, linear flow.
+ * Section: How It Works (redesign-v2). Pinned scroll scene: the brain
+ * (persistent canvas behind) re-brightens, the camera glides to one
+ * region per step, and oversized captions swap Go2-style bottom-left.
+ *
+ * Copy + region mapping live in src/data/how-it-works.ts; choreography
+ * lives in src/scripts/experience.ts (queries [data-stage] markup).
+ * Without JS/with reduced motion this renders as a plain readable list.
  */
-const steps = [
-  {
-    num: "01",
-    title: "Sense",
-    desc: "Cameras see. Microphones hear. Touch sensors feel. Like your eyes and ears, every input streams in raw, all the time.",
-    accent: "accent-cyan",
-  },
-  {
-    num: "02",
-    title: "Encode",
-    desc: "Each input gets turned into spikes, the brain's native language. Edges show up in vision. Sounds become patterns. Nothing is pre-chewed.",
-    accent: "accent-blue",
-  },
-  {
-    num: "03",
-    title: "Think",
-    desc: "Half a million neurons connect the dots. The brain links what it is sensing now to what it has seen before. Memory, prediction, and decision happen together.",
-    accent: "accent-purple",
-  },
-  {
-    num: "04",
-    title: "Act",
-    desc: "Signals fire out to the body. Walk. Grab. Speak. The robot moves in real time, with no round trip to a data center.",
-    accent: "accent-green",
-  },
-  {
-    num: "05",
-    title: "Learn",
-    desc: "What just happened comes back as feedback. Connections strengthen or fade based on the outcome. One step later, the brain is different. Better.",
-    accent: "accent-amber",
-  },
-];
+import { PIPELINE_STEPS } from "@data/how-it-works";
 ---
 
-<section id="how-it-works" class="section relative">
-  <div class="max-w-4xl mx-auto w-full">
-    <div class="text-center mb-20">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">How It Works</p>
+<section id="how-it-works" class="relative">
+  <div class="hiw-frame max-w-6xl mx-auto w-full px-6 md:px-10 py-24">
+    <div class="hiw-header text-center mb-16">
+      <p class="reveal hud-label !text-[10px] !tracking-[0.3em] mb-6 text-text-muted">How It Works</p>
       <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
         Five steps.<br />
         <span class="italic gradient-text">Every millisecond.</span>
       </h2>
     </div>
 
-    <!-- Pipeline flow -->
-    <div class="space-y-3">
-      {steps.map((s, i) => (
-        <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.2}s; --glow-color: var(--color-${s.accent});`}>
-          <div class="flex items-center gap-5">
-            <span class={`text-2xl font-mono text-${s.accent}/40 group-hover:text-${s.accent} transition-colors duration-300 w-10`}>{s.num}</span>
-            <h3 class={`text-lg font-medium text-${s.accent} group-hover:text-text-primary transition-colors duration-300`}>
-              {s.title}
-            </h3>
-            {i < steps.length - 1 && (
-              <span class="hidden md:inline text-text-muted/20 ml-auto mr-2">→</span>
-            )}
-            <span class={`expand-indicator text-${s.accent}/40 text-sm ${i < steps.length - 1 ? '' : 'ml-auto'}`}>+</span>
-          </div>
-          <div class="expand-body mt-3 ml-[3.75rem]">
-            <p class="text-sm text-text-secondary leading-relaxed">{s.desc}</p>
-          </div>
+    <div class="hiw-stages relative">
+      {PIPELINE_STEPS.map((s, i) => (
+        <div
+          class="hiw-stage mb-14"
+          data-stage
+          data-region={s.region}
+          data-index={i}
+          style={`--stage-accent: var(--color-${s.accent});`}
+        >
+          <p class="hiw-num hud-label !text-[11px] mb-3 text-scrim" style="color: var(--stage-accent);">
+            {s.num} / 05
+          </p>
+          <h3 class="hiw-title text-text-primary text-scrim" style="font-family: var(--font-tech); font-weight: 700; font-size: clamp(3rem, 8vw, 7rem); line-height: 0.95; letter-spacing: -0.02em;">
+            {s.title}
+          </h3>
+          <p class="hiw-desc mt-5 text-text-primary/90 text-scrim text-[clamp(0.95rem,1.3vw,1.15rem)] leading-relaxed max-w-md">
+            {s.desc}
+          </p>
         </div>
       ))}
     </div>
 
-    <!-- Cycle indicator -->
-    <div class="reveal text-center mt-12">
-      <div class="inline-flex items-center gap-3 text-[10px] font-mono text-text-muted">
+    <div class="hiw-footer text-center mt-4">
+      <div class="inline-flex items-center gap-3 hud-label !text-[10px] text-text-muted">
         <span class="w-8 h-px bg-gradient-to-r from-transparent to-text-muted/30"></span>
         <span>This loop runs continuously. The brain never stops learning.</span>
         <span class="w-8 h-px bg-gradient-to-l from-transparent to-text-muted/30"></span>
@@ -79,10 +53,40 @@ const steps = [
   </div>
 </section>
 
-<script>
-  if ("ontouchstart" in window) {
-    document.querySelectorAll<HTMLElement>("#how-it-works .expand-card").forEach((card) => {
-      card.addEventListener("click", () => card.classList.toggle("expanded"));
-    });
+<style>
+  /* Pinned mode (experience.ts adds .hiw-pinned when it takes over):
+     the section becomes one viewport; captions stack bottom-left and
+     the choreography cross-fades them over the live brain. */
+  :global(#how-it-works.hiw-pinned) .hiw-frame {
+    height: 100vh;
+    max-width: none;
+    padding: 0;
+    display: block;
   }
-</script>
+  :global(#how-it-works.hiw-pinned) .hiw-header {
+    position: absolute;
+    top: 7rem;
+    left: 0;
+    right: 0;
+    margin: 0;
+  }
+  :global(#how-it-works.hiw-pinned) .hiw-stages {
+    position: absolute;
+    inset: 0;
+  }
+  :global(#how-it-works.hiw-pinned) .hiw-stage {
+    position: absolute;
+    left: clamp(1.5rem, 6vw, 6rem);
+    bottom: clamp(5rem, 14vh, 9rem);
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  :global(#how-it-works.hiw-pinned) .hiw-footer {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 0;
+    right: 0;
+    margin: 0;
+  }
+</style>

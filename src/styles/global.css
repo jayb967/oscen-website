@@ -54,6 +54,16 @@ main > section {
   color: var(--color-text-secondary);
 }
 
+/* Layered dark text-shadow so copy stays legible over the bright brain.
+   Shared by the hero and every caption that floats on the canvas. */
+.text-scrim {
+  text-shadow:
+    0 2px 20px rgba(5, 8, 16, 1),
+    0 4px 40px rgba(5, 8, 16, 0.95),
+    0 8px 80px rgba(5, 8, 16, 0.8),
+    0 0 120px rgba(5, 8, 16, 0.6);
+}
+
 /* ─── Base ─── */
 html {
   scroll-behavior: smooth;

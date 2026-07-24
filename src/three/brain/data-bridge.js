@@ -445,19 +445,33 @@ export class DataBridge {
         }
     }
 
+    /**
+     * Boost firing rates (and optionally neuromodulators) on top of the
+     * live/sim feed for ~5s. Values merge via max(), so this flares
+     * regions/pathways without suppressing organic activity. Used by the
+     * scroll choreography; also the demo_reaction postMessage payload.
+     */
+    applyOverride(firingRates = {}, neuromodulation = {}) {
+        this._demoOverride = {
+            firingRates,
+            neuromodulation,
+            timestamp: Date.now(),
+        };
+    }
+
+    clearOverride() {
+        this._demoOverride = null;
+    }
+
     /** Handle postMessage from parent frame (demo reaction pages) */
     _handlePostMessage(event) {
         const msg = event.data;
         if (!msg || typeof msg !== 'object') return;
 
         if (msg.type === 'demo_reaction') {
-            this._demoOverride = {
-                firingRates: msg.firingRates || {},
-                neuromodulation: msg.neuromodulation || {},
-                timestamp: Date.now(),
-            };
+            this.applyOverride(msg.firingRates || {}, msg.neuromodulation || {});
         } else if (msg.type === 'demo_clear') {
-            this._demoOverride = null;
+            this.clearOverride();
         } else if (msg.type === 'demo_benchmark') {
             // Benchmark retention data from parent frame (continual learning page)
             // msg.retention = { pathwayId: retentionFloat (0-1) }

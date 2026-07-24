@@ -61,8 +61,23 @@ function init() {
 
     if (!prefersReduced) {
         initSmoothScroll();
-        initChoreography(stage);
+        initHeroScene(stage);
+        initHowItWorksScene(stage);
     }
+}
+
+/** Named brain states so every scene speaks the same vocabulary. */
+const MOODS = {
+    hero: { dim: 0, bloom: 1.0 },        // full presence behind the hero
+    backdrop: { dim: 0.75, bloom: 0.45 }, // quiet behind copy sections
+    focus: { dim: 0.3, bloom: 0.9 },      // pinned scenes: bright, one region flared
+};
+
+const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
+
+function applyMood(stage: BrainStage, mood: { dim: number; bloom: number }) {
+    stage.module.setDim(mood.dim);
+    stage.setBloomStrength(mood.bloom);
 }
 
 /** Lenis drives scroll; GSAP's ticker drives Lenis; ScrollTrigger listens. */
@@ -74,11 +89,11 @@ function initSmoothScroll() {
 }
 
 /**
- * Hero: camera dollies back and the brain dims/settles as you scroll
- * into the content. The giant back-title fades slightly ahead of it.
- * (Phase 3 will extend this timeline with the pinned explainer scenes.)
+ * Hero: camera dollies back and the brain settles from `hero` to
+ * `backdrop` mood as you scroll into the content. The giant back-title
+ * fades slightly ahead of it.
  */
-function initChoreography(stage: BrainStage) {
+function initHeroScene(stage: BrainStage) {
     const hero = document.getElementById("hero");
     const backTitle = document.getElementById("experience-title");
     if (!hero) return;
@@ -94,14 +109,94 @@ function initChoreography(stage: BrainStage) {
         onUpdate: (self) => {
             const p = self.progress;
             stage.setOrbit({
-                radius: ORBIT_START.radius + (ORBIT_END.radius - ORBIT_START.radius) * p,
-                height: ORBIT_START.height + (ORBIT_END.height - ORBIT_START.height) * p,
+                radius: lerp(ORBIT_START.radius, ORBIT_END.radius, p),
+                height: lerp(ORBIT_START.height, ORBIT_END.height, p),
             });
-            stage.module.setDim(p * 0.75);
-            stage.setBloomStrength(1.0 - p * 0.55);
+            applyMood(stage, {
+                dim: lerp(MOODS.hero.dim, MOODS.backdrop.dim, p),
+                bloom: lerp(MOODS.hero.bloom, MOODS.backdrop.bloom, p),
+            });
             if (backTitle) {
                 backTitle.style.opacity = String(Math.max(0, 1 - p * 1.6));
             }
+        },
+    });
+}
+
+/**
+ * How It Works: pin the section for one viewport per step. Each step
+ * cross-fades its caption, glides the camera to its brain region, and
+ * flares that region's firing rate through the real data bridge.
+ * The section renders as a plain list until .hiw-pinned is added here.
+ */
+function initHowItWorksScene(stage: BrainStage) {
+    const section = document.getElementById("how-it-works");
+    if (!section) return;
+    const captions = Array.from(
+        section.querySelectorAll<HTMLElement>("[data-stage]"),
+    );
+    if (!captions.length) return;
+
+    section.classList.add("hiw-pinned");
+
+    // Per-step orbit poses: gentle radius/height drift keeps the glide alive.
+    const ORBITS = [
+        { radius: 13, height: 3 },
+        { radius: 12, height: 5 },
+        { radius: 11, height: 4 },
+        { radius: 12, height: 2.5 },
+        { radius: 13, height: 5.5 },
+    ];
+
+    let active = -1;
+    const header = section.querySelector<HTMLElement>(".hiw-header");
+
+    const showCaption = (i: number) => {
+        const prev = captions[active];
+        const next = captions[i];
+        active = i;
+        if (prev) {
+            gsap.to(prev, { opacity: 0, y: -24, duration: 0.35, ease: "power2.in", overwrite: true });
+        }
+        gsap.fromTo(
+            next,
+            { opacity: 0, y: 32 },
+            { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", delay: prev ? 0.15 : 0, overwrite: true },
+        );
+        // Header yields to the captions after the first step.
+        if (header) {
+            gsap.to(header, { opacity: i === 0 ? 1 : 0.2, duration: 0.5, overwrite: true });
+        }
+
+        const region = next.dataset.region!;
+        stage.focusRegion(region);
+        stage.setOrbit(ORBITS[i % ORBITS.length]);
+        // Flare the step's region on top of organic activity (~5s decay).
+        stage.module.bridge.applyOverride({ [region]: 0.18 });
+    };
+
+    const leave = (restoreMood = true) => {
+        stage.focusRegion(null);
+        stage.module.bridge.clearOverride();
+        if (restoreMood) applyMood(stage, MOODS.backdrop);
+    };
+
+    ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: () => "+=" + captions.length * window.innerHeight,
+        pin: true,
+        scrub: true,
+        onEnter: () => applyMood(stage, MOODS.focus),
+        onEnterBack: () => applyMood(stage, MOODS.focus),
+        onLeave: () => leave(),
+        onLeaveBack: () => leave(),
+        onUpdate: (self) => {
+            const i = Math.min(
+                captions.length - 1,
+                Math.floor(self.progress * captions.length),
+            );
+            if (i !== active) showCaption(i);
         },
     });
 }
