@@ -12,33 +12,46 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
-## 2026-07-24 SESSION HANDOFF -- START HERE
+## 2026-07-24 SESSION HANDOFF v2 (late evening) -- START HERE
 
-**State**: branch `redesign-v2` (NOT pushed), 7 commits ahead of `main`, all
-builds green. Phases 0-3 complete; Phase 4 staged but blocked on Higgsfield
-credits (see Phase 4 box). All open questions Q1-Q6 answered (see bottom).
+**State**: branch `redesign-v2` (NOT pushed, deliberately: Jesus wants a
+local feedback round first), 11 commits ahead of `main`, all builds green,
+working tree clean. Phases 0-6 functionally COMPLETE including the Phase 5
+reveal; Phase 7 (hardening/launch) not started. Q1-Q6 answered (bottom).
 
-**Working setup**: `cd oscen-website && npm run dev` -> localhost:4321
-(landing experience) and localhost:4321/dev/brain (raw brain module harness).
+**NEXT SESSION = VISUAL FEEDBACK ROUND**: Jesus will supply screenshots
+with change requests against the running site. Before touching code, make
+sure the dev server is up (`cd oscen-website && npm run dev` -> :4321,
+restart it after any `npm run build` -- the build invalidates the Vite
+dep cache and the dev server starts 504ing "Outdated Optimize Dep").
+Iterate screenshot-by-screenshot; verify each fix visually (Playwright)
+before moving on; commit in small logical chunks. Push only when he says.
 
-**What exists now (files created this session):**
-- `src/three/brain/` -- data-bridge.js / brain-regions.js / brain-pulses.js
-  (ported from canonical `oscen/brain-viz/`, do NOT edit the website's stale
-  `public/brain-viz/` copy) + `brain-module.js` (BrainModule: portable
-  THREE.Group) + `brain-stage.js` (BrainStage: container shell; scroll hooks
-  `setOrbit/setCameraPose/focusRegion/setBloomStrength/setPointer`).
-- `src/scripts/experience.ts` -- owns the persistent canvas + Lenis +
-  ScrollTrigger choreography (hero scene + pinned HowItWorks scene, shared
-  `MOODS` states). Exposed as `window.__experience`.
-- `src/scripts/audio-controller.ts` -- ambient player; activates when
-  `public/audio/ambient.mp3` exists (autoplay + gesture unlock + HUD toggle).
-- `src/components/ExperienceHUD.astro` -- live ticker (listens to
-  `oscen:metrics` / `oscen:datamode` window events) + sound toggle.
-- `src/data/how-it-works.ts` -- pipeline copy + step->brain-region mapping.
-- `src/pages/dev/brain.astro` -- parity/debug harness (noindex).
-- Rewritten: `Hero.astro` (no iframe), `HowItWorks.astro` (pinned scene,
-  degrades to list), `index.astro` (experience layer + HUD), `global.css`
-  (--font-tech, main>section z-10, .hud-label, .text-scrim).
+**Page map for feedback triage:**
+- Landing experience: Hero -> ProofStrip -> Problem -> Solution ->
+  InspiredByYou -> Proof -> HowItWorks (pinned) -> Reveal (pinned,
+  brain-into-head) -> RealWorld -> Market -> Vision -> ThreePaths -> CTA
+  -> Footer. Landing copy lives in `src/data/sections.ts` (+ reveal.ts,
+  how-it-works.ts); section markup in `src/components/sections/`.
+- 3D: `src/three/brain/` (BrainModule/BrainStage) + `src/three/humanoid/`
+  (humanoid-figure.js = model/materials/x-ray/head-tracking,
+  humanoid-environment.js = concrete room, humanoid-reveal.js = Phase 5
+  choreography). Scroll wiring: `src/scripts/experience.ts`.
+- Debug harnesses: /dev/brain, /dev/humanoid (framing + material buttons,
+  sliders, drag-drop GLB). Choreography debug from the landing page
+  console: `__experience.reveal.enter(); __experience.reveal.setProgress(0.5)`.
+- Inner pages (architecture/research/invest/build/contact/support/
+  privacy/terms): restyled tokens + shared `Footer.astro`.
+
+**Design contracts currently in force (change only if Jesus asks):**
+- One accent (blue); semantic exceptions: red = problem/flaw/severity,
+  green = live/advantage/excitatory, pink = inhibitory (arch 80/20),
+  amber = warnings. Type: Instrument Serif narrative headlines, Space
+  Grotesk (`font-tech`) for HUD/captions/stats. JetBrains Mono unloaded.
+- Glass cards carry `.glass-ticks` corner brackets (background strokes;
+  ::after is reserved for the glow hint).
+- Footer giant type: "One brain." solid / "Any body." outline, mirrors
+  the reveal captions.
 
 **Critical gotchas (learned the hard way, do not rediscover):**
 1. `three` is PINNED to 0.160.0. r185 blows out the bloom into a white core.
@@ -57,25 +70,26 @@ credits (see Phase 4 box). All open questions Q1-Q6 answered (see bottom).
 6. Playwright MCP browser sometimes wedges with "Browser is already in use":
    kill via `ps ax -o pid,command | grep mcp-chrome | awk '{print $1}' | xargs kill`.
 
-**Next steps in order (updated 2026-07-24 evening):**
-1. DONE -- Phase 4 generation ran (credits were topped up): GLB live at
-   `public/models/humanoid.glb`, `/dev/humanoid` harness + environment built
-   (see Phase 4 box for details + gotchas).
-2. Phase 4 leftovers: head-shell-only x-ray mask + lit eyes; cursor head
-   tracking; optional texture cleanup at shoulder joints.
-3. Phase 5 reveal choreography (brain group scale ~50x down into the head;
-   BrainModule.setScale exists; HumanoidStage xray state validated).
-4. DONE -- Phase 6 core restyle (glass-ticks cards, font-tech sweep site-wide,
-   Q4 copy consolidation; competitor table kept). Remaining: typographic
-   footer, spacing normalization, one-accent pass.
-5. Phase 2 leftovers: REAL-DEVICE mobile check (emulated pass done, DPR cap
-   1.5 on small screens shipped); eyebrow legibility polish.
-6. Phase 7 hardening/launch checklist as written.
+**Next steps in order (updated 2026-07-24 late evening):**
+1. VISUAL FEEDBACK ROUND (next session): apply Jesus's screenshot-driven
+   fixes. See "NEXT SESSION" block above for the workflow.
+2. After sign-off: push `redesign-v2`, enable the Netlify branch preview,
+   and have Jesus do the REAL-DEVICE mobile check on the preview URL
+   (emulated pass done; DPR cap 1.5 on small screens shipped; add a
+   static poster fallback only if a real phone struggles).
+3. Phase 7 hardening/launch checklist as written (analytics/consent
+   regression, delete stale public/brain-viz once nothing references it,
+   cross-browser + Lighthouse, OG images, then merge to main).
+4. Known small leftovers, do opportunistically: reveal soft snap points;
+   shoulder-joint texture cleanup on the GLB (needs a DCC tool, not code);
+   deep-link-past-reveal shows the plain brain backdrop (accepted).
 
 **Reminders owed to Jesus** (surface these when relevant):
-- After landing launch: revisit inner pages (architecture/research/invest).
-- At Phase 6: ask for the ambient audio track (player is already wired).
-- Push `redesign-v2` when he wants a Netlify branch preview.
+- ASK FOR THE AMBIENT AUDIO TRACK: player fully wired, activates the
+  moment `public/audio/ambient.mp3` exists (reminder already given once).
+- After landing launch: revisit inner pages (architecture/research/
+  invest) for deeper treatment (currently tokens/footer only, per Q5).
+- Higgsfield balance after the humanoid generation: 1,165 credits.
 
 ---
 
