@@ -47,12 +47,13 @@ const VERT = /* glsl */ `
     varying float vWeight;
 
     void main() {
+        // Direct uniform-array indexing: dynamic indexing is spec-legal in
+        // VERTEX shaders even under GLSL ES 1.00 (the constant-index rule
+        // only binds fragment shaders), and this runs per point per frame --
+        // the old defensive loop cost NUM_REGIONS iterations x 330k points.
         int ri = int(aRegion + 0.5);
-        float rate = 0.0;
-        float pulse = 0.0;
-        for (int i = 0; i < ${NUM_REGIONS}; i++) {
-            if (i == ri) { rate = uRates[i]; pulse = uPulse[i]; }
-        }
+        float rate = uRates[ri];
+        float pulse = uPulse[ri];
 
         float intensity = clamp(rate + pulse * 0.5, 0.0, 1.4);
         vIntensity = intensity;
@@ -173,7 +174,11 @@ export class BrainPointCloud {
             transparent: true,
             blending: THREE.AdditiveBlending,
             depthWrite: false,
-            depthTest: true,
+            // No depth test: in the reveal the humanoid's head (which DOES
+            // write depth) would otherwise z-cull every neuron behind the
+            // face -- the brain must glow THROUGH the skull. In the plain
+            // brain scenes nothing else writes depth, so this changes nothing.
+            depthTest: false,
         });
 
         this.points = new THREE.Points(geo, this.material);
@@ -306,10 +311,16 @@ export class BrainPointCloud {
      * POSITIONS inherit the parent transform, but gl_PointSize does not --
      * without this, shrinking the brain (the reveal) leaves every firing
      * point at full screen-space size and the clusters read as giant blobs.
+     *
+     * Sub-linear exponent: strictly linear sprite size makes the cloud's
+     * luminance fall off with scale^2, and the in-skull brain goes almost
+     * invisible. k^0.6 keeps k=1 exact (hero untouched) while giving the
+     * 0.038-scale reveal brain ~5x the linear sprite footprint -- glowing
+     * mass, still well inside the skull silhouette.
      */
     setSizeScale(k) {
         this._sizeScale = k;
-        if (this.material) this.material.uniforms.uSize.value = 1.5 * k;
+        if (this.material) this.material.uniforms.uSize.value = 1.5 * Math.pow(k, 0.6);
     }
 
     setVisible(v) { if (this.points) this.points.visible = v; }

@@ -102,10 +102,16 @@ export class BrainShell {
             opacity: 0.22,
             side: THREE.FrontSide,
             depthWrite: false,   // let interior glow show through
+            // No depth test: the reveal parks the shell inside the humanoid's
+            // depth-writing head; the glass must stay visible through the
+            // skull. Elsewhere nothing writes depth, so no visual change.
+            depthTest: false,
         });
 
         this.mesh = new THREE.Mesh(geo, this.material);
         this.mesh.frustumCulled = false;
+        // After the figure (0), before the neuron points (2).
+        this.mesh.renderOrder = 1;
         this.group.add(this.mesh);
 
         // Uniform scale so the largest dimension maps to TARGET_MAX_DIM.
