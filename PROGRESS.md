@@ -12,7 +12,56 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
-## 2026-07-24 CINEMATIC BRAIN SWAP -- FULL PLAN (NEXT SESSION: START HERE)
+## 2026-07-24 CINEMATIC BRAIN SWAP -- EXECUTED (late night session)
+
+Both phases of the plan below are DONE, verified in Playwright, committed
+on `redesign-v2` (NOT pushed -- Jesus still reviewing locally). 8 commits:
+Phase 1 (demo swap), module copies, draco GLB, regions/pulses re-sync,
+BrainModule integration, BrainStage integration + bloom re-tune, pulses
+setDim fix, reveal-fit + HIW pose fixes.
+
+**What shipped:**
+- Investor demo iframe -> canonical cinematic copy at
+  `/brain-viz/index.html?mode=sim` (HUD VISIBLE per Jesus -- no embed=true).
+- Hero native port: shell GLB draco-compressed 4.49 MB -> 431 KB at
+  `public/models/brain.glb` (decoder at public/draco/, BrainShell.load
+  gained an optional dracoDecoderPath -- SITE-ONLY divergence, canonical's
+  import map has no DRACOLoader entry, do not sync that one back).
+- BrainModule.loadCinematic() mounts shell + point cloud INSIDE
+  module.group (reveal setScale/setDim intact); BrainStage kicks it on an
+  idle callback after first classic paint (LCP rule preserved).
+- Bloom regime: threshold 0.80 / radius 1.05 / cap 0.34, exposure 1.0,
+  PMREM RoomEnvironment, grade pass above low tier, quality auto-tier.
+  MOODS rescaled: hero 0.34 / backdrop 0.16 / focus 0.30; reveal ramps
+  0.16->0.20->0.14->0.06, outro ->0.08, backdrop-fallback 0.09.
+- HIW orbits re-tuned (+5 radius, step-4 height up) for the wider shell.
+
+**Bugs found + fixed (SYNCED to canonical oscen/brain-viz working tree,
+NOT yet committed there -- review + commit in the oscen repo):**
+1. brain-pulses.js setDim wrote material.opacity on a ShaderMaterial =
+   silent no-op; now drives uBaseOpacity + a pulse-intensity multiplier.
+   (Also affects canonical Beliefs Mode dim.)
+2. brain-pointcloud.js: new setSizeScale(k) -- gl_PointSize doesn't
+   inherit the group transform, so the reveal shrink left firing clusters
+   as giant screen-space blobs at the skull's ears. BrainModule.setScale
+   propagates. BRAIN_END_SCALE 0.066 -> 0.055 (wider cinematic shell).
+
+**Verified:** hero 86 fps desktop (330k pts, high tier), reveal heaviest
+frame 90 fps, /dev/brain 116 fps + parity vs canonical :8788 embed,
+mobile 390x844 emulated 120 fps @ DPR 1 (real-device check still owed),
+full scroll-through (backdrop quiet again, five HIW flares on anatomical
+anchors, reveal brain fits the skull, outro portrait), demo iframe boots
+cinematic with HUD + zero console errors, npm run build green, dev server
+restarted. Screenshots from the session at workspace root (phase1/phase2-*.png).
+
+**Still owed:** Jesus eyeballs everything (esp. HIW step framing + reveal
+brightness inside the skull -- tuned by eye, taste calls are his); real
+push + Netlify preview per the v2 handoff; commit the two synced fixes in
+the oscen repo.
+
+---
+
+## 2026-07-24 CINEMATIC BRAIN SWAP -- FULL PLAN (executed above, kept for reference)
 
 The canonical brain-viz in the sibling repo (`oscen/brain-viz/`) was
 overhauled to a single Cinematic version (classic point-cloud renderer

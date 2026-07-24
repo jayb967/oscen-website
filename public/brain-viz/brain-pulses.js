@@ -412,6 +412,7 @@ export class BrainPulses {
 
     _syncUniforms() {
         const daWarmth = Math.max(0, (this.neuromodulation.da || 1.2) - 1.0);
+        const dimK = this._dimK != null ? this._dimK : 1.0;
 
         for (const pw of this.pathways) {
             const unis = pw.material.uniforms;
@@ -423,7 +424,7 @@ export class BrainPulses {
             for (let i = 0; i < MAX_PULSES_PER_PATHWAY; i++) {
                 if (i < pw.pulses.length) {
                     posArr[i] = pw.pulses[i].t;
-                    intArr[i] = pw.pulses[i].intensity;
+                    intArr[i] = pw.pulses[i].intensity * dimK;
                 } else {
                     posArr[i] = -10.0; // off-screen
                     intArr[i] = 0.0;
@@ -442,16 +443,18 @@ export class BrainPulses {
         // tube meshes entirely so the bloom pass can't amplify them, and
         // active pulses are cleared so they don't keep blooming for a
         // few hundred ms after the dim.
+        //
+        // NOTE: the tubes render with a custom ShaderMaterial, so setting
+        // material.opacity does NOTHING (the shader never reads it) -- dim
+        // must go through the shader's own uniforms: uBaseOpacity for the
+        // resting tube, and a pulse-intensity multiplier (applied in
+        // _syncUniforms) for the traveling glow.
         const k = Math.max(0, Math.min(1, 1 - factor));
         const hide = factor > 0.85;
+        this._dimK = k;
         for (const pw of this.pathways) {
-            if (pw.material) {
-                const base = (pw.material.userData && pw.material.userData.baseOpacity != null)
-                    ? pw.material.userData.baseOpacity
-                    : 1.0;
-                pw.material.opacity = base * k;
-                pw.material.transparent = true;
-                pw.material.needsUpdate = true;
+            if (pw.material && pw.material.uniforms) {
+                pw.material.uniforms.uBaseOpacity.value = BASE_OPACITY * k;
             }
             if (pw.mesh) pw.mesh.visible = !hide;
             if (hide && Array.isArray(pw.pulses)) pw.pulses.length = 0;
