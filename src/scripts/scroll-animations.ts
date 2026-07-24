@@ -85,19 +85,8 @@ function animateHero() {
     });
   }
 
-  // Brain viz zoom: grows as user scrolls through hero
-  const brainFrame = document.getElementById("brain-frame") as HTMLIFrameElement | null;
-  if (brainFrame) {
-    ScrollTrigger.create({
-      trigger: hero,
-      start: "top top",
-      end: "bottom top",
-      scrub: true,
-      onUpdate: (self) => {
-        brainFrame.contentWindow?.postMessage({ zoom: self.progress }, "*");
-      },
-    });
-  }
+  // Brain camera/dim choreography lives in experience.ts (inline stage,
+  // no more iframe postMessage).
 }
 
 /* ─── Batch reveal for all .reveal elements ─── */

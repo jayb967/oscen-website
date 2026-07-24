@@ -19,11 +19,30 @@ import Vision from "../components/sections/Vision.astro";
 import FounderVision from "../components/sections/FounderVision.astro";
 import ThreePaths from "../components/sections/ThreePaths.astro";
 import CTA from "../components/sections/CTA.astro";
+import ExperienceHUD from "../components/ExperienceHUD.astro";
 ---
 
 <Base title="OSCEN | Intelligence that grows">
   <Nav />
   <ScrollIndicator />
+  <ExperienceHUD />
+
+  <!-- Persistent experience layer. The bloom composer writes opaque
+       alpha, so a title UNDER the canvas can never show through; instead
+       the giant title sits ABOVE it with mix-blend-mode:screen -- bright
+       particles overpower the glyphs (reads as "brain in front of type"),
+       dark areas reveal them. Section content paints above via
+       main>section z-10. -->
+  <div id="experience" class="fixed inset-0 z-[1] pointer-events-none" aria-hidden="true">
+    <div id="experience-canvas" class="absolute inset-0"></div>
+    <div
+      id="experience-title"
+      class="absolute inset-0 flex items-center justify-center select-none"
+      style="font-family: var(--font-tech); font-weight: 700; font-size: clamp(6rem, 19vw, 22rem); letter-spacing: -0.02em; color: rgba(226, 232, 244, 0.16); mix-blend-mode: screen;"
+    >
+      OSCEN
+    </div>
+  </div>
 
   <main>
     <Hero />
@@ -40,4 +59,8 @@ import CTA from "../components/sections/CTA.astro";
     <ThreePaths />
     <CTA />
   </main>
+
+  <script>
+    import "../scripts/experience";
+  </script>
 </Base>

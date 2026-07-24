@@ -218,6 +218,16 @@ export class BrainStage {
         if (target) this._target.set(target.x, target.y, target.z);
     }
 
+    /**
+     * Adjust the idle auto-orbit without taking camera ownership.
+     * Used by scroll choreography for dolly-style moves that keep the
+     * orbit + parallax alive. Any field may be omitted.
+     */
+    setOrbit({ radius, height } = {}) {
+        if (radius !== undefined) this._orbitRadius = radius;
+        if (height !== undefined) this._orbitHeight = height;
+    }
+
     /** Hand the camera back to the idle auto-orbit. */
     releaseCameraPose() {
         this._externalPose = false;

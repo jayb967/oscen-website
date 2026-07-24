@@ -86,20 +86,33 @@ Source: `oscen/brain-viz/` (canonical, newer than the website copy).
 
 ## Phase 2 -- Scroll rig + new hero (2-3 days)
 
-- [ ] `SiteExperience` orchestrator: one WebGLRenderer + fixed canvas behind all
-      content, single rAF, GSAP ScrollTrigger master timeline mapped to camera
-      position/target + per-section scene state. Lenis wired to ScrollTrigger.
-- [ ] Hero (reference: ref-unfor-hero.jpeg + current hero copy): brain floats
-      center, oversized OSCEN display type split so the brain overlaps letters
-      (front/behind depth trick -- two text layers, one behind canvas via z-index,
-      one masked in front). Keep current copy ("Intelligence that grows" etc).
-- [ ] Persistent HUD chrome: top-left wordmark, top-right nav, bottom-left live
-      stat ticker (step count / neurons / synapses from DataBridge), bottom-center
-      SCROLL TO EXPLORE. Small, monospace, spaced uppercase.
-- [ ] Silent preload: assets load during hero (brain is procedural = instant;
-      humanoid GLB streams in background), thin progress line only if >400ms.
-- [ ] Mobile: reduced particle counts + capped DPR; verify 60fps on a mid phone,
-      else static poster fallback.
+- [x] `src/scripts/experience.ts`: BrainStage mounted in fixed transparent
+      canvas (`#experience` z-1; `main > section` z-10 via global.css), Lenis
+      bridged to ScrollTrigger via gsap.ticker, hero choreography (orbit dolly
+      14->23, dim 0->0.75, bloom 1.0->0.45, back-title fade). Exposed as
+      `window.__experience`. Reduced motion skips Lenis + choreography.
+- [x] Hero rewritten (`Hero.astro`): iframe GONE, copy unchanged, parallax now
+      drives `stage.setPointer` directly (old postMessage was a no-op),
+      BrainVizPlay conversion preserved. Giant OSCEN back-title: the bloom
+      composer writes OPAQUE alpha so under-canvas text can never show through;
+      implemented instead as an over-canvas layer with `mix-blend-mode: screen`
+      (bright particles overpower glyphs = same depth read). Stat line honest:
+      "Training now" replaces the cosmetic "Live" badge.
+- [x] HUD chrome (`ExperienceHUD.astro`): bottom-left live ticker (step count,
+      neurons, SIMULATED/LIVE mode from real bridge status events), bottom-right
+      sound toggle. font-tech (Space Grotesk added to Base.astro fonts).
+- [x] Audio (Q6): `audio-controller.ts` -- HEAD-probes `/audio/ambient.mp3`,
+      toggle stays hidden until the file EXISTS (drop it in public/audio/ to
+      activate), autoplay attempted + one-shot gesture unlock fallback, 2.5s
+      fades, localStorage preference. Expect one dev-console 404 until the
+      track ships -- harmless, by design.
+- [x] Silent preload: brain is procedural (renders in <1s), canvas fades in
+      over 2s. No gate, no progress bar needed at current asset weight.
+- [ ] Mobile: verify on real device; add reduced particle counts / static
+      poster fallback if needed. (Desktop verified at 120fps; DPR already
+      capped at 2; offscreen pause active.)
+- [ ] Polish pass with fresh eyes: eyebrow legibility over bright clusters,
+      back-title size/opacity tuning, hero->ProofStrip transition timing.
 
 ## Phase 3 -- "How it works" pinned scenes (2-3 days)
 
@@ -187,24 +200,29 @@ Total estimate: ~3 weeks focused work.
 
 ## Open questions for Jesus (answer before Phase 1 ends)
 
-- **Q1 -- Stack sign-off**: OK with staying Astro + vanilla three.js in this repo on
-  a branch (recommendation above), vs. a fresh React/R3F project in a new folder?
-- **Q2 -- Humanoid sourcing**: (a) buy + retexture a stock rigged android (fastest,
-  $50-300, closest controllable match), (b) AI image-to-3D from the screenshots as
-  a base then cleanup (cheap, quality risk for hero closeups), (c) commission a
-  custom sculpt (best match, slowest/priciest). Also: confirm the feminine
-  EVE-style android IS the OSCEN brand direction (it will become the face of the
-  company site).
-- **Q3 -- Typography**: keep Instrument Serif + Outfit (current brand, humane/warm),
-  or move toward the references' technical display sans (condensed/extended
-  grotesk) for hero type? (Hybrid possible: display sans for HUD/captions, serif
-  for narrative headings.)
-- **Q4 -- Copy scope**: pure re-skin of existing 13-section copy, or also consolidate
-  (e.g. merge Vision + FounderVision, trim Market) while we're in there?
-- **Q5 -- Page scope**: landing page only gets the 3D experience (inner pages just
-  restyled), or should architecture/research get their own scroll scenes too?
-- **Q6 -- Sound**: unfor-dev has ambient audio + toggle. Add a subtle neural
-  soundscape (off by default), or skip audio entirely?
+- **Q1 -- Stack sign-off**: ANSWERED 2026-07-24 -- YES, Astro + vanilla three.js
+  in-repo on `redesign-v2`.
+- **Q2 -- Humanoid sourcing**: ANSWERED 2026-07-24 -- custom sculpt built from an
+  AI image-to-3D base (generate from the target screenshots, then clean up
+  topology/materials, add panel-seam detail, rig for idle animation). The
+  feminine EVE-style android IS confirmed as the brand's face. Fallback if the
+  AI base can't reach hero-closeup quality on the FACE: keep the AI body, swap
+  in a sculpted/stock head, or drop to a stock rigged android retextured.
+- **Q3 -- Typography**: ANSWERED 2026-07-24 -- HYBRID: technical sans for HUD
+  chrome, captions, and stat numbers; Instrument Serif stays for narrative
+  headlines. MUST be applied consistently across the ENTIRE site (inner pages
+  included), not just the landing experience.
+- **Q4 -- Copy scope**: ANSWERED 2026-07-24 -- consolidate per recommendation
+  (merge Vision + FounderVision, trim Market) BUT the competitor comparison
+  content (Market's competitor table + VLA-ceiling explainer) MUST be kept.
+- **Q5 -- Page scope**: ANSWERED 2026-07-24 -- landing page only for now; inner
+  pages get restyled tokens/nav/footer. REMINDER OWED TO JESUS: after landing
+  launch, revisit inner pages (architecture/research/invest) for deeper
+  treatment.
+- **Q6 -- Sound**: ANSWERED 2026-07-24 -- build the audio functionality now
+  (player + HUD toggle + autoplay-with-gesture-unlock, off until a track file is
+  dropped in); Jesus will supply the actual track later. REMINDER OWED TO JESUS:
+  ask for the audio track when Phase 6 polish starts.
 
 ## Reference file map
 

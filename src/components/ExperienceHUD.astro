@@ -1,0 +1,71 @@
+---
+/**
+ * Persistent HUD chrome for the landing experience (Phase 2).
+ * Bottom-left: live ticker fed by real DataBridge metrics (honest mode
+ * label -- SIMULATED on the marketing site unless a live ws is wired).
+ * Bottom-right: sound toggle (hidden until an audio track ships).
+ * Technical sans per the hybrid type system.
+ */
+---
+
+<div id="hud" class="fixed inset-x-0 bottom-0 z-20 pointer-events-none" aria-hidden="true">
+  <div class="flex items-end justify-between px-5 pb-4 md:px-8 md:pb-6">
+    <div id="hud-ticker" class="hud-label !text-[10px] leading-relaxed opacity-0 transition-opacity duration-1000">
+      <span class="text-text-primary font-medium" id="hud-step">—</span>
+      <span class="mx-1 text-text-muted">steps</span>
+      <span class="mx-2 text-text-muted">·</span>
+      <span class="text-text-primary font-medium" id="hud-neurons">—</span>
+      <span class="mx-1 text-text-muted">neurons</span>
+      <span class="mx-2 text-text-muted">·</span>
+      <span id="hud-mode" class="text-accent-cyan">—</span>
+    </div>
+    <button
+      id="hud-sound"
+      class="hud-label !text-[10px] pointer-events-auto hidden items-center gap-2 hover:text-text-primary transition-colors cursor-pointer bg-transparent border-0 p-0"
+      aria-label="Toggle ambient sound"
+    >
+      <span>SOUND</span>
+      <span id="hud-sound-state" class="text-text-muted">OFF</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const ticker = document.getElementById("hud-ticker")!;
+  const stepEl = document.getElementById("hud-step")!;
+  const neuronsEl = document.getElementById("hud-neurons")!;
+  const modeEl = document.getElementById("hud-mode")!;
+
+  let shown = false;
+  window.addEventListener("oscen:metrics", ((e: CustomEvent) => {
+    const m = e.detail;
+    stepEl.textContent = m.step.toLocaleString();
+    neuronsEl.textContent = (m.totalNeurons / 1e6).toFixed(2) + "M";
+    if (!shown) {
+      shown = true;
+      ticker.style.opacity = "1";
+    }
+  }) as EventListener);
+
+  window.addEventListener("oscen:datamode", ((e: CustomEvent) => {
+    const mode = e.detail as string;
+    modeEl.textContent = mode.toUpperCase();
+    modeEl.className = mode === "live" ? "text-accent-green" : "text-accent-cyan";
+  }) as EventListener);
+
+  // Sound toggle appears only when a track is actually available.
+  const soundBtn = document.getElementById("hud-sound") as HTMLButtonElement;
+  const soundState = document.getElementById("hud-sound-state")!;
+  const wireAudio = () => {
+    const audio = window.__experience?.audio;
+    if (!audio) return setTimeout(wireAudio, 500);
+    audio.onChange((on: boolean, available: boolean) => {
+      soundBtn.classList.toggle("hidden", !available);
+      soundBtn.classList.toggle("flex", available);
+      soundState.textContent = on ? "ON" : "OFF";
+      soundState.className = on ? "text-accent-green" : "text-text-muted";
+    });
+    soundBtn.addEventListener("click", () => audio.toggle());
+  };
+  wireAudio();
+</script>

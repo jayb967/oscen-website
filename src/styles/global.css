@@ -31,6 +31,27 @@
   --font-display: "Instrument Serif", "Georgia", serif;
   --font-body: "Outfit", "Helvetica Neue", sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+  /* Hybrid type system (redesign-v2): technical sans for HUD chrome,
+     captions, and oversized stat numbers; serif stays for narrative
+     headlines. Apply site-wide, inner pages included. */
+  --font-tech: "Space Grotesk", "Outfit", "Helvetica Neue", sans-serif;
+}
+
+/* ─── Experience layer stacking (redesign-v2) ───
+   The three.js canvas is a fixed transparent layer at z-1. The giant
+   hero back-title sits under it (z-0, inside the same wrapper); all
+   scrolling section content must paint above it. */
+main > section {
+  position: relative;
+  z-index: 10;
+}
+
+.hud-label {
+  font-family: var(--font-tech);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
 }
 
 /* ─── Base ─── */

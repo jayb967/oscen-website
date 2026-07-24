@@ -1,29 +1,19 @@
 ---
 /**
- * Hero. Pure awe. The brain IS the experience.
- * Three words of tagline. The visualization does the rest.
+ * Hero (redesign-v2). The brain renders on the persistent experience
+ * canvas BEHIND this section (see index.astro); the giant OSCEN
+ * back-title sits behind the brain for the depth trick. This section
+ * carries only the foreground copy.
  */
 ---
 
-<section id="hero" class="relative h-screen w-full overflow-hidden flex items-center justify-center">
-  <!-- Brain visualization. full viewport -->
-  <div class="absolute inset-0 z-0">
-    <iframe
-      id="brain-frame"
-      src="/brain-viz/index.html?embed=true&labels=false"
-      class="w-full h-full border-0 opacity-0 transition-opacity duration-[2s]"
-      loading="eager"
-      title="OSCEN Neural Activity"
-      aria-hidden="true"
-      style="pointer-events: none;"
-    ></iframe>
-    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(5,8,16,0.55) 0%, var(--color-abyss) 100%);"></div>
-    <div class="absolute bottom-0 left-0 right-0 h-64 pointer-events-none" style="background: linear-gradient(to top, var(--color-abyss), transparent);"></div>
-  </div>
+<section id="hero" class="h-screen w-full overflow-hidden flex items-center justify-center">
+  <!-- Bottom fade into the next section -->
+  <div class="absolute bottom-0 left-0 right-0 h-64 pointer-events-none" style="background: linear-gradient(to top, var(--color-abyss), transparent);"></div>
 
   <!-- Content. Deliberately sparse. -->
-  <div class="relative z-10 text-center max-w-4xl mx-auto px-6 hero-backdrop">
-    <p id="hero-eyebrow" class="text-[11px] font-mono text-text-secondary uppercase tracking-[0.35em] mb-6 hero-text-shadow">
+  <div class="relative text-center max-w-4xl mx-auto px-6 hero-backdrop">
+    <p id="hero-eyebrow" class="hud-label !tracking-[0.35em] mb-6 hero-text-shadow">
       Brain software for robots
     </p>
     <h1 id="hero-title" class="font-display text-[clamp(3.5rem,9vw,9rem)] leading-[0.85] tracking-tight hero-text-shadow">
@@ -39,17 +29,17 @@
     </p>
 
     <!-- Minimal stat line. whisper-quiet -->
-    <div id="hero-stats" class="mt-12 flex items-center justify-center gap-6 text-text-secondary hero-text-shadow">
-      <span class="text-[12px] font-mono tracking-wider">1.15M neurons</span>
+    <div id="hero-stats" class="mt-12 flex items-center justify-center gap-6 text-text-secondary hero-text-shadow" style="font-family: var(--font-tech);">
+      <span class="text-[12px] tracking-wider">1.15M neurons</span>
       <span class="text-text-secondary/30">&middot;</span>
-      <span class="text-[12px] font-mono tracking-wider">~850M plastic synapses</span>
+      <span class="text-[12px] tracking-wider">~850M plastic synapses</span>
       <span class="text-text-secondary/30">&middot;</span>
-      <span class="text-[12px] font-mono tracking-wider text-accent-green">Live</span>
+      <span class="text-[12px] tracking-wider text-accent-green">Training now</span>
     </div>
   </div>
 
   <!-- Scroll hint. a single subtle line -->
-  <div id="hero-scroll" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+  <div id="hero-scroll" class="absolute bottom-10 left-1/2 -translate-x-1/2">
     <div class="w-px h-8 bg-gradient-to-b from-transparent to-text-muted/30"></div>
   </div>
 </section>
@@ -63,20 +53,16 @@
       0 0 120px rgba(5, 8, 16, 0.6);
   }
   .hero-backdrop {
-    background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(5, 8, 16, 0.7) 0%, rgba(5, 8, 16, 0.3) 50%, transparent 80%);
+    background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(5, 8, 16, 0.72) 0%, rgba(5, 8, 16, 0.38) 55%, transparent 80%);
     padding: 3rem 2rem;
     border-radius: 2rem;
   }
 </style>
 
 <script>
-  const frame = document.getElementById("brain-frame") as HTMLIFrameElement;
-  frame?.addEventListener("load", () => {
-    requestAnimationFrame(() => (frame.style.opacity = "1"));
-  });
-
-  // Mouse parallax: send normalized mouse position to brain viz.
-  // First interaction also fires the BrainVizPlay conversion (once per pageview).
+  // Mouse parallax straight into the inline stage (the old iframe
+  // postMessage was a silent no-op). First interaction still fires the
+  // BrainVizPlay conversion once per pageview.
   const hero = document.getElementById("hero")!;
   let brainVizFired = false;
   function reportBrainVizPlay() {
@@ -87,12 +73,12 @@
   }
   hero.addEventListener("mousemove", (e) => {
     reportBrainVizPlay();
-    const x = (e.clientX / window.innerWidth) * 2 - 1;   // -1 to 1
-    const y = (e.clientY / window.innerHeight) * 2 - 1;   // -1 to 1
-    frame?.contentWindow?.postMessage({ mouse: { x, y } }, "*");
+    const x = (e.clientX / window.innerWidth) * 2 - 1;
+    const y = (e.clientY / window.innerHeight) * 2 - 1;
+    window.__experience?.stage.setPointer(x, y);
   });
   hero.addEventListener("touchstart", reportBrainVizPlay, { passive: true });
   hero.addEventListener("mouseleave", () => {
-    frame?.contentWindow?.postMessage({ mouse: { x: 0, y: 0 } }, "*");
+    window.__experience?.stage.setPointer(0, 0);
   });
 </script>
