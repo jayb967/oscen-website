@@ -137,10 +137,15 @@ Reference: ref-go2-pinned-stat.jpeg caption system.
 
 Target: `docs/reference/humanoid-target-fullbody.png` + `humanoid-target-closeup.png`.
 
-- [ ] Source the model (open question Q2): rigged feminine android GLB; retexture to
-      matte porcelain white + panel-seam detail (seams via normal/AO map or curve
-      decals; darker rubber at joints). Draco/meshopt-compress; budget <= 8MB,
-      <= 100k tris, 2k textures.
+- [~] Source the model (Q2: AI image-to-3D base). STAGED 2026-07-24, BLOCKED on
+      credits: both reference images uploaded + confirmed to Higgsfield
+      (media_ids `10baf21e-c6cd-4067-a2f6-10d01cf254a3` fullbody,
+      `0e7a3ea9-6117-4e31-8df9-5ab0de892e99` closeup). Ready-to-run call:
+      `multi_image_to_3d` with should_texture + enable_pbr + enable_rigging,
+      pose_mode a-pose, 1.75m, 100k tris, symmetry on, seed 42, matte-porcelain
+      texture prompt. Cost 35 credits; workspace has 0 (free plan). ACTION
+      (Jesus): top up Higgsfield credits, then re-run the staged call. After
+      generation: cleanup pass + draco compress; budget <= 8MB, <= 100k tris.
 - [ ] Environment to match screenshots: warm-gray concrete panel walls (large flat
       boxes + subtle roughness texture), beige floor, soft HDRI key from back-left,
       contact shadows, gentle fog. Keep it minimal -- 3 planes + lightmap-feel, not
