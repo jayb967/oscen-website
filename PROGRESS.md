@@ -12,6 +12,142 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-07-24 CINEMATIC BRAIN SWAP -- FULL PLAN (NEXT SESSION: START HERE)
+
+The canonical brain-viz in the sibling repo (`oscen/brain-viz/`) was
+overhauled to a single Cinematic version (classic point-cloud renderer
+retired). The website ships the OLD classic look in two places; both must
+switch. Investigation is DONE (2026-07-24 late session); the findings and
+decisions below are settled -- do not re-litigate, just execute.
+
+**DECIDED: no iframe for the hero.** The Phase 5 reveal mounts the
+humanoid INTO BrainStage's scene and shrinks the brain into her skull --
+one shared scene/camera/bloom chain. An iframe brain is a separate WebGL
+context, so the reveal (plus setLateralOffset / mood tweens / HIW
+region-flare choreography, all direct API calls) would die. Hero = native
+port (Phase 2 below). Investor demo = wholesale folder copy (Phase 1).
+Jesus signed off 2026-07-24; scroll perf must not degrade noticeably.
+
+### Canonical source facts (verified)
+
+- `oscen/brain-viz/` is self-contained: `lib/` (vendored three + addons via
+  import map), `assets/brain.glb` (4.3 MB anatomical mesh), `demos/`
+  (416 KB), total 5.8 MB. Entry `index.html` ALWAYS boots
+  `brain-scene-cinematic.js` (`?ver=` ignored). Embed contract:
+  `index.html?embed=true` hides HUD, `&mode=sim` forces simulated data.
+- `BrainSceneCinematic extends BrainScene` and adds everything via
+  `_initEnhancements`/`_updateEnhancements` hooks. The cinematic layer is
+  5 self-contained modules: `brain-shell.js` (glass GLB shell +
+  `buildAnatomyCenters`), `brain-pointcloud.js` (200-330k GPU points
+  sampled in the mesh; `build(mesh)` / `setFiringData(regionData)` /
+  `setNeuromodulation(nm)` / `update(dt)`), `brain-postfx.js`
+  (`createGradePass`: vignette/grain/CA), `quality-tier.js`
+  (`detectQualityTier(renderer)` -> pixelRatio/point counts/bloom/grade),
+  `region-anatomy.js` (`REGION_ANATOMY` anchors).
+- Cinematic bloom regime: threshold 0.80, radius 1.05, strength CAP 0.34,
+  toneMappingExposure 1.0, resting cloud dim (uBright 0.14) so only firing
+  regions + pulses bloom. Neuromod arousal boost is capped after the base
+  update (see `_updateNeuromodEffects` override).
+- IBL: PMREM RoomEnvironment on `scene.environment` only (background stays
+  dark). Site three is npm-pinned 0.160.0 -- every API the cinematic code
+  uses (PMREM, RoomEnvironment, transmission) exists there.
+- TIMING TRAP: the site's `src/three/brain/` port was taken from the
+  canonical 2026-07-24 ~14:11 state, but canonical `brain-regions.js` /
+  `brain-pulses.js` gained the cinematic hooks at ~21:05 the same day:
+  regions: `setBilateralCenter`, `getCenter(id, side)`, `setLabelCamera`,
+  `setHullVisible`, `setCloudVisible`, `regionData` exposure; pulses:
+  `rebuild()`, `radialArcScale` (curved fiber-tract arcs, cinematic sets
+  0.45 + `lateralSpread` 0), bilateral per-hemisphere tube build. These are
+  ADDITIVE diffs -- re-sync them into the site copies, preserving the
+  site-specific DataBridge extras (onStatus, dispose, opt-in postMessage,
+  applyOverride) already noted in Phase 1 of the redesign log.
+
+### Phase 1 -- Investor demo swap (minutes, do first for a quick win)
+
+1. Delete `public/brain-viz/` (848 KB stale classic), copy
+   `oscen/brain-viz/` there wholesale (lib/, assets/, demos/, shaders/,
+   all .js + index.html). 5.8 MB static, served as-is by Astro.
+2. `src/pages/investor-pitch/demo.astro` line ~37: iframe src
+   `/brain-viz/` -> `/brain-viz/index.html?embed=true&mode=sim`.
+   (Jesus was asked about HUD-on vs off in the pitch iframe; default is
+   embed=true = hidden. Drop the param if he wants the HUD.)
+3. Verify in Playwright: cinematic boots in the iframe (glass shell,
+   volumetric cloud, bilateral pulses), no console errors. Check whether
+   demo.astro sends postMessage demo hooks and that they still fire.
+4. Commit. This also gives an on-site pixel reference for Phase 2 parity.
+
+### Phase 2 -- Hero native port (the real session)
+
+Copy verbatim into `src/three/brain/`: brain-shell.js, brain-pointcloud.js,
+brain-postfx.js, quality-tier.js, region-anatomy.js. Strip `?v=` import
+suffixes; imports use the site's npm three (`three`,
+`three/addons/environments/RoomEnvironment.js`).
+
+Asset: `assets/brain.glb` -> `public/models/brain.glb`. COMPRESS FIRST
+(gltf-transform draco, like the humanoid 8.5->5.4 MB; decoder already
+self-hosted at public/draco/ -- BrainShell's loader must get the
+DRACOLoader wired if the compressed file needs it).
+
+Re-sync `brain-regions.js` + `brain-pulses.js` (diff canonical vs site,
+port the additive cinematic hooks listed above).
+
+Integration -- `brain-module.js` (CRITICAL: shell + point cloud go INSIDE
+`module.group`, NOT the scene, so the reveal's `setScale` shrink and
+`setDim` keep working):
+- After shell GLB load: `buildAnatomyCenters(REGION_ANATOMY, REGIONS)`,
+  `setBilateralCenter` per region, `pulses.rebuild()`, hide classic hull
+  + instanced cloud, build BrainPointCloud with tier counts + centers.
+- Per frame: `pointCloud.setFiringData(regions.regionData)`,
+  `.setNeuromodulation(smoothNm)`, `.update(dt)`, `shell.update(dt)`.
+- Extend `setDim` to also dim the shell material + point-cloud brightness
+  uniform (check uniform names in brain-pointcloud.js).
+- `getRegionCenter` (used by HIW focusRegion) automatically returns
+  anatomical anchors once registered -- BUT the anatomy fix reverses the
+  old front/back error, so RE-CHECK all five HIW step orbit poses
+  visually; they may now frame the wrong side.
+
+Integration -- `brain-stage.js`:
+- Quality tier: `min(tier.pixelRatio, existing maxPixelRatio cap)` (site
+  already caps 2 desktop / 1.5 mobile).
+- Bloom: threshold 0.80, radius 1.05, cap 0.34 enforced after the
+  neuromod boost (port the cinematic `_updateNeuromodEffects` cap).
+  Exposure 1.2 -> 1.0 (then re-check humanoid reveal + outro looks).
+- `scene.environment` = PMREM RoomEnvironment (shell needs it; humanoid
+  x-ray ShaderMaterial ignores env so it is safe).
+- RE-TUNE the mood/bloom vocabulary in experience.ts: MOODS
+  hero/backdrop/focus bloom values (1.0/0.45/0.9) and the reveal +
+  outro bloom ramps (0.6/0.42/0.18/0.24) were tuned for the OLD regime;
+  under cap-0.34 they all clamp flat. Scale them into the new range
+  (~0.34/0.16/0.30 starting points) and tune by eye per scene.
+
+Scroll-perf guardrails (Jesus's hard requirement):
+- Progressive boot: classic look renders first (cinematic already does
+  this pre-GLB); kick the shell GLB fetch AFTER first hero paint
+  (idle callback), keeping the no-GLB-in-critical-path LCP rule.
+- Perf gates: hero >= 60 fps desktop; reveal heaviest frame (was 84 fps
+  with 15k spheres) must stay >= 50 fps with shell + cloud + humanoid.
+  If it dips: lower `fillTotal` for the site, or tier down one notch
+  during the reveal (pointCloud opts are per-build).
+- Mobile emulated 390x844: DPR 1.5 cap + low tier; static poster fallback
+  remains the escape hatch per the v2 handoff.
+
+### Verification (both phases)
+
+- Reference: serve canonical statically (`cd oscen/brain-viz && python3
+  -m http.server 8788`) and compare `http://localhost:8788/index.html?embed=true&mode=sim`
+  side-by-side with the site hero + demo iframe (same viewport
+  screenshots via Playwright).
+- Full scroll-through: hero glide-back, brain-aside copy sections,
+  Five-steps flares (anatomical anchors!), reveal shrink (glass shell +
+  cloud inside the skull -- NEW look, check it reads well), outro spin.
+- `/dev/brain` harness still boots; `npm run build` green, then RESTART
+  the dev server (Vite stale-dep 504 gotcha, fires on new lazy imports
+  too).
+- Sync any brain-viz fixes discovered here BACK to `oscen/brain-viz/`
+  (canonical), per the document-ownership rule.
+
+---
+
 ## 2026-07-24 FEEDBACK ROUND 1 -- APPLIED (read this, then the v2 handoff below)
 
 Jesus's first screenshot round is implemented, 5 commits on `redesign-v2`
@@ -42,7 +178,7 @@ re-optimized on first hit. Same fix: restart the dev server.
 
 ---
 
-## 2026-07-24 SESSION HANDOFF v2 (late evening) -- START HERE
+## 2026-07-24 SESSION HANDOFF v2 (late evening) -- workflow reference (superseded as entry point by the CINEMATIC BRAIN SWAP plan above)
 
 **State**: branch `redesign-v2` (NOT pushed, deliberately: Jesus wants a
 local feedback round first), 11 commits ahead of `main`, all builds green,
