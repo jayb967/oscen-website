@@ -13,6 +13,7 @@
  */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 // Scene brain centroid (matches brain-pulses.js BRAIN_CENTER and the region layout).
 const BRAIN_CENTER = new THREE.Vector3(0, 0.5, -0.5);
@@ -37,9 +38,18 @@ export class BrainShell {
         this.scene.add(this.group);
     }
 
-    /** Load the GLB. Returns a promise resolving to the mesh (or rejecting). */
-    load(url) {
+    /**
+     * Load the GLB. Returns a promise resolving to the mesh (or rejecting).
+     * Pass `dracoDecoderPath` (e.g. '/draco/') when the asset is
+     * draco-compressed; the site ships the compressed brain + decoder.
+     */
+    load(url, { dracoDecoderPath } = {}) {
         const loader = new GLTFLoader();
+        if (dracoDecoderPath) {
+            const draco = new DRACOLoader();
+            draco.setDecoderPath(dracoDecoderPath);
+            loader.setDRACOLoader(draco);
+        }
         return new Promise((resolve, reject) => {
             loader.load(
                 url,
