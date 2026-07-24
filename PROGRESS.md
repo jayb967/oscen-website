@@ -12,6 +12,36 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-07-24 FEEDBACK ROUND 1 -- APPLIED (read this, then the v2 handoff below)
+
+Jesus's first screenshot round is implemented, 5 commits on `redesign-v2`
+(still NOT pushed). What changed:
+
+1. **Brain glides aside for copy sections** -- `BrainStage.setLateralOffset`
+   (screen-space camera strafe) scrubbed in experience.ts: out as Problem
+   enters, held through Proof, back to center as How It Works arrives.
+   Tunable: `COPY_ASIDE_PAN = 13` world units.
+2. **No more pose snaps** -- mood + orbit live in a shared `stageState`
+   (exposed as `__experience.state`); scrubbed scenes write it, hand-offs
+   tween it. Fixes the "brain POPs at Five steps" bug (was an instant
+   radius 23 -> 13 setOrbit). The pinned scene self-heals if a deep link
+   lands mid-flush.
+3. **Concrete room REMOVED from the reveal** (was reading as a floating
+   gray slab). Figure stands on black. Room survives only in /dev/humanoid.
+4. **Reveal body wears the GLB's real textures** -- the hybrid x-ray shader
+   is now one instance per mesh sampling that mesh's albedo map, all
+   sharing one uniform set. Flat porcelain is gone from the reveal.
+5. **Post-reveal outro** -- `HumanoidReveal.setOutro(p)` scrubbed from pin
+   release to the FOOTER's arrival (not page bottom -- the opaque footer
+   would hide it): one slow full yaw revolution, ending front-facing in a
+   head-and-shoulders portrait. Outro p=0 == reveal p=1, seamless.
+
+GOTCHA addendum: the Vite "Outdated Optimize Dep" 504 can fire WITHOUT a
+build -- lazily-imported deps (RoomEnvironment via /dev/humanoid) get
+re-optimized on first hit. Same fix: restart the dev server.
+
+---
+
 ## 2026-07-24 SESSION HANDOFF v2 (late evening) -- START HERE
 
 **State**: branch `redesign-v2` (NOT pushed, deliberately: Jesus wants a
