@@ -42,33 +42,47 @@ What changes structurally:
 
 ## Phase 0 -- Foundation (0.5-1 day)
 
-- [ ] Branch `redesign-v2` off `main`; Netlify branch-deploy previews on.
-- [ ] `npm i three gsap lenis` (gsap already present); `npm i -D @types/three`.
-- [ ] Confirm reference assets committed: `docs/reference/*` (10 images) +
+- [x] Branch `redesign-v2` off `main`. (Netlify branch-deploy previews: enable in
+      Netlify UI when first pushing the branch.)
+- [x] `npm i three lenis` + `-D @types/three` (gsap already present).
+      **three is PINNED to 0.160.0** -- canonical brain-viz vendors r160, and
+      r185 renders the same scene blown out (bloom/color pipeline changes:
+      differentiated clusters become one white core). Verified side-by-side
+      2026-07-24. Upgrading three later requires re-tuning bloom
+      threshold/strength and re-checking additive materials.
+- [x] Reference assets committed: `docs/reference/*` (10 images) +
       `docs/REDESIGN-REFERENCE.md` + this file.
-- [ ] Decide open questions below (fonts, model sourcing, page scope, copy scope).
+- [~] Open questions: proceeding on recommended defaults (Astro + vanilla three
+      in-repo; landing-page scope; re-skin copy; no audio; fonts TBD in Phase 6;
+      humanoid sourcing still needs founder decision before Phase 4).
 
 ## Phase 1 -- Extract the brain into a mountable module (1-2 days)
 
 Source: `oscen/brain-viz/` (canonical, newer than the website copy).
 
-- [ ] Create `src/three/brain/` in this repo: port `data-bridge.js` (DataBridge +
-      REGIONS/POSITIONS/SHAPES/PATHWAYS) unchanged; port `BrainRegions`,
-      `BrainPulses` (+ hull/sulci shader, starfield) as ES modules importing npm
-      `three`.
-- [ ] Write `BrainModule` class replacing `BrainScene`: constructor takes
-      `{ scene, camera | null, quality, mode }`, no DOM/window access, exposes
-      `update(dt)`, `setFiringRates()`, `setNeuromodulation()`, `setDim()`,
-      `setScale()`, `dispose()`. Model it on `oscen/brain-viz/demos/body-scene.js`
-      (already container-scoped).
-- [ ] Cut the 9 coupling points listed in REDESIGN-REFERENCE.md section 4 (no
-      self-boot, no #canvas-container, no document.body labels, options object
-      instead of URL params, teardown for all listeners).
-- [ ] Add offscreen/visibility pause + DPR cap + `prefers-reduced-motion` static mode.
-- [ ] Standalone test page `/dev/brain` rendering the module inline (no iframe) with
-      sim data. Verify visual parity with the current hero (bloom, colors, pulses).
-- [ ] Keep WebSocket live mode behind a flag (`?ws=` for demos; marketing default =
-      simulated, same as today -- honest labeling, no fake "Live" badge).
+- [x] `src/three/brain/` created. `data-bridge.js`, `brain-regions.js`,
+      `brain-pulses.js` ported from canonical `oscen/brain-viz/` (2026-07-24
+      state) nearly verbatim. DataBridge additions: `onStatus()` callback,
+      `dispose()`, postMessage listener now opt-in (`listenPostMessage`).
+- [x] `brain-module.js` -- `BrainModule`: regions + pulses in one THREE.Group,
+      bridge wiring, `update/setDim/setScale/getRegionCenter/dispose`. No DOM.
+- [x] `brain-stage.js` -- `BrainStage(container, opts)` replaces `BrainScene`:
+      container-scoped sizing (ResizeObserver), options object instead of URL
+      params, full teardown, ACES + UnrealBloom + fog + starfield + neuromod
+      light/bloom effects ported. Idle auto-orbit + `setPointer()` parallax when
+      non-interactive; OrbitControls when `interactive: true`. Scroll hooks for
+      Phase 2: `setCameraPose/releaseCameraPose/focusRegion/setBloomStrength`.
+- [x] Offscreen pause (IntersectionObserver + visibilitychange), DPR cap (2),
+      `prefers-reduced-motion` = static camera.
+- [x] `/dev/brain` test page (noindex, not linked): OrbitControls, sim data,
+      fps/status HUD, focus + dim buttons. **Visual parity confirmed vs canonical
+      brain-viz served statically** (after pinning three to r160 -- see Phase 0).
+      121 fps desktop. NOTE: the old `public/brain-viz` copy on the site is
+      visually STALE (narrower hull, dimmer shell, no pulse flash); the canonical
+      look is the target, so the new hero will look slightly different (better)
+      than the current one.
+- [x] Live mode stays available: `new BrainStage(el, { mode: 'live', wsUrl })`.
+      Default is simulated.
 
 ## Phase 2 -- Scroll rig + new hero (2-3 days)
 

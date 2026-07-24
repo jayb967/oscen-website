@@ -1,0 +1,119 @@
+---
+// Dev-only harness for the extracted brain module (Phase 1).
+// Visual parity check against the old iframe hero: /brain-viz/index.html
+// Interactive OrbitControls + sim data. Not linked from anywhere.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>dev / brain module</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0a0e1a;
+        overflow: hidden;
+        font-family: ui-monospace, monospace;
+      }
+      #stage {
+        position: fixed;
+        inset: 0;
+      }
+      #hud {
+        position: fixed;
+        left: 12px;
+        bottom: 12px;
+        color: #8b95ab;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        pointer-events: none;
+        line-height: 1.7;
+      }
+      #hud b {
+        color: #e2e8f4;
+        font-weight: 600;
+      }
+      #controls {
+        position: fixed;
+        right: 12px;
+        bottom: 12px;
+        display: flex;
+        gap: 8px;
+      }
+      #controls button {
+        background: rgba(94, 164, 245, 0.08);
+        border: 1px solid rgba(94, 164, 245, 0.25);
+        color: #e2e8f4;
+        font: 11px ui-monospace, monospace;
+        letter-spacing: 0.08em;
+        padding: 6px 10px;
+        cursor: pointer;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="hud">loading…</div>
+    <div id="controls">
+      <button data-focus="">RESET</button>
+      <button data-focus="Motor Cortex">MOTOR</button>
+      <button data-focus="Association">ASSOC</button>
+      <button data-dim="toggle">DIM</button>
+    </div>
+
+    <script>
+      import { BrainStage } from "../../three/brain/brain-stage.js";
+
+      const stage = new BrainStage(document.getElementById("stage")!, {
+        mode: "sim",
+        interactive: true,
+      });
+
+      // Expose for console poking during development.
+      (window as any).stage = stage;
+
+      const hud = document.getElementById("hud")!;
+      let status = "sim";
+      stage.module.bridge.onStatus((s: string) => (status = s));
+
+      let frames = 0;
+      let fps = 0;
+      let last = performance.now();
+      function tick() {
+        frames++;
+        const now = performance.now();
+        if (now - last >= 1000) {
+          fps = frames;
+          frames = 0;
+          last = now;
+        }
+        const m = stage.module.lastMetrics;
+        hud.innerHTML = m
+          ? `<b>${fps}</b> fps · <b>${status}</b> · step <b>${m.step.toLocaleString()}</b> · ` +
+            `${(m.totalNeurons / 1e6).toFixed(2)}M neurons · DA ${(m.neuromodulation?.da ?? 0).toFixed(2)}`
+          : "waiting for metrics…";
+        requestAnimationFrame(tick);
+      }
+      tick();
+
+      let dimmed = false;
+      document.querySelectorAll<HTMLButtonElement>("#controls button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (btn.dataset.dim) {
+            dimmed = !dimmed;
+            stage.module.setDim(dimmed ? 0.85 : 0);
+          } else {
+            stage.focusRegion(btn.dataset.focus || null);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
