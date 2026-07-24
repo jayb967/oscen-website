@@ -8,11 +8,13 @@
  * Material states:
  *  - 'source'     the GLB's shipped PBR materials (tunable params)
  *  - 'porcelain'  matte ceramic override
- *  - 'xray'       hybrid shader: porcelain-ish lit shading blended into a
- *                 fresnel hologram per-fragment, driven by two uniforms
- *                 (uBodyXray whole-figure, uHeadXray above-the-neck mask).
- *                 The whole reveal runs in this one material so scrubbing
- *                 never swaps materials mid-frame.
+ *  - 'xray'       hybrid shader: lit shading of the mesh's REAL albedo
+ *                 texture blended into a fresnel hologram per-fragment,
+ *                 driven by two uniforms (uBodyXray whole-figure,
+ *                 uHeadXray above-the-neck mask). One material instance
+ *                 per mesh (each carries its own map) but all share the
+ *                 same uniform objects, so the reveal scrubs every mesh
+ *                 with single writes and never swaps materials mid-frame.
  */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -174,7 +176,7 @@ export class HumanoidFigure {
         this.model.traverse((node) => {
             if (!node.isMesh) return;
             if (mode === 'porcelain') node.material = this._getPorcelainMat();
-            else if (mode === 'xray') node.material = this._getXrayMat();
+            else if (mode === 'xray') node.material = this._getXrayMatFor(node);
             else node.material = this._sourceMaterials.get(node) ?? node.material;
         });
         if (mode === 'source') this._applyMatParams();
@@ -209,9 +211,9 @@ export class HumanoidFigure {
     setXray({ head, body } = {}) {
         if (head !== undefined) this._xray.head = head;
         if (body !== undefined) this._xray.body = body;
-        const mat = this._getXrayMat();
-        mat.uniforms.uHeadXray.value = this._xray.head;
-        mat.uniforms.uBodyXray.value = this._xray.body;
+        const u = this._getXrayUniforms();
+        u.uHeadXray.value = this._xray.head;
+        u.uBodyXray.value = this._xray.body;
         if (this._eyeMat) {
             this._eyeMat.opacity = Math.min(1, Math.max(this._xray.head, this._xray.body) * 1.4);
         }
@@ -231,68 +233,95 @@ export class HumanoidFigure {
         return this._porcelainMat;
     }
 
-    _getXrayMat() {
-        if (!this._xrayMat) {
-            this._xrayMat = new THREE.ShaderMaterial({
-                transparent: true,
-                side: THREE.DoubleSide,
-                uniforms: {
-                    uHeadXray: { value: 0 },
-                    uBodyXray: { value: 0 },
-                    // Neck line in WORLD y, refreshed every update() while
-                    // x-ray is active (the reveal scales/moves the group).
-                    uNeckY: { value: 0 },
-                    uNeckBand: { value: this.opts.height * 0.03 },
-                    uXrayColor: { value: new THREE.Color(0x9fc4ef) },
-                    uShellColor: { value: new THREE.Color(0xd9d4cb) },
-                    uKeyDir: { value: new THREE.Vector3(-0.55, 0.7, -0.45).normalize() },
-                },
-                vertexShader: /* glsl */ `
-                    #include <common>
-                    #include <skinning_pars_vertex>
-                    varying vec3 vNormal;
-                    varying vec3 vView;
-                    varying float vWorldY;
-                    void main() {
-                        #include <beginnormal_vertex>
-                        #include <skinbase_vertex>
-                        #include <skinnormal_vertex>
-                        #include <begin_vertex>
-                        #include <skinning_vertex>
-                        vec4 world = modelMatrix * vec4(transformed, 1.0);
-                        vec4 mv = viewMatrix * world;
-                        vNormal = normalize(normalMatrix * objectNormal);
-                        vView = normalize(-mv.xyz);
-                        vWorldY = world.y;
-                        gl_Position = projectionMatrix * mv;
-                    }`,
-                fragmentShader: /* glsl */ `
-                    uniform float uHeadXray;
-                    uniform float uBodyXray;
-                    uniform float uNeckY;
-                    uniform float uNeckBand;
-                    uniform vec3 uXrayColor;
-                    uniform vec3 uShellColor;
-                    uniform vec3 uKeyDir;
-                    varying vec3 vNormal;
-                    varying vec3 vView;
-                    varying float vWorldY;
-                    void main() {
-                        vec3 n = normalize(vNormal);
-                        float fres = pow(1.0 - abs(dot(n, normalize(vView))), 2.2);
-                        float headMask = smoothstep(uNeckY - uNeckBand, uNeckY + uNeckBand, vWorldY);
-                        float xray = max(uBodyXray, headMask * uHeadXray);
-                        // Lit porcelain approximation for the solid part.
-                        float lit = 0.25 + 0.75 * max(0.0, dot(n, uKeyDir));
-                        vec3 solid = uShellColor * lit + fres * 0.15;
-                        vec3 holo = uXrayColor * (0.25 + fres);
-                        float alpha = mix(1.0, 0.05 + fres * 0.8, xray);
-                        gl_FragColor = vec4(mix(solid, holo, xray), alpha);
-                        #include <colorspace_fragment>
-                    }`,
-            });
-        }
-        return this._xrayMat;
+    /** Uniform objects shared by every per-mesh x-ray material. */
+    _getXrayUniforms() {
+        this._xrayUniforms ??= {
+            uHeadXray: { value: 0 },
+            uBodyXray: { value: 0 },
+            // Neck line in WORLD y, refreshed every update() while
+            // x-ray is active (the reveal scales/moves the group).
+            uNeckY: { value: 0 },
+            uNeckBand: { value: this.opts.height * 0.03 },
+            uXrayColor: { value: new THREE.Color(0x9fc4ef) },
+            uShellColor: { value: new THREE.Color(0xd9d4cb) },
+            uKeyDir: { value: new THREE.Vector3(-0.55, 0.7, -0.45).normalize() },
+        };
+        return this._xrayUniforms;
+    }
+
+    /**
+     * Per-mesh hybrid material: same shader and shared uniforms, plus the
+     * mesh's own albedo map so the solid state shows the GLB's real
+     * surface detail (meshes without a map fall back to the shell color).
+     */
+    _getXrayMatFor(node) {
+        this._xrayMats ??= new Map();
+        let mat = this._xrayMats.get(node);
+        if (mat) return mat;
+
+        const map = this._sourceMaterials.get(node)?.map ?? null;
+        mat = new THREE.ShaderMaterial({
+            transparent: true,
+            side: THREE.DoubleSide,
+            uniforms: {
+                ...this._getXrayUniforms(),
+                uMap: { value: map },
+                uHasMap: { value: map ? 1 : 0 },
+            },
+            vertexShader: /* glsl */ `
+                #include <common>
+                #include <skinning_pars_vertex>
+                varying vec3 vNormal;
+                varying vec3 vView;
+                varying float vWorldY;
+                varying vec2 vUv;
+                void main() {
+                    #include <beginnormal_vertex>
+                    #include <skinbase_vertex>
+                    #include <skinnormal_vertex>
+                    #include <begin_vertex>
+                    #include <skinning_vertex>
+                    vec4 world = modelMatrix * vec4(transformed, 1.0);
+                    vec4 mv = viewMatrix * world;
+                    vNormal = normalize(normalMatrix * objectNormal);
+                    vView = normalize(-mv.xyz);
+                    vWorldY = world.y;
+                    vUv = uv;
+                    gl_Position = projectionMatrix * mv;
+                }`,
+            fragmentShader: /* glsl */ `
+                uniform float uHeadXray;
+                uniform float uBodyXray;
+                uniform float uNeckY;
+                uniform float uNeckBand;
+                uniform vec3 uXrayColor;
+                uniform vec3 uShellColor;
+                uniform vec3 uKeyDir;
+                uniform sampler2D uMap;
+                uniform float uHasMap;
+                varying vec3 vNormal;
+                varying vec3 vView;
+                varying float vWorldY;
+                varying vec2 vUv;
+                void main() {
+                    vec3 n = normalize(vNormal);
+                    float fres = pow(1.0 - abs(dot(n, normalize(vView))), 2.2);
+                    float headMask = smoothstep(uNeckY - uNeckBand, uNeckY + uNeckBand, vWorldY);
+                    float xray = max(uBodyXray, headMask * uHeadXray);
+                    // Lit real-texture shading for the solid part. Ambient
+                    // floor 0.35: albedo maps run darker than the old flat
+                    // shell color and there is no room bounce on black.
+                    vec3 albedo = mix(uShellColor, texture2D(uMap, vUv).rgb, uHasMap);
+                    float lit = 0.35 + 0.75 * max(0.0, dot(n, uKeyDir));
+                    vec3 solid = albedo * lit + fres * 0.15;
+                    vec3 holo = uXrayColor * (0.25 + fres);
+                    float alpha = mix(1.0, 0.05 + fres * 0.8, xray);
+                    gl_FragColor = vec4(mix(solid, holo, xray), alpha);
+                    #include <colorspace_fragment>
+                }`,
+        });
+        this._xrayMats.set(node, mat);
+        return mat;
     }
 
     // ── per-frame ──────────────────────────────────────────────────
@@ -316,11 +345,11 @@ export class HumanoidFigure {
         }
 
         // Keep the neck mask honest while the reveal moves/scales the group.
-        if (this._xrayMat && this.model && (this._xray.head > 0 || this._xray.body > 0)) {
+        if (this._xrayUniforms && this.model && (this._xray.head > 0 || this._xray.body > 0)) {
             this._neckProbe ??= new THREE.Vector3();
             this._neckProbe.set(0, this.neckYLocal(), 0);
-            this._xrayMat.uniforms.uNeckY.value = this.group.localToWorld(this._neckProbe).y;
-            this._xrayMat.uniforms.uNeckBand.value =
+            this._xrayUniforms.uNeckY.value = this.group.localToWorld(this._neckProbe).y;
+            this._xrayUniforms.uNeckBand.value =
                 this.opts.height * 0.03 * this.group.scale.y;
         }
 
@@ -358,8 +387,11 @@ export class HumanoidFigure {
         this._sourceMaterials.clear();
         this._porcelainMat?.dispose();
         this._porcelainMat = null;
-        this._xrayMat?.dispose();
-        this._xrayMat = null;
+        if (this._xrayMats) {
+            for (const mat of this._xrayMats.values()) mat.dispose();
+            this._xrayMats = null;
+        }
+        this._xrayUniforms = null;
     }
 
     dispose() {
