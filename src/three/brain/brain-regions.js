@@ -24,7 +24,9 @@ export class BrainRegions {
         this.scene = scene;
         this.regionMeshes = {};   // id → InstancedMesh
         this.regionData = {};     // id → { count, baseColors, currentRate }
-        this.regionCenters = {};  // id → THREE.Vector3
+        this.regionCenters = {};  // id → THREE.Vector3 (primary / label anchor)
+        this._sideCenters = {};   // id → { plus: Vector3, minus: Vector3 } (CINEMATIC bilateral)
+        this._labelCamera = null; // set by cinematic so labels pick the near side
         this.time = 0;
         this._basePositions = {}; // id → Float32Array (x,y,z per instance)
         this._noisePhases = {};   // id → Float32Array (3 phases per instance)
@@ -292,9 +294,84 @@ export class BrainRegions {
         }
     }
 
-    /** Get center position of a region */
-    getCenter(regionId) {
+    /**
+     * Get a region's center. `side` selects a hemisphere anchor (CINEMATIC only):
+     *   'plus' / 'minus'  -> the +lr / -lr bilateral anchor (used by the synapse
+     *                        pulses so tubes are built on BOTH hemispheres).
+     *   undefined (1-arg) -> the label/primary anchor. Classic never registers
+     *                        bilateral anchors, so this is byte-identical to the
+     *                        old behavior. Cinematic, once a label camera is set,
+     *                        returns whichever hemisphere anchor faces the camera
+     *                        so labels stop stacking on one half.
+     */
+    getCenter(regionId, side) {
+        const pair = this._sideCenters[regionId];
+        if (pair) {
+            if (side === 'plus') return pair.plus;
+            if (side === 'minus') return pair.minus;
+            // No explicit side: pick the camera-facing anchor for labels.
+            if (this._labelCamera && pair.plus !== pair.minus) {
+                const cam = this._labelCamera.position;
+                return pair.plus.distanceToSquared(cam) <= pair.minus.distanceToSquared(cam)
+                    ? pair.plus : pair.minus;
+            }
+        }
         return this.regionCenters[regionId] || new THREE.Vector3();
+    }
+
+    /**
+     * Override a region's center (CINEMATIC-ONLY). The cinematic scene registers
+     * anatomical anchors on the GLB mesh and calls this so labels + synapse
+     * endpoints follow the real anatomy instead of the midline schematic in
+     * REGION_POSITIONS. Also updates regionData.center (read by consumers that
+     * cache it). Classic never calls this, so its layout is unchanged.
+     */
+    setCenterOverride(regionId, vec3) {
+        if (!vec3) return;
+        const c = this.regionCenters[regionId];
+        if (c) c.copy(vec3); else this.regionCenters[regionId] = vec3.clone();
+        if (this.regionData[regionId]) this.regionData[regionId].center = this.regionCenters[regionId];
+    }
+
+    /**
+     * Register both hemisphere anchors for a region (CINEMATIC-ONLY). `plus` is
+     * the +lr side and doubles as the primary/label anchor; `minus` is the
+     * mirrored -lr side (pass the same vector for a midline region). Lets
+     * getCenter(id, 'plus'|'minus') hand the synapse pulses a per-hemisphere
+     * endpoint so activity appears on BOTH halves, not just one. Classic never
+     * calls this, so its single-anchor layout is unchanged.
+     */
+    setBilateralCenter(regionId, plus, minus) {
+        if (!plus) return;
+        this.setCenterOverride(regionId, plus);
+        this._sideCenters[regionId] = { plus, minus: minus || plus };
+    }
+
+    /** Camera used to pick the near-hemisphere label anchor (CINEMATIC-ONLY). */
+    setLabelCamera(camera) {
+        this._labelCamera = camera || null;
+    }
+
+    /**
+     * Show/hide the procedural sphere hull (solid sulci shader + wireframe).
+     * The cinematic scene hides it because the anatomical GLB shell replaces it.
+     */
+    setHullVisible(visible) {
+        if (!this._hullMeshes) return;
+        for (const mesh of this._hullMeshes) {
+            if (mesh) mesh.visible = visible;
+        }
+    }
+
+    /**
+     * Show/hide the instanced-sphere particle clouds. The cinematic scene hides
+     * them because the GPU point cloud (brain-pointcloud.js) replaces them, but
+     * region firing data (regionData) keeps updating for the labels + point cloud.
+     */
+    setCloudVisible(visible) {
+        for (const mesh of Object.values(this.regionMeshes)) {
+            if (mesh) mesh.visible = visible;
+        }
     }
 
     /**
