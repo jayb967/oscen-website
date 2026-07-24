@@ -114,18 +114,19 @@ body::after {
   overflow: hidden;
 }
 
-/* ─── Glass Surfaces ─── */
+/* ─── Glass Surfaces ───
+   PERF: no backdrop-filter. The landing page keeps a live WebGL canvas
+   animating behind every section, so backdrop blur forced the compositor
+   to re-blur that canvas under every visible card on every frame -- a
+   large constant scroll tax. A slightly more opaque flat fill reads
+   nearly identical over the near-black scene. */
 .glass {
-  background: rgba(10, 14, 26, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(11, 15, 28, 0.85);
   border: 1px solid var(--color-border);
 }
 
 .glass-bright {
-  background: rgba(20, 28, 50, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(20, 28, 50, 0.72);
   border: 1px solid var(--color-border-bright);
 }
 

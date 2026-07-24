@@ -372,15 +372,18 @@ function initRevealScene(stage: BrainStage) {
         scrub: true,
         onEnter: () => {
             entered = true;
-            // The reveal scrub owns bloom directly from here; stop any
-            // in-flight mood tween so the two don't fight over it.
+            // The reveal scrub owns camera + bloom directly from here; stop
+            // any in-flight mood OR orbit tween -- both re-apply the full
+            // stageState (dim/bloom/orbit) on every tick and would fight it.
             gsap.killTweensOf(stageState.mood);
+            gsap.killTweensOf(stageState.orbit);
             ensureLoaded();
             reveal?.enter();
         },
         onEnterBack: () => {
             entered = true;
             gsap.killTweensOf(stageState.mood);
+            gsap.killTweensOf(stageState.orbit);
             reveal?.enter();
         },
         onLeave: () => {

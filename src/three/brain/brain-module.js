@@ -142,13 +142,14 @@ export class BrainModule {
 
     /** Dim factor 0 (full) .. 1 (hidden) across regions + pathways. */
     setDim(factor) {
+        // Mood tweens re-apply the whole stage state on every tick (60Hz for
+        // 1+ s per hand-off) -- skip the fan-out when nothing changed.
+        if (this._dimApplied && Math.abs(factor - this._dim) < 1e-4) return;
+        this._dimApplied = true;
         this._dim = factor;
         this.regions.setDim(factor);
         this.pulses.setDim(factor);
         if (this._cloudBase) {
-            // regions.setDim re-shows the classic instanced clouds at low
-            // factors; in cinematic mode they stay replaced by the point cloud.
-            this.regions.setCloudVisible(false);
             const u = this.pointCloud.material.uniforms;
             u.uBright.value = this._cloudBase.bright * (1 - factor * 0.96);
             u.uAlpha.value = this._cloudBase.alpha * (1 - factor * 0.96);

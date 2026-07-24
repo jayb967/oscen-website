@@ -106,11 +106,12 @@ export class BrainStage {
         this.renderer.setSize(w, h);
         // GPU auto-tier scales point counts / pixel ratio / post so the
         // cinematic layer never stutters on integrated GPUs. The site's own
-        // maxPixelRatio cap (2 desktop / 1.5 mobile) still wins if lower.
+        // maxPixelRatio cap (2 desktop / 1.5 mobile) still wins if lower,
+        // and a total-megapixel budget wins over both: a large desktop
+        // window at DPR 2 is an 8+ MP drawing buffer, and the additive
+        // point cloud + bloom chain pay for every pixel of it.
         this.quality = detectQualityTier(this.renderer);
-        this.renderer.setPixelRatio(Math.min(
-            window.devicePixelRatio, this.opts.maxPixelRatio, this.quality.pixelRatio,
-        ));
+        this.renderer.setPixelRatio(this._computePixelRatio());
         this.renderer.setClearColor(this.opts.clearColor, this.opts.clearAlpha);
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.0;
@@ -118,6 +119,24 @@ export class BrainStage {
         this.renderer.domElement.style.width = '100%';
         this.renderer.domElement.style.height = '100%';
         this.container.appendChild(this.renderer.domElement);
+    }
+
+    /**
+     * Effective device pixel ratio: the tier/site caps, further clamped so
+     * the drawing buffer never exceeds a per-tier megapixel budget. Keeps
+     * huge desktop windows from silently rendering 4x the pixels of the
+     * window the scene was tuned in.
+     */
+    _computePixelRatio() {
+        const { clientWidth: w, clientHeight: h } = this.container;
+        const budget = { high: 3.8e6, med: 2.6e6, low: 1.6e6 }[this.quality?.tier] ?? 2.6e6;
+        const areaCap = Math.sqrt(budget / Math.max(1, w * h));
+        return Math.max(0.75, Math.min(
+            window.devicePixelRatio,
+            this.opts.maxPixelRatio,
+            this.quality?.pixelRatio ?? 2,
+            areaCap,
+        ));
     }
 
     _initScene() {
@@ -266,6 +285,11 @@ export class BrainStage {
      */
     setCameraPose(position, target) {
         this._externalPose = true;
+        // The external pose owns the aim outright: kill any lingering focus
+        // glide (e.g. HIW's focusRegion(null) restore) or it keeps lerping
+        // _target back toward the brain every frame, fighting the scrub --
+        // jitter while scrolling, then a full re-aim once scrolling stops.
+        this._focusTarget = null;
         if (position) this.camera.position.set(position.x, position.y, position.z);
         if (target) this._target.set(target.x, target.y, target.z);
     }
@@ -336,7 +360,7 @@ export class BrainStage {
         this._rafId = requestAnimationFrame(() => this._animate());
         const dt = Math.min(this.clock.getDelta(), 0.05);
 
-        if (this._focusTarget) {
+        if (this._focusTarget && !this._externalPose) {
             if (this.controls) this.controls.target.lerp(this._focusTarget, 0.06);
             else this._target.lerp(this._focusTarget, 0.06);
         }
@@ -444,6 +468,13 @@ export class BrainStage {
         if (!w || !h) return;
         this.camera.aspect = w / h;
         this.camera.updateProjectionMatrix();
+        const pr = this._computePixelRatio();
+        if (Math.abs(pr - this.renderer.getPixelRatio()) > 0.01) {
+            this.renderer.setPixelRatio(pr);
+            // Point sprites are sized in device pixels; keep them in step.
+            const cloudMat = this.module?.pointCloud?.material;
+            if (cloudMat) cloudMat.uniforms.uPixelRatio.value = pr;
+        }
         this.renderer.setSize(w, h);
         this.composer.setSize(w, h);
         this.bloomPass.resolution.set(w, h);
