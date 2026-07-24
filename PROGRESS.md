@@ -57,17 +57,19 @@ credits (see Phase 4 box). All open questions Q1-Q6 answered (see bottom).
 6. Playwright MCP browser sometimes wedges with "Browser is already in use":
    kill via `ps ax -o pid,command | grep mcp-chrome | awk '{print $1}' | xargs kill`.
 
-**Next steps in order:**
-1. (Jesus) Top up Higgsfield credits -> run the staged Phase 4 generation
-   (media_ids + exact params in the Phase 4 box below), poll job_status,
-   download the GLB to `public/models/humanoid.glb` (draco-compress if >8MB).
-2. Build `/dev/humanoid` harness + concrete-room environment + matte-porcelain
-   material tuning against `docs/reference/humanoid-target-*.png`.
+**Next steps in order (updated 2026-07-24 evening):**
+1. DONE -- Phase 4 generation ran (credits were topped up): GLB live at
+   `public/models/humanoid.glb`, `/dev/humanoid` harness + environment built
+   (see Phase 4 box for details + gotchas).
+2. Phase 4 leftovers: head-shell-only x-ray mask + lit eyes; cursor head
+   tracking; optional texture cleanup at shoulder joints.
 3. Phase 5 reveal choreography (brain group scale ~50x down into the head;
-   BrainModule.setScale exists for this).
-4. Phase 6 restyle pass (glass corner-tick cards, font-tech sweep across ALL
-   pages incl. inner, copy consolidation per Q4 -- KEEP competitor table).
-5. Phase 2 leftovers: mobile perf verification; eyebrow legibility polish.
+   BrainModule.setScale exists; HumanoidStage xray state validated).
+4. DONE -- Phase 6 core restyle (glass-ticks cards, font-tech sweep site-wide,
+   Q4 copy consolidation; competitor table kept). Remaining: typographic
+   footer, spacing normalization, one-accent pass.
+5. Phase 2 leftovers: REAL-DEVICE mobile check (emulated pass done, DPR cap
+   1.5 on small screens shipped); eyebrow legibility polish.
 6. Phase 7 hardening/launch checklist as written.
 
 **Reminders owed to Jesus** (surface these when relevant):
@@ -173,9 +175,10 @@ Source: `oscen/brain-viz/` (canonical, newer than the website copy).
       track ships -- harmless, by design.
 - [x] Silent preload: brain is procedural (renders in <1s), canvas fades in
       over 2s. No gate, no progress bar needed at current asset weight.
-- [ ] Mobile: verify on real device; add reduced particle counts / static
-      poster fallback if needed. (Desktop verified at 120fps; DPR already
-      capped at 2; offscreen pause active.)
+- [~] Mobile: EMULATED check 2026-07-24 (390x844): 93fps hero, 78fps mid-page,
+      layout intact. DPR cap lowered to 1.5 on <=768px screens (experience.ts).
+      STILL OWED: real-device verification (emulation ran on desktop GPU);
+      add static poster fallback only if a real phone struggles.
 - [ ] Polish pass with fresh eyes: eyebrow legibility over bright clusters,
       back-title size/opacity tuning, hero->ProofStrip transition timing.
 
@@ -195,8 +198,8 @@ Reference: ref-go2-pinned-stat.jpeg caption system.
 - [x] Real firing bursts per step via new `DataBridge.applyOverride()` (public
       method refactored out of the demo_reaction postMessage handler; flare
       0.18 merged via max() over organic sim activity).
-- [ ] Glass explainer cards (corner-tick style) for Problem/Solution copy
-      blocks -- rolled into Phase 6 restyle pass.
+- [x] Glass explainer cards (corner-tick style) for Problem/Solution copy
+      blocks -- done in the Phase 6 restyle pass (.glass-ticks, 2026-07-24).
 
 ## Phase 4 -- The humanoid (3-5 days, parallelizable with Phase 3)
 
@@ -245,12 +248,21 @@ Target: `docs/reference/humanoid-target-fullbody.png` + `humanoid-target-closeup
 
 ## Phase 6 -- Content sections + full redesign pass (3-4 days)
 
-- [ ] Re-skin remaining landing sections over/between the canvas scenes, in order:
-      Proof (stats grid), Market (comparison), RealWorld, Vision/FounderVision
-      (condense -- see Q4), ThreePaths, CTA + typographic footer (ref-unfor-footer
-      style: giant solid + outline type, contact grid).
-- [ ] Typography decision (Q3) applied site-wide; spacing normalized to the
-      "every scene breathes" rule; one accent color enforced.
+- [x] Glass corner-tick cards: `.glass-ticks` utility in global.css (background
+      strokes, NOT pseudo-elements -- cards already spend ::after on the glow
+      hint) applied to all 17 glass cards across the landing sections.
+- [x] Q4 copy consolidation: FounderVision MERGED into Vision.astro (pillars +
+      Now/Next/Future roadmap + single ghost-text close), FounderVision.astro
+      deleted; Market TRIMMED (answer strip removed -- every number in it was
+      already in the table row, VLA cards, or Proof). Competitor table + VLA
+      ceiling explainer KEPT intact.
+- [x] Q3 font-tech sweep: ALL `font-mono` class usages -> `font-tech` across
+      every .astro page/component (landing + inner + pitch) + format.ts +
+      scroll-animations.ts selector. JetBrains Mono dropped from the Google
+      Fonts load (no code blocks exist site-wide); --font-mono token now
+      system-mono only.
+- [ ] Remaining re-skin: typographic footer (ref-unfor style), spacing
+      normalization, one-accent enforcement, remaining section polish.
 - [ ] Rehouse section copy into `src/data/` while porting (audit finding: copy is
       currently inline in 13 .astro files).
 - [ ] Inner pages (architecture, research, invest, build, contact, support, legal,

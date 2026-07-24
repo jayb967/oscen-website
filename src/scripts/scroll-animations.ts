@@ -142,7 +142,7 @@ function animateFlipCards() {
         const front = card.querySelector(".flip-front");
         if (front) {
           gsap.fromTo(
-            front.querySelector(".font-mono"),
+            front.querySelector(".font-tech"),
             { scale: 0.8, opacity: 0 },
             { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)", delay: 0.1 },
           );

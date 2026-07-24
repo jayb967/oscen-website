@@ -18,7 +18,7 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
 
     <!-- Header -->
     <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Market Opportunity</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Market Opportunity</p>
       <h1 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-[0.9]">
         The markets are<br />
         <span class="italic gradient-text">converging.</span>
@@ -32,7 +32,7 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
     <!-- Beachhead -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <div class="reveal glass-bright rounded-2xl p-8 md:p-10">
-        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Market Wedge</p>
+        <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Market Wedge</p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="md:col-span-1">
             <h3 class="text-lg font-display text-text-primary mb-2">Primary market</h3>
@@ -77,18 +77,18 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
               </div>
               <div class="flex items-center gap-4">
                 <div class="text-right">
-                  <div class="text-xl font-mono font-bold text-accent-blue">{m.projected}</div>
+                  <div class="text-xl font-tech font-bold text-accent-blue">{m.projected}</div>
                   <div class="text-[9px] text-text-muted">by {m.year}</div>
                 </div>
                 {m.cagr !== "N/A" && (
-                  <span class="px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green text-[10px] font-mono">
+                  <span class="px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green text-[10px] font-tech">
                     {m.cagr} CAGR
                   </span>
                 )}
               </div>
             </div>
             <div class="mt-2">
-              <a href={m.sourceUrl} target="_blank" rel="noopener" class="text-[9px] font-mono text-accent-blue/50 hover:text-accent-blue transition-colors">
+              <a href={m.sourceUrl} target="_blank" rel="noopener" class="text-[9px] font-tech text-accent-blue/50 hover:text-accent-blue transition-colors">
                 Source: {m.source} →
               </a>
             </div>
@@ -100,18 +100,18 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
       <div class="reveal glass-bright rounded-2xl p-6 mt-8">
         <div class="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-2">TAM</div>
-            <div class="text-2xl font-mono font-bold text-accent-blue">$115B+</div>
+            <div class="text-[10px] font-tech text-text-muted uppercase tracking-wider mb-2">TAM</div>
+            <div class="text-2xl font-tech font-bold text-accent-blue">$115B+</div>
             <div class="text-[9px] text-text-muted mt-1">Combined by 2030–35</div>
           </div>
           <div>
-            <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-2">SAM</div>
-            <div class="text-2xl font-mono font-bold text-accent-cyan">$20B+</div>
+            <div class="text-[10px] font-tech text-text-muted uppercase tracking-wider mb-2">SAM</div>
+            <div class="text-2xl font-tech font-bold text-accent-cyan">$20B+</div>
             <div class="text-[9px] text-text-muted mt-1">Neuromorphic + robot brain</div>
           </div>
           <div>
-            <div class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-2">SOM (Year 5)</div>
-            <div class="text-2xl font-mono font-bold text-accent-green">$50M–200M</div>
+            <div class="text-[10px] font-tech text-text-muted uppercase tracking-wider mb-2">SOM (Year 5)</div>
+            <div class="text-2xl font-tech font-bold text-accent-green">$50M–200M</div>
             <div class="text-[9px] text-text-muted mt-1">Licensing + royalties</div>
           </div>
         </div>
@@ -130,25 +130,25 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
         <table class="w-full text-left">
           <thead>
             <tr class="border-b border-border">
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Company</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Raised</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Valuation</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider">Focus</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase tracking-wider text-center">GPU?</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase tracking-wider">Company</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase tracking-wider">Raised</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase tracking-wider">Valuation</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase tracking-wider">Focus</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase tracking-wider text-center">GPU?</th>
             </tr>
           </thead>
           <tbody>
             {COMPETITORS.map((c) => (
               <tr class="border-b border-border/50 hover:bg-white/[0.02] transition-colors">
                 <td class="px-5 py-3 text-sm text-text-primary font-medium">{c.name}</td>
-                <td class="px-5 py-3 text-sm font-mono text-accent-amber">{c.raised}</td>
-                <td class="px-5 py-3 text-sm font-mono text-text-secondary">{c.valuation}</td>
+                <td class="px-5 py-3 text-sm font-tech text-accent-amber">{c.raised}</td>
+                <td class="px-5 py-3 text-sm font-tech text-text-secondary">{c.valuation}</td>
                 <td class="px-5 py-3 text-[11px] text-text-secondary">{c.focus}</td>
                 <td class="px-5 py-3 text-center">
                   {c.gpuDependent ? (
-                    <span class="text-accent-red text-xs font-mono">Yes</span>
+                    <span class="text-accent-red text-xs font-tech">Yes</span>
                   ) : (
-                    <span class="text-accent-green text-xs font-mono">No</span>
+                    <span class="text-accent-green text-xs font-tech">No</span>
                   )}
                 </td>
               </tr>
@@ -164,13 +164,13 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
             <div class="flex items-center justify-between mb-2">
               <span class="text-sm text-text-primary font-medium">{c.name}</span>
               {c.gpuDependent ? (
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-accent-red/10 text-accent-red">GPU</span>
+                <span class="text-[9px] font-tech px-2 py-0.5 rounded-full bg-accent-red/10 text-accent-red">GPU</span>
               ) : (
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green">No GPU</span>
+                <span class="text-[9px] font-tech px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green">No GPU</span>
               )}
             </div>
             <div class="flex items-center gap-4 text-[11px]">
-              <span class="font-mono text-accent-amber">{c.raised}</span>
+              <span class="font-tech text-accent-amber">{c.raised}</span>
               <span class="text-text-muted">{c.valuation}</span>
             </div>
             <p class="text-[10px] text-text-secondary mt-1">{c.focus}</p>
@@ -180,22 +180,22 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
 
       <!-- OSCEN positioning -->
       <div class="reveal glass-bright rounded-2xl p-6 mt-8">
-        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">OSCEN's Position</p>
+        <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-4">OSCEN's Position</p>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
-            <div class="text-accent-green text-lg font-mono font-bold">No GPU</div>
+            <div class="text-accent-green text-lg font-tech font-bold">No GPU</div>
             <div class="text-[9px] text-text-muted mt-1">Neuromorphic native</div>
           </div>
           <div>
-            <div class="text-accent-blue text-lg font-mono font-bold">Continual</div>
+            <div class="text-accent-blue text-lg font-tech font-bold">Continual</div>
             <div class="text-[9px] text-text-muted mt-1">Learns after deployment</div>
           </div>
           <div>
-            <div class="text-accent-purple text-lg font-mono font-bold">Patented</div>
+            <div class="text-accent-purple text-lg font-tech font-bold">Patented</div>
             <div class="text-[9px] text-text-muted mt-1">6 claims, 20 CIPs</div>
           </div>
           <div>
-            <div class="text-accent-cyan text-lg font-mono font-bold">&lt;5W</div>
+            <div class="text-accent-cyan text-lg font-tech font-bold">&lt;5W</div>
             <div class="text-[9px] text-text-muted mt-1">Edge-native</div>
           </div>
         </div>
@@ -218,9 +218,9 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
               <div class="flex items-center justify-between mb-1.5">
                 <div>
                   <span class="text-sm text-text-primary">{item.system}</span>
-                  <span class="text-[9px] font-mono text-text-muted ml-2">{item.source}</span>
+                  <span class="text-[9px] font-tech text-text-muted ml-2">{item.source}</span>
                 </div>
-                <span class={`text-sm font-mono font-bold text-${item.color}`}>{item.power}</span>
+                <span class={`text-sm font-tech font-bold text-${item.color}`}>{item.power}</span>
               </div>
               <div class="h-2 rounded-full bg-elevated overflow-hidden">
                 <div
@@ -236,12 +236,12 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
 
       <div class="reveal grid grid-cols-2 gap-3 mt-6">
         <div class="glass rounded-xl p-4 text-center">
-          <div class="text-xl font-mono text-accent-blue font-bold">75–200x</div>
+          <div class="text-xl font-tech text-accent-blue font-bold">75–200x</div>
           <div class="text-[9px] text-text-muted mt-1">Less energy vs GPU</div>
           <div class="text-[8px] text-text-muted/60">Intel Loihi benchmarks, IEEE 2024</div>
         </div>
         <div class="glass rounded-xl p-4 text-center">
-          <div class="text-xl font-mono text-accent-amber font-bold">536 TWh</div>
+          <div class="text-xl font-tech text-accent-amber font-bold">536 TWh</div>
           <div class="text-[9px] text-text-muted mt-1">Global data center energy 2025</div>
           <div class="text-[8px] text-text-muted/60">IEA, projected 1,065 TWh by 2030</div>
         </div>
@@ -283,7 +283,7 @@ import { MARKETS, COMPETITORS, ENERGY_DATA, KEY_STATS } from "../../data/pitch";
         ].map((item) => (
           <div class="reveal glass rounded-xl p-5">
             <div class="flex items-center gap-3 mb-3">
-              <span class={`text-lg font-mono font-bold text-${item.color}`}>{item.stat}</span>
+              <span class={`text-lg font-tech font-bold text-${item.color}`}>{item.stat}</span>
             </div>
             <h3 class="text-sm font-medium text-text-primary mb-2">{item.title}</h3>
             <p class="text-[11px] text-text-secondary leading-relaxed">{item.desc}</p>

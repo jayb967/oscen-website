@@ -11,7 +11,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
 
 <section id="support-thanks" class="max-w-5xl mx-auto px-6 mb-20 hidden">
   <div class="reveal glass rounded-xl p-8 border border-accent-amber/30">
-    <p class="text-[10px] font-mono text-accent-amber uppercase tracking-[0.3em] mb-3" id="thanks-eyebrow">Thanks</p>
+    <p class="text-[10px] font-tech text-accent-amber uppercase tracking-[0.3em] mb-3" id="thanks-eyebrow">Thanks</p>
     <h2 class="font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary leading-tight mb-4" id="thanks-headline">
       Thank you.
     </h2>
@@ -25,7 +25,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
       <input type="hidden" name="_subject" value="New supporter sign-up" />
 
       <div>
-        <label for="thanks-name" class="block text-[11px] font-mono text-text-muted uppercase tracking-wider mb-1.5">
+        <label for="thanks-name" class="block text-[11px] font-tech text-text-muted uppercase tracking-wider mb-1.5">
           Display name for the contributor wall (optional)
         </label>
         <input
@@ -37,11 +37,11 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
           placeholder="Real name, pseudonym, or leave blank"
           class="w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/30 focus:outline-none transition-colors"
         />
-        <p class="text-[10px] text-text-muted/70 mt-1.5 font-mono">If you already entered one at Stripe checkout, you can leave this blank.</p>
+        <p class="text-[10px] text-text-muted/70 mt-1.5 font-tech">If you already entered one at Stripe checkout, you can leave this blank.</p>
       </div>
 
       <div>
-        <label for="thanks-email" class="block text-[11px] font-mono text-text-muted uppercase tracking-wider mb-1.5">
+        <label for="thanks-email" class="block text-[11px] font-tech text-text-muted uppercase tracking-wider mb-1.5">
           Email <span id="thanks-email-hint" class="text-text-muted/60 normal-case">for thanks and updates</span>
         </label>
         <input
@@ -66,12 +66,12 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
         <button
           type="button"
           id="thanks-skip"
-          class="text-[12px] font-mono text-text-muted hover:text-text-primary transition-colors"
+          class="text-[12px] font-tech text-text-muted hover:text-text-primary transition-colors"
         >
           Skip
         </button>
       </div>
-      <p id="thanks-status" class="text-xs font-mono mt-2 hidden"></p>
+      <p id="thanks-status" class="text-xs font-tech mt-2 hidden"></p>
     </form>
 
     <div id="thanks-done" class="hidden">

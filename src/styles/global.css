@@ -30,7 +30,9 @@
 
   --font-display: "Instrument Serif", "Georgia", serif;
   --font-body: "Outfit", "Helvetica Neue", sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+  /* System mono only -- JetBrains Mono dropped from the font load in the
+     redesign-v2 font-tech sweep (no code blocks anywhere on the site). */
+  --font-mono: "SF Mono", "Fira Code", ui-monospace, monospace;
   /* Hybrid type system (redesign-v2): technical sans for HUD chrome,
      captions, and oversized stat numbers; serif stays for narrative
      headlines. Apply site-wide, inner pages included. */
@@ -125,6 +127,34 @@ body::after {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--color-border-bright);
+}
+
+/* Photo-corner tick marks on glass panels (ref-unfor-glass-cards look).
+   Drawn as background strokes, not pseudo-elements, because the card
+   containers already spend ::after on the glow hint. Declared after
+   .glass/.glass-bright so the background-image wins the cascade. */
+.glass-ticks {
+  --tick: rgba(94, 164, 245, 0.4);
+  background-image:
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick));
+  background-repeat: no-repeat;
+  background-size:
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px;
+  background-position:
+    10px 10px, 10px 10px,
+    calc(100% - 10px) 10px, calc(100% - 10px) 10px,
+    10px calc(100% - 10px), 10px calc(100% - 10px),
+    calc(100% - 10px) calc(100% - 10px), calc(100% - 10px) calc(100% - 10px);
 }
 
 /* ─── Typography Utilities ─── */

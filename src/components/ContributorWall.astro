@@ -15,7 +15,7 @@ const sorted = [...CONTRIBUTORS].sort((a, b) =>
   {sorted.length === 0 ? (
     <div class="reveal glass rounded-xl p-8 text-center">
       <p class="text-sm text-text-secondary">Be the first.</p>
-      <p class="text-xs text-text-muted mt-2 font-mono">The wall lights up the moment someone backs Synapse or above.</p>
+      <p class="text-xs text-text-muted mt-2 font-tech">The wall lights up the moment someone backs Synapse or above.</p>
     </div>
   ) : (
     <div class="reveal glass rounded-xl p-6">
@@ -27,7 +27,7 @@ const sorted = [...CONTRIBUTORS].sort((a, b) =>
           </li>
         ))}
       </ul>
-      <p class="text-[10px] font-mono text-text-muted mt-6">
+      <p class="text-[10px] font-tech text-text-muted mt-6">
         {sorted.length} {sorted.length === 1 ? "supporter" : "supporters"}. Want off the wall? Email info@oscen.ai.
       </p>
     </div>

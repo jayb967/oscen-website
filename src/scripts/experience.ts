@@ -31,10 +31,14 @@ function init() {
 
     // Transparent clear: the giant back-title (z-0) shows through empty
     // space, the brain's particles occlude it -- the depth trick.
+    // Phones get a lower DPR cap: at <=768px CSS width the visual loss of
+    // 1.5x vs 2x is negligible but the fragment load nearly halves.
+    const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
     const stage = new BrainStage(canvasHost, {
         mode: "sim",
         interactive: false,
         clearAlpha: 0,
+        maxPixelRatio: isSmallScreen ? 1.5 : 2,
     });
 
     const audio = new AudioController();

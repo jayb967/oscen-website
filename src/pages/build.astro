@@ -19,7 +19,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
   <main class="pt-32 pb-24">
     <!-- Header -->
     <section class="max-w-5xl mx-auto px-6 mb-10">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Path B · Collaborators</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Path B · Collaborators</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
         Build the brain<br />
         <span class="italic gradient-text">with us.</span>
@@ -33,12 +33,12 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     <section class="max-w-5xl mx-auto px-6 mb-10">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="reveal glass rounded-2xl p-6">
-          <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-blue/70">Step 1 · 60 seconds</p>
+          <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-accent-blue/70">Step 1 · 60 seconds</p>
           <h3 class="mt-3 text-xl font-display text-text-primary">Tell us who you are</h3>
           <p class="mt-2 text-sm text-text-secondary leading-relaxed">Name, email, role, and what pulled you here. Below.</p>
         </div>
         <div class="reveal glass rounded-2xl p-6">
-          <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-blue/70">Step 2 · 500-word memo</p>
+          <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-accent-blue/70">Step 2 · 500-word memo</p>
           <h3 class="mt-3 text-xl font-display text-text-primary">Show how you think</h3>
           <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             We'll reply within 48 hours with a single prompt. Pick the part of the brain you'd push hardest on and tell us how. We read every reply.
@@ -63,7 +63,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <label class="block">
-            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Name</span>
+            <span class="text-[11px] font-tech text-text-secondary uppercase tracking-wider">Name</span>
             <input
               type="text"
               name="name"
@@ -73,7 +73,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
             />
           </label>
           <label class="block">
-            <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Email</span>
+            <span class="text-[11px] font-tech text-text-secondary uppercase tracking-wider">Email</span>
             <input
               type="email"
               name="email"
@@ -85,7 +85,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
         </div>
 
         <fieldset>
-          <legend class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Your role</legend>
+          <legend class="text-[11px] font-tech text-text-secondary uppercase tracking-wider">Your role</legend>
           <div class="mt-3 grid grid-cols-2 md:grid-cols-5 gap-2">
             {[
               { value: "engineer", label: "Engineer" },
@@ -105,7 +105,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
         </fieldset>
 
         <label class="block">
-          <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">LinkedIn, GitHub, or company site</span>
+          <span class="text-[11px] font-tech text-text-secondary uppercase tracking-wider">LinkedIn, GitHub, or company site</span>
           <input
             type="url"
             name="link"
@@ -117,7 +117,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
         </label>
 
         <label class="block">
-          <span class="text-[11px] font-mono text-text-secondary uppercase tracking-wider">Why OSCEN? (a few sentences)</span>
+          <span class="text-[11px] font-tech text-text-secondary uppercase tracking-wider">Why OSCEN? (a few sentences)</span>
           <textarea
             name="why"
             rows="5"
@@ -141,11 +141,11 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
           Send
         </button>
 
-        <p id="collab-status" class="text-center text-sm font-mono hidden"></p>
+        <p id="collab-status" class="text-center text-sm font-tech hidden"></p>
       </form>
 
       <div id="collab-success" class="hidden glass-bright rounded-2xl p-9 text-center">
-        <p class="text-[10px] font-mono text-accent-green uppercase tracking-[0.3em] mb-3">Received</p>
+        <p class="text-[10px] font-tech text-accent-green uppercase tracking-[0.3em] mb-3">Received</p>
         <h3 class="font-display text-2xl text-text-primary">Step 1 done.</h3>
         <p class="text-sm text-text-secondary mt-3 max-w-md mx-auto leading-relaxed">
           Watch your inbox for the 500-word memo prompt within 48 hours. Reply within a week and we'll read it.
@@ -174,7 +174,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
     <!-- Back -->
     <section class="max-w-5xl mx-auto px-6 text-center">
       <div class="divider max-w-24 mx-auto mb-10"></div>
-      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+      <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
 </Base>

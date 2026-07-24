@@ -13,5 +13,5 @@ export function compactNumber(n: number): string {
 
 /** Section label component markup (reused in every section) */
 export function sectionLabel(text: string): string {
-  return `<span class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em]">${text}</span>`;
+  return `<span class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em]">${text}</span>`;
 }

@@ -22,7 +22,7 @@ import {
 
     <!-- Header -->
     <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Ask</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">The Ask</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.85]">
         <span class="gradient-text">{RAISE_AMOUNT}</span> seed.
       </h1>
@@ -35,12 +35,12 @@ import {
     <!-- Two-Round Strategy -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <div class="reveal glass-bright rounded-2xl p-8 md:p-10">
-        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-8">Staged De-Risking</p>
+        <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-8">Staged De-Risking</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div class="glass rounded-xl p-6 border border-accent-blue/20">
-            <span class="text-[9px] font-mono text-accent-blue uppercase tracking-wider">Now</span>
-            <div class="text-3xl font-mono font-bold text-accent-blue mt-2">{RAISE_AMOUNT}</div>
+            <span class="text-[9px] font-tech text-accent-blue uppercase tracking-wider">Now</span>
+            <div class="text-3xl font-tech font-bold text-accent-blue mt-2">{RAISE_AMOUNT}</div>
             <div class="text-sm text-text-primary font-medium mt-1">Seed Round</div>
             <div class="text-[11px] text-text-secondary mt-3 leading-relaxed space-y-1">
               <p>5 elite hires</p>
@@ -50,8 +50,8 @@ import {
             </div>
           </div>
           <div class="glass rounded-xl p-6 border border-border/50 opacity-70">
-            <span class="text-[9px] font-mono text-text-muted uppercase tracking-wider">After proof</span>
-            <div class="text-3xl font-mono font-bold text-text-secondary mt-2">{SERIES_A_TARGET}</div>
+            <span class="text-[9px] font-tech text-text-muted uppercase tracking-wider">After proof</span>
+            <div class="text-3xl font-tech font-bold text-text-secondary mt-2">{SERIES_A_TARGET}</div>
             <div class="text-sm text-text-primary font-medium mt-1">Series A</div>
             <div class="text-[11px] text-text-secondary mt-3 leading-relaxed space-y-1">
               <p>Scale to 10M+ neurons</p>
@@ -64,19 +64,19 @@ import {
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
-            <div class="text-xl md:text-2xl font-mono font-bold text-accent-blue">{RAISE_AMOUNT}</div>
+            <div class="text-xl md:text-2xl font-tech font-bold text-accent-blue">{RAISE_AMOUNT}</div>
             <div class="text-[10px] text-text-muted mt-1">Seed raise</div>
           </div>
           <div>
-            <div class="text-xl md:text-2xl font-mono font-bold text-accent-purple">{PRE_MONEY_VALUATION}</div>
+            <div class="text-xl md:text-2xl font-tech font-bold text-accent-purple">{PRE_MONEY_VALUATION}</div>
             <div class="text-[10px] text-text-muted mt-1">Pre-money valuation</div>
           </div>
           <div>
-            <div class="text-xl md:text-2xl font-mono font-bold text-accent-cyan">{FOUNDER_OWNERSHIP_POST}</div>
+            <div class="text-xl md:text-2xl font-tech font-bold text-accent-cyan">{FOUNDER_OWNERSHIP_POST}</div>
             <div class="text-[10px] text-text-muted mt-1">Founder retains</div>
           </div>
           <div>
-            <div class="text-xl md:text-2xl font-mono font-bold text-accent-green">{INVESTOR_OWNERSHIP}</div>
+            <div class="text-xl md:text-2xl font-tech font-bold text-accent-green">{INVESTOR_OWNERSHIP}</div>
             <div class="text-[10px] text-text-muted mt-1">Investor equity</div>
           </div>
         </div>
@@ -101,11 +101,11 @@ import {
             <div>
               <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-3">
-                  <span class="text-[10px] font-mono text-text-muted">{item.icon}</span>
+                  <span class="text-[10px] font-tech text-text-muted">{item.icon}</span>
                   <span class="text-sm text-text-primary">{item.category}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class={`text-sm font-mono font-bold text-${item.color}`}>{item.amount}</span>
+                  <span class={`text-sm font-tech font-bold text-${item.color}`}>{item.amount}</span>
                   <span class="text-[9px] text-text-muted">{item.percentage}</span>
                 </div>
               </div>
@@ -125,7 +125,7 @@ import {
         {USE_OF_FUNDS.map((item, i) => (
           <div class="expand-card reveal glass rounded-xl p-4 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${item.color});`}>
             <div class="flex items-center gap-3">
-              <span class={`text-sm font-mono font-bold text-${item.color}`}>{item.amount}</span>
+              <span class={`text-sm font-tech font-bold text-${item.color}`}>{item.amount}</span>
               <span class="text-sm text-text-primary">{item.category}</span>
               <span class="expand-indicator text-text-muted/40 text-sm ml-auto">+</span>
             </div>
@@ -148,14 +148,14 @@ import {
           {MILESTONES.map((m, i) => (
             <div class="flex gap-4 items-start py-4 border-b border-border/50 last:border-0">
               <div class="shrink-0 w-16">
-                <span class="text-[10px] font-mono text-accent-blue uppercase">{m.quarter}</span>
+                <span class="text-[10px] font-tech text-accent-blue uppercase">{m.quarter}</span>
               </div>
               <div class="flex-1">
                 <h3 class="text-sm font-medium text-text-primary">{m.title}</h3>
                 <p class="text-[11px] text-text-secondary mt-1 leading-relaxed">{m.description}</p>
               </div>
               <div class="shrink-0 text-right">
-                <span class="px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green text-[9px] font-mono">
+                <span class="px-2 py-0.5 rounded-full bg-accent-green/10 text-accent-green text-[9px] font-tech">
                   {m.metric}
                 </span>
               </div>
@@ -175,8 +175,8 @@ import {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         {REVENUE_MODEL.map((phase) => (
           <div class="reveal glass rounded-xl p-5">
-            <span class="text-[10px] font-mono text-text-muted uppercase tracking-wider">{phase.year}</span>
-            <div class="text-xl font-mono font-bold text-accent-amber mt-2">{phase.range}</div>
+            <span class="text-[10px] font-tech text-text-muted uppercase tracking-wider">{phase.year}</span>
+            <div class="text-xl font-tech font-bold text-accent-amber mt-2">{phase.range}</div>
             <h3 class="text-sm text-text-primary font-medium mt-2">{phase.model}</h3>
             <p class="text-[11px] text-text-secondary mt-2 leading-relaxed">{phase.description}</p>
           </div>
@@ -195,7 +195,7 @@ import {
         {REVENUE_SOURCES.map((src) => (
           <div class="reveal glass rounded-xl p-5">
             <div class="flex items-center gap-3 mb-3">
-              <span class={`text-sm font-mono font-bold text-${src.color}`}>{src.timeline}</span>
+              <span class={`text-sm font-tech font-bold text-${src.color}`}>{src.timeline}</span>
               <h3 class="text-sm font-medium text-text-primary">{src.name}</h3>
             </div>
             <p class="text-[11px] text-text-secondary leading-relaxed">{src.description}</p>
@@ -204,7 +204,7 @@ import {
       </div>
 
       <div class="reveal glass-bright rounded-xl p-5 mt-6">
-        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-3">Core Model</p>
+        <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-3">Core Model</p>
         <p class="text-sm text-text-secondary leading-relaxed">
           <span class="text-text-primary font-medium">Brain-as-a-Service is the annuity.</span> Hardware is sold once; the brain is rented monthly.
           At $700/robot/month average, 93% gross margin, and $25K+ lifetime value per robot, the economics compound with every OEM partnership.
@@ -224,11 +224,11 @@ import {
         <table class="w-full text-left">
           <thead>
             <tr class="border-b border-border">
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase">Company</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase">Valuation</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase">Raised</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase hidden md:table-cell">Product?</th>
-              <th class="px-5 py-3 text-[10px] font-mono text-text-muted uppercase hidden md:table-cell">Patent?</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase">Company</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase">Valuation</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase">Raised</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase hidden md:table-cell">Product?</th>
+              <th class="px-5 py-3 text-[10px] font-tech text-text-muted uppercase hidden md:table-cell">Patent?</th>
             </tr>
           </thead>
           <tbody>
@@ -244,20 +244,20 @@ import {
                   ]}>{c.company}</span>
                   <span class="text-[9px] text-text-muted block mt-0.5">{c.stage}</span>
                 </td>
-                <td class="px-5 py-3 text-sm font-mono text-accent-amber">{c.valuation}</td>
-                <td class="px-5 py-3 text-sm font-mono text-text-secondary">{c.raised}</td>
+                <td class="px-5 py-3 text-sm font-tech text-accent-amber">{c.valuation}</td>
+                <td class="px-5 py-3 text-sm font-tech text-text-secondary">{c.raised}</td>
                 <td class="px-5 py-3 text-center hidden md:table-cell">
                   {c.hadProduct ? (
-                    <span class="text-accent-green text-xs font-mono">Yes</span>
+                    <span class="text-accent-green text-xs font-tech">Yes</span>
                   ) : (
-                    <span class="text-accent-red text-xs font-mono">No</span>
+                    <span class="text-accent-red text-xs font-tech">No</span>
                   )}
                 </td>
                 <td class="px-5 py-3 text-center hidden md:table-cell">
                   {c.hadPatent ? (
-                    <span class="text-accent-green text-xs font-mono">Yes</span>
+                    <span class="text-accent-green text-xs font-tech">Yes</span>
                   ) : (
-                    <span class="text-accent-red text-xs font-mono">No</span>
+                    <span class="text-accent-red text-xs font-tech">No</span>
                   )}
                 </td>
               </tr>
@@ -286,11 +286,11 @@ import {
           <div class="reveal glass rounded-xl p-4">
             <div class="flex items-center justify-between mb-2">
               <span class="text-sm text-text-primary font-medium">{nd.source}</span>
-              <span class="text-sm font-mono text-accent-green font-bold">{nd.amount}</span>
+              <span class="text-sm font-tech text-accent-green font-bold">{nd.amount}</span>
             </div>
             <div class="flex items-center gap-3 text-[10px]">
               <span class="text-text-muted">{nd.timeline}</span>
-              <span class="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue font-mono">{nd.status}</span>
+              <span class="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue font-tech">{nd.status}</span>
             </div>
           </div>
         ))}

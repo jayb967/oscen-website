@@ -32,7 +32,7 @@ const stats = [
   <div class="max-w-4xl mx-auto w-full">
     <!-- Two lines, that's it -->
     <div class="text-center mb-20">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Problem</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">The Problem</p>
       <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
         AI today is powerful.<br />
         <span class="text-text-secondary">But it can't learn from experience.</span>
@@ -45,14 +45,14 @@ const stats = [
         <div class="flip-card reveal h-44" tabindex="0" role="button" aria-label={`${s.value} ${s.label}. Hover for details.`} style={`--glow-delay: ${i * 2}s; --glow-color: var(--color-${s.color.replace('text-', '')});`}>
           <div class="flip-inner w-full h-full">
             <!-- Front -->
-            <div class="flip-front w-full h-full glass-bright rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-              <div class={`text-3xl md:text-4xl font-mono font-bold tracking-tight ${s.color}`}>{s.value}</div>
+            <div class="flip-front w-full h-full glass-bright glass-ticks rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+              <div class={`text-3xl md:text-4xl font-tech font-bold tracking-tight ${s.color}`}>{s.value}</div>
               <div class="text-sm text-text-secondary mt-2">{s.label}</div>
             </div>
             <!-- Back -->
-            <div class="flip-back w-full h-full glass rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+            <div class="flip-back w-full h-full glass glass-ticks rounded-2xl p-6 flex flex-col items-center justify-center text-center">
               <p class="text-sm text-text-secondary leading-relaxed">{s.back}</p>
-              <span class="text-[9px] font-mono text-text-muted uppercase tracking-wider mt-3">{s.source}</span>
+              <span class="text-[9px] font-tech text-text-muted uppercase tracking-wider mt-3">{s.source}</span>
             </div>
           </div>
         </div>

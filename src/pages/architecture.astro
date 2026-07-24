@@ -79,7 +79,7 @@ const motorRanges = [
   <main class="pt-32 pb-24">
     <!-- Page header -->
     <section class="max-w-5xl mx-auto px-6 mb-24">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Architecture</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Architecture</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
         Inside the<br />
         <span class="italic gradient-text">living brain.</span>
@@ -103,12 +103,12 @@ const motorRanges = [
             <div class="flex items-center gap-3">
               <span class="w-2.5 h-2.5 rounded-full shrink-0" style={`background: ${rgbToHex(r.color)}`}></span>
               <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{r.label}</h3>
-              <span class="ml-auto text-[10px] font-mono text-text-muted">{formatNeurons(r.neurons)}</span>
+              <span class="ml-auto text-[10px] font-tech text-text-muted">{formatNeurons(r.neurons)}</span>
               <span class="expand-indicator text-text-muted/40 text-sm">+</span>
             </div>
             <div class="expand-body mt-3">
               <p class="text-xs text-text-secondary leading-relaxed">{r.description}</p>
-              <p class="text-[10px] font-mono text-text-muted mt-2">{r.connections}</p>
+              <p class="text-[10px] font-tech text-text-muted mt-2">{r.connections}</p>
             </div>
           </div>
         ))}
@@ -123,7 +123,7 @@ const motorRanges = [
       <p class="reveal text-sm text-text-muted mb-4 max-w-xl">All six operate simultaneously every simulation step. This is Patent Claim #1.</p>
 
       <!-- Three-factor pipeline -->
-      <div class="reveal flex items-center gap-2 mb-12 text-[10px] font-mono text-text-muted overflow-x-auto pb-2">
+      <div class="reveal flex items-center gap-2 mb-12 text-[10px] font-tech text-text-muted overflow-x-auto pb-2">
         <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70 whitespace-nowrap">STDP</span>
         <span class="text-text-muted/30">→</span>
         <span class="px-3 py-1.5 rounded-full border border-accent-cyan/20 text-accent-cyan/70 whitespace-nowrap">Eligibility Trace</span>
@@ -161,8 +161,8 @@ const motorRanges = [
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- LIF equation -->
         <div class="reveal glass rounded-xl p-6">
-          <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-4">Membrane Dynamics</p>
-          <div class="font-mono text-lg text-accent-blue tracking-wide mb-4">
+          <p class="text-[10px] font-tech text-text-muted uppercase tracking-wider mb-4">Membrane Dynamics</p>
+          <div class="font-tech text-lg text-accent-blue tracking-wide mb-4">
             &tau; &middot; dV/dt = -(V - V<sub>rest</sub>) + R &middot; I<sub>syn</sub>
           </div>
           <p class="text-xs text-text-secondary leading-relaxed">
@@ -171,11 +171,11 @@ const motorRanges = [
           </p>
           <div class="flex gap-4 mt-4">
             <div class="text-center">
-              <div class="text-sm font-mono text-accent-green">80%</div>
+              <div class="text-sm font-tech text-accent-green">80%</div>
               <div class="text-[10px] text-text-muted">Excitatory</div>
             </div>
             <div class="text-center">
-              <div class="text-sm font-mono text-accent-pink">20%</div>
+              <div class="text-sm font-tech text-accent-pink">20%</div>
               <div class="text-[10px] text-text-muted">Inhibitory</div>
             </div>
           </div>
@@ -183,7 +183,7 @@ const motorRanges = [
 
         <!-- Dendritic compartments -->
         <div class="reveal glass rounded-xl p-6">
-          <p class="text-[10px] font-mono text-text-muted uppercase tracking-wider mb-4">4 Dendritic Compartments</p>
+          <p class="text-[10px] font-tech text-text-muted uppercase tracking-wider mb-4">4 Dendritic Compartments</p>
           <div class="space-y-3">
             {compartments.map((c) => (
               <div class="flex items-center gap-3">
@@ -211,14 +211,14 @@ const motorRanges = [
         {phases.map((p, i) => (
           <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-purple);`}>
             <div class="flex items-center gap-4">
-              <span class="text-[10px] font-mono text-text-muted w-6">{String(i + 1).padStart(2, '0')}</span>
+              <span class="text-[10px] font-tech text-text-muted w-6">{String(i + 1).padStart(2, '0')}</span>
               <h3 class="text-sm font-medium text-text-primary">{p.name}</h3>
-              <span class="text-[10px] font-mono text-text-muted ml-auto">{p.plasticity}</span>
+              <span class="text-[10px] font-tech text-text-muted ml-auto">{p.plasticity}</span>
               <span class="expand-indicator text-text-muted/40 text-sm">+</span>
             </div>
             <div class="expand-body mt-3 ml-10">
               <p class="text-xs text-text-secondary leading-relaxed">{p.desc}</p>
-              <span class="text-[10px] font-mono text-text-muted mt-1 inline-block">{p.steps} steps</span>
+              <span class="text-[10px] font-tech text-text-muted mt-1 inline-block">{p.steps} steps</span>
             </div>
           </div>
         ))}
@@ -245,7 +245,7 @@ const motorRanges = [
             <div class="flex items-center gap-4">
               <span class={`w-2 h-2 rounded-full bg-${l.color}`}></span>
               <span class="text-sm text-text-primary w-40">{l.layer}</span>
-              <span class="text-[10px] font-mono text-text-muted w-12">{l.n}</span>
+              <span class="text-[10px] font-tech text-text-muted w-12">{l.n}</span>
               <span class="text-xs text-text-secondary">{l.role}</span>
             </div>
           ))}
@@ -264,7 +264,7 @@ const motorRanges = [
         <div class="space-y-2">
           {motorRanges.map((m) => (
             <div class="flex items-center gap-4">
-              <span class={`text-[10px] font-mono text-${m.color} w-20`}>{m.range}</span>
+              <span class={`text-[10px] font-tech text-${m.color} w-20`}>{m.range}</span>
               <div class="flex-1 h-1.5 rounded-full bg-elevated overflow-hidden">
                 <div class={`h-full rounded-full bg-${m.color}/40`} style={`width: ${parseInt(m.range.split('–')[1] || m.range.split('–')[0]) - parseInt(m.range.split('–')[0])}%`}></div>
               </div>
@@ -293,7 +293,7 @@ const motorRanges = [
             { step: "06", label: "STDP learning", desc: "Brain learns. No query needed next time" },
           ].map((s) => (
             <div class="text-center">
-              <div class="text-lg font-mono text-accent-purple/50">{s.step}</div>
+              <div class="text-lg font-tech text-accent-purple/50">{s.step}</div>
               <div class="text-xs text-text-primary mt-1">{s.label}</div>
               <p class="text-[10px] text-text-muted mt-1 leading-relaxed">{s.desc}</p>
             </div>
@@ -310,7 +310,7 @@ const motorRanges = [
       <p class="reveal text-sm text-text-muted mb-12 max-w-xl">The brain learns from its own actions. Motor commands fire, actuators move, proprioceptive sensors capture the outcome, and R-STDP adjusts motor pathways.</p>
 
       <div class="reveal glass rounded-xl p-6">
-        <div class="flex items-center justify-center gap-3 flex-wrap text-[11px] font-mono">
+        <div class="flex items-center justify-center gap-3 flex-wrap text-[11px] font-tech">
           <span class="px-3 py-1.5 rounded-full border border-accent-green/20 text-accent-green/70">Motor fires</span>
           <span class="text-text-muted/30">→</span>
           <span class="px-3 py-1.5 rounded-full border border-accent-blue/20 text-accent-blue/70">Actuator moves</span>
@@ -333,7 +333,7 @@ const motorRanges = [
     <!-- Back to home -->
     <section class="max-w-5xl mx-auto px-6 text-center">
       <div class="divider max-w-24 mx-auto mb-10"></div>
-      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+      <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
 </Base>

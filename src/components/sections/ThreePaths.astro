@@ -43,7 +43,7 @@ const paths = [
 <section id="three-paths" class="section relative">
   <div class="max-w-5xl mx-auto w-full px-6">
     <div class="text-center mb-12">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-4">Three ways in</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-4">Three ways in</p>
       <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
         Pick your <span class="italic gradient-text">path</span>.
       </h2>
@@ -53,14 +53,14 @@ const paths = [
       {paths.map((p) => (
         <a
           href={p.href}
-          class="reveal glass rounded-2xl p-7 group hover:border-border-bright transition-all duration-300 block"
+          class="reveal glass glass-ticks rounded-2xl p-7 group hover:border-border-bright transition-all duration-300 block"
         >
-          <p class={`text-[10px] font-mono uppercase tracking-[0.25em] ${p.eyebrowCls}`}>{p.eyebrow}</p>
+          <p class={`text-[10px] font-tech uppercase tracking-[0.25em] ${p.eyebrowCls}`}>{p.eyebrow}</p>
           <h3 class={`mt-3 text-2xl font-display text-text-primary ${p.titleHoverCls} transition-colors`}>
             {p.title}
           </h3>
           <p class="mt-3 text-sm text-text-secondary leading-relaxed">{p.desc}</p>
-          <div class={`mt-5 inline-flex items-center gap-2 text-xs font-mono ${p.ctaCls} transition-colors`}>
+          <div class={`mt-5 inline-flex items-center gap-2 text-xs font-tech ${p.ctaCls} transition-colors`}>
             <span>{p.cta}</span>
             <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </div>

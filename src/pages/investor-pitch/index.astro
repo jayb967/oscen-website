@@ -17,7 +17,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
 
     <!-- Hero -->
     <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Seed Round | Confidential</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Seed Round | Confidential</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,7vw,5rem)] text-text-primary leading-[0.85]">
         Adaptive intelligence<br />
         <span class="italic gradient-text">for robotics.</span>
@@ -50,7 +50,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
           { value: "<5W", label: "Target power", sub: "vs 200–700W GPU", color: "text-accent-green" },
         ].map((stat) => (
           <div class="glass-bright rounded-xl p-4 text-center">
-            <div class={`text-lg md:text-xl font-mono font-bold ${stat.color}`}>{stat.value}</div>
+            <div class={`text-lg md:text-xl font-tech font-bold ${stat.color}`}>{stat.value}</div>
             <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">{stat.label}</div>
             <div class="text-[9px] text-text-muted/60 mt-0.5">{stat.sub}</div>
           </div>
@@ -61,7 +61,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
     <!-- The 60-second pitch -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <div class="reveal glass-bright rounded-2xl p-8 md:p-12">
-        <p class="text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-8">The Pitch</p>
+        <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-8">The Pitch</p>
         <div class="space-y-6 text-lg text-text-secondary leading-relaxed max-w-3xl">
           <p>
             <span class="text-text-primary font-medium">Autonomous robots need on-device intelligence.</span> Today, {TOTAL_COMPETITOR_FUNDING} has been poured into robot AI,
@@ -138,7 +138,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
         ].map((card) => (
           <a href={card.href} class="reveal glass rounded-xl p-5 group hover:border-border-bright transition-all duration-300 block">
             <div class="flex items-center justify-between mb-3">
-              <span class={`text-xl font-mono font-bold text-${card.accent}`}>{card.num}</span>
+              <span class={`text-xl font-tech font-bold text-${card.accent}`}>{card.num}</span>
               <span class="text-text-muted/30 group-hover:text-text-muted group-hover:translate-x-1 transition-all duration-300 text-sm">→</span>
             </div>
             <h3 class="text-sm font-medium text-text-primary group-hover:text-accent-blue transition-colors">{card.title}</h3>
@@ -185,7 +185,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
     <!-- Back -->
     <section class="max-w-5xl mx-auto px-6 text-center">
       <div class="divider max-w-24 mx-auto mb-10"></div>
-      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to oscen.ai</a>
+      <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to oscen.ai</a>
     </section>
   </main>
 </Base>

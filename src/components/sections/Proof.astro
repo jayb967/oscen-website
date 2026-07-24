@@ -35,7 +35,7 @@ const proofs = [
 <section id="proof" class="section relative">
   <div class="max-w-4xl mx-auto w-full">
     <div class="text-center mb-20">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Proof</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Proof</p>
       <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
         Not a concept.<br />
         <span class="text-text-secondary">A running system.</span>
@@ -47,14 +47,14 @@ const proofs = [
       {proofs.map((p, i) => (
         <div class="flip-card reveal h-48" tabindex="0" role="button" aria-label={`${p.value} ${p.label}. Hover for details.`} style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${p.color.replace('text-', '')});`}>
           <div class="flip-inner w-full h-full">
-            <div class="flip-front w-full h-full glass-bright rounded-2xl p-5 flex flex-col items-center justify-center text-center">
-              <div class={`text-2xl md:text-3xl font-mono font-bold tracking-tight ${p.color}`}>{p.value}</div>
+            <div class="flip-front w-full h-full glass-bright glass-ticks rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+              <div class={`text-2xl md:text-3xl font-tech font-bold tracking-tight ${p.color}`}>{p.value}</div>
               <div class="text-xs text-text-muted mt-2 uppercase tracking-wider">{p.label}</div>
             </div>
-            <div class="flip-back w-full h-full glass rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+            <div class="flip-back w-full h-full glass glass-ticks rounded-2xl p-5 flex flex-col items-center justify-center text-center">
               <p class="text-xs text-text-secondary leading-relaxed">{p.back}</p>
               {p.link && (
-                <a href={p.link} class="text-[10px] font-mono text-accent-purple/70 hover:text-accent-purple mt-2 transition-colors">
+                <a href={p.link} class="text-[10px] font-tech text-accent-purple/70 hover:text-accent-purple mt-2 transition-colors">
                   {p.linkLabel} →
                 </a>
               )}
@@ -68,7 +68,7 @@ const proofs = [
     <div class="reveal text-center">
       <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-border">
         <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
-        <span class="text-[10px] font-mono text-text-muted tracking-wider">
+        <span class="text-[10px] font-tech text-text-muted tracking-wider">
           Training continuously on dedicated infrastructure
         </span>
       </div>

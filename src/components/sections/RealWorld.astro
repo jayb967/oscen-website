@@ -29,7 +29,7 @@ const pairs = [
 <section id="real-world" class="section relative">
   <div class="max-w-5xl mx-auto w-full px-6">
     <div class="text-center mb-12">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">What this means</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">What this means</p>
       <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
         Robots that <span class="italic gradient-text">actually live with us.</span>
       </h2>
@@ -40,14 +40,14 @@ const pairs = [
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       {pairs.map((p) => (
-        <div class="reveal glass-bright rounded-2xl p-6">
+        <div class="reveal glass-bright glass-ticks rounded-2xl p-6">
           <div>
-            <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-red/70">Today</p>
+            <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-accent-red/70">Today</p>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">{p.today}</p>
           </div>
           <div class="divider my-4"></div>
           <div>
-            <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-green/80">With OSCEN</p>
+            <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-accent-green/80">With OSCEN</p>
             <p class="mt-2 text-sm text-text-primary leading-relaxed">{p.oscen}</p>
           </div>
         </div>

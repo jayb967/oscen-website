@@ -24,7 +24,7 @@ const tabs = [
       <a
         href={tab.href}
         class:list={[
-          "px-3 sm:px-4 py-1.5 text-[11px] font-mono tracking-wide rounded-full whitespace-nowrap transition-all duration-300",
+          "px-3 sm:px-4 py-1.5 text-[11px] font-tech tracking-wide rounded-full whitespace-nowrap transition-all duration-300",
           current === tab.id
             ? "bg-accent-blue/10 border border-accent-blue/30 text-accent-blue"
             : "text-text-muted hover:text-text-primary hover:bg-white/[0.03]",
@@ -35,7 +35,7 @@ const tabs = [
     ))}
     <span class="ml-auto hidden md:inline-flex items-center gap-2">
       <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
-      <span class="text-[9px] font-mono text-text-muted">Live training</span>
+      <span class="text-[9px] font-tech text-text-muted">Live training</span>
     </span>
   </div>
 </div>

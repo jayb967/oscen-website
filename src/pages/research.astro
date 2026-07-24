@@ -14,7 +14,7 @@ import SupportStrip from "../components/SupportStrip.astro";
   <main class="pt-32 pb-24">
     <!-- Page header -->
     <section class="max-w-5xl mx-auto px-6 mb-24">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">Research</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Research</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
         The science<br />
         <span class="italic gradient-text">behind the brain.</span>
@@ -75,7 +75,7 @@ import SupportStrip from "../components/SupportStrip.astro";
               <h3 class={`text-sm font-medium text-${item.accent} group-hover:text-text-primary transition-colors`}>{item.mechanism}</h3>
               <span class={`expand-indicator text-${item.accent}/40 text-sm`}>+</span>
             </div>
-            <p class="text-[10px] font-mono text-text-muted mt-1">{item.basis}</p>
+            <p class="text-[10px] font-tech text-text-muted mt-1">{item.basis}</p>
             <div class="expand-body mt-3">
               <p class="text-xs text-text-secondary leading-relaxed">{item.note}</p>
             </div>
@@ -102,7 +102,7 @@ import SupportStrip from "../components/SupportStrip.astro";
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span class="text-sm text-text-primary">{item.label}</span>
-                <span class={`text-[11px] font-mono text-${item.color}`}>{item.power}</span>
+                <span class={`text-[11px] font-tech text-${item.color}`}>{item.power}</span>
               </div>
               <div class="h-1.5 rounded-full bg-elevated overflow-hidden">
                 <div class={`h-full rounded-full bg-${item.color}/50`} style={`width: ${item.bar}%`}></div>
@@ -114,12 +114,12 @@ import SupportStrip from "../components/SupportStrip.astro";
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="reveal glass rounded-xl p-5">
-          <div class="text-2xl font-mono text-accent-green font-bold">73×</div>
+          <div class="text-2xl font-tech text-accent-green font-bold">73×</div>
           <div class="text-xs text-text-muted mt-1">less energy than CPU</div>
           <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Published spiking-network benchmark for robotics peg-in-hole task. IEEE 2024.</p>
         </div>
         <div class="reveal glass rounded-xl p-5">
-          <div class="text-2xl font-mono text-accent-green font-bold">109×</div>
+          <div class="text-2xl font-tech text-accent-green font-bold">109×</div>
           <div class="text-xs text-text-muted mt-1">less energy than GPU</div>
           <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Published spiking-network benchmark for keyword spotting.</p>
         </div>
@@ -191,10 +191,10 @@ import SupportStrip from "../components/SupportStrip.astro";
           <table class="w-full text-xs">
             <thead>
               <tr class="border-b border-border">
-                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Company</th>
-                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Approach</th>
-                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Learning</th>
-                <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Edge</th>
+                <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Company</th>
+                <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Approach</th>
+                <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Learning</th>
+                <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Edge</th>
               </tr>
             </thead>
             <tbody>
@@ -273,13 +273,13 @@ import SupportStrip from "../components/SupportStrip.astro";
 
       <div class="reveal glass rounded-xl p-6">
         <div class="space-y-3 text-xs text-text-secondary">
-          <p><span class="text-text-muted font-mono">STDP</span>. Bi, G.-Q. & Poo, M.-M. (1998). Synaptic modifications in cultured hippocampal neurons. <em>J. Neurosci.</em></p>
-          <p><span class="text-text-muted font-mono">Three-factor</span>. Gerstner, W. et al. (2018). Eligibility traces and plasticity on behavioral time scales. <em>Front. Neural Circuits.</em></p>
-          <p><span class="text-text-muted font-mono">BCM</span>. Bienenstock, E., Cooper, L. & Munro, P. (1982). Theory for the development of neuron selectivity. <em>J. Neurosci.</em></p>
-          <p><span class="text-text-muted font-mono">Reward</span>. Schultz, W. (1998). Predictive reward signal of dopamine neurons. <em>J. Neurophysiol.</em></p>
-          <p><span class="text-text-muted font-mono">Scaling</span>. Turrigiano, G. et al. (1998). Activity-dependent scaling of quantal amplitude in neocortical neurons. <em>Nature.</em></p>
-          <p><span class="text-text-muted font-mono">Critical</span>. Hensch, T. (2005). Critical period plasticity in local cortical circuits. <em>Nature Rev. Neurosci.</em></p>
-          <p><span class="text-text-muted font-mono">SNN energy</span>. Published spiking neural network energy benchmarks (2024). <em>IEEE IJCNN.</em></p>
+          <p><span class="text-text-muted font-tech">STDP</span>. Bi, G.-Q. & Poo, M.-M. (1998). Synaptic modifications in cultured hippocampal neurons. <em>J. Neurosci.</em></p>
+          <p><span class="text-text-muted font-tech">Three-factor</span>. Gerstner, W. et al. (2018). Eligibility traces and plasticity on behavioral time scales. <em>Front. Neural Circuits.</em></p>
+          <p><span class="text-text-muted font-tech">BCM</span>. Bienenstock, E., Cooper, L. & Munro, P. (1982). Theory for the development of neuron selectivity. <em>J. Neurosci.</em></p>
+          <p><span class="text-text-muted font-tech">Reward</span>. Schultz, W. (1998). Predictive reward signal of dopamine neurons. <em>J. Neurophysiol.</em></p>
+          <p><span class="text-text-muted font-tech">Scaling</span>. Turrigiano, G. et al. (1998). Activity-dependent scaling of quantal amplitude in neocortical neurons. <em>Nature.</em></p>
+          <p><span class="text-text-muted font-tech">Critical</span>. Hensch, T. (2005). Critical period plasticity in local cortical circuits. <em>Nature Rev. Neurosci.</em></p>
+          <p><span class="text-text-muted font-tech">SNN energy</span>. Published spiking neural network energy benchmarks (2024). <em>IEEE IJCNN.</em></p>
         </div>
       </div>
     </section>
@@ -289,7 +289,7 @@ import SupportStrip from "../components/SupportStrip.astro";
     <!-- Back to home -->
     <section class="max-w-5xl mx-auto px-6 text-center">
       <div class="divider max-w-24 mx-auto mb-10"></div>
-      <a href="/" class="text-sm font-mono text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
+      <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
 </Base>

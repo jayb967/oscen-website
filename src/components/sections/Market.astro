@@ -58,7 +58,7 @@ const stats = [
 <section id="market" class="section relative">
   <div class="max-w-5xl mx-auto w-full">
     <div class="text-center mb-20">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The Market</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">The Market</p>
       <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
         Everyone is building the body.<br />
         <span class="italic gradient-text">No one is building the brain.</span>
@@ -70,11 +70,11 @@ const stats = [
       {stats.map((s, i) => (
         <div class="flip-card reveal h-36" tabindex="0" role="button" aria-label={`${s.value}: ${s.label}`} style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${s.color.replace('text-', '')});`}>
           <div class="flip-inner w-full h-full">
-            <div class="flip-front w-full h-full glass-bright rounded-xl p-4 flex flex-col items-center justify-center text-center">
-              <div class={`text-xl md:text-2xl font-mono font-bold ${s.color}`}>{s.value}</div>
+            <div class="flip-front w-full h-full glass-bright glass-ticks rounded-xl p-4 flex flex-col items-center justify-center text-center">
+              <div class={`text-xl md:text-2xl font-tech font-bold ${s.color}`}>{s.value}</div>
               <div class="text-[10px] text-text-muted mt-2 uppercase tracking-wider leading-tight">{s.label}</div>
             </div>
-            <div class="flip-back w-full h-full glass rounded-xl p-4 flex items-center justify-center text-center">
+            <div class="flip-back w-full h-full glass glass-ticks rounded-xl p-4 flex items-center justify-center text-center">
               <p class="text-[11px] text-text-secondary">{s.sub}</p>
             </div>
           </div>
@@ -83,16 +83,16 @@ const stats = [
     </div>
 
     <!-- Competitor comparison -->
-    <div class="reveal glass rounded-xl overflow-hidden mb-8">
+    <div class="reveal glass glass-ticks rounded-xl overflow-hidden mb-8">
       <div class="overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
             <tr class="border-b border-border">
-              <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Company</th>
-              <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Approach</th>
-              <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Learning</th>
-              <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Edge</th>
-              <th class="text-left p-4 text-text-muted font-mono font-normal uppercase tracking-wider">Power</th>
+              <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Company</th>
+              <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Approach</th>
+              <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Learning</th>
+              <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Edge</th>
+              <th class="text-left p-4 text-text-muted font-tech font-normal uppercase tracking-wider">Power</th>
             </tr>
           </thead>
           <tbody>
@@ -104,7 +104,7 @@ const stats = [
                   <td class="p-4 text-text-secondary">{row.approach}</td>
                   <td class={`p-4 ${row.learning === 'Continual' ? 'text-accent-green' : 'text-text-muted'}`}>{row.learning}</td>
                   <td class={`p-4 ${row.edge === 'Yes' ? 'text-accent-green' : 'text-text-muted'}`}>{row.edge}</td>
-                  <td class={`p-4 font-mono ${isOscen ? 'text-accent-green' : 'text-text-muted'}`}>{row.energy}</td>
+                  <td class={`p-4 font-tech ${isOscen ? 'text-accent-green' : 'text-text-muted'}`}>{row.energy}</td>
                 </tr>
               );
             })}
@@ -113,13 +113,13 @@ const stats = [
       </div>
     </div>
 
-    <p class="reveal text-[10px] text-text-muted text-center font-mono mb-24">
+    <p class="reveal text-[10px] text-text-muted text-center font-tech mb-24">
       * Currently training on CPU at ~45W. Targeting purpose-built low-power edge compute at &lt;5W.
     </p>
 
     <!-- VLA ceiling explainer -->
     <div class="text-center mb-12">
-      <p class="reveal text-[10px] font-mono text-text-muted uppercase tracking-[0.3em] mb-6">The VLA ceiling</p>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">The VLA ceiling</p>
       <h3 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
         Every competitor uses the same playbook.<br />
         <span class="italic gradient-text">It has the same four flaws.</span>
@@ -131,7 +131,7 @@ const stats = [
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
       {vlaLimits.map((item, i) => (
-        <div class="expand-card reveal glass rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${item.accent});`}>
+        <div class="expand-card reveal glass glass-ticks rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-${item.accent});`}>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class={`text-xl text-${item.accent}`} set:html={item.icon} />
@@ -142,7 +142,7 @@ const stats = [
             <span class={`expand-indicator text-${item.accent}/40 text-lg`}>+</span>
           </div>
           <div class="flex items-baseline gap-2 mt-3">
-            <span class={`text-2xl font-mono font-bold text-${item.accent}`}>{item.stat}</span>
+            <span class={`text-2xl font-tech font-bold text-${item.accent}`}>{item.stat}</span>
             <span class="text-[10px] text-text-muted uppercase tracking-wider">{item.statLabel}</span>
           </div>
           <div class="expand-body mt-4">
@@ -152,28 +152,8 @@ const stats = [
       ))}
     </div>
 
-    <!-- OSCEN answer strip -->
-    <div class="reveal glass-bright rounded-2xl p-8 text-center">
-      <p class="text-[10px] font-mono text-accent-blue/60 uppercase tracking-[0.3em] mb-4">The OSCEN difference</p>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div>
-          <div class="text-xl font-mono font-bold text-accent-green">Continual</div>
-          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Learns forever</div>
-        </div>
-        <div>
-          <div class="text-xl font-mono font-bold text-accent-green">&lt;5W</div>
-          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Total power</div>
-        </div>
-        <div>
-          <div class="text-xl font-mono font-bold text-accent-green">0ms</div>
-          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Cloud latency</div>
-        </div>
-        <div>
-          <div class="text-xl font-mono font-bold text-accent-green">6 patents</div>
-          <div class="text-[10px] text-text-muted mt-1 uppercase tracking-wider">Anti-forgetting</div>
-        </div>
-      </div>
-    </div>
+    <!-- Answer strip removed in the Q4 trim: every number in it already
+         appears in the OSCEN table row, the VLA cards, or Proof. -->
   </div>
 </section>
 
