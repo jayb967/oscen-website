@@ -120,6 +120,7 @@ export class BrainModule {
                     shellOpacity: this.shell.material.opacity,
                 };
                 this.setDim(this._dim);
+                this.pointCloud.setSizeScale(this._scale ?? 1);
                 return mesh;
             } finally {
                 this.group.scale.setScalar(savedScale);
@@ -157,7 +158,10 @@ export class BrainModule {
 
     /** Uniform scale on the whole brain group. */
     setScale(s) {
+        this._scale = s;
         this.group.scale.setScalar(s);
+        // Sprite size doesn't inherit the group transform (see setSizeScale).
+        this.pointCloud?.setSizeScale(s);
     }
 
     /**

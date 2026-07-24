@@ -21,7 +21,7 @@
 import { HumanoidFigure } from './humanoid-figure.js';
 
 const HEIGHT = 7;                 // figure height in brain-world units
-const BRAIN_END_SCALE = 0.066;    // brain radius 5.5 -> ~0.36, inside a ~0.44 head
+const BRAIN_END_SCALE = 0.055;    // cinematic shell half-width ~6.5 -> ~0.36, inside a ~0.44 head
 const CRANIUM_LIFT = 0.16;        // head-bone origin sits low; center brain in the cranium
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));

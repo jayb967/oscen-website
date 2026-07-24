@@ -301,6 +301,17 @@ export class BrainPointCloud {
         if (this.material) this.material.uniforms.uTime.value = this.time;
     }
 
+    /**
+     * Scale the sprite size with the brain group's world scale. Point
+     * POSITIONS inherit the parent transform, but gl_PointSize does not --
+     * without this, shrinking the brain (the reveal) leaves every firing
+     * point at full screen-space size and the clusters read as giant blobs.
+     */
+    setSizeScale(k) {
+        this._sizeScale = k;
+        if (this.material) this.material.uniforms.uSize.value = 1.5 * k;
+    }
+
     setVisible(v) { if (this.points) this.points.visible = v; }
 
     dispose() {

@@ -220,12 +220,14 @@ function initHowItWorksScene(stage: BrainStage) {
     section.classList.add("hiw-pinned");
 
     // Per-step orbit poses: gentle radius/height drift keeps the glide alive.
+    // Radii re-tuned +5 for the cinematic shell (13 world units wide vs the
+    // classic hull's ~10) so the anatomy never overflows the frame.
     const ORBITS = [
-        { radius: 13, height: 3 },
-        { radius: 12, height: 5 },
-        { radius: 11, height: 4 },
-        { radius: 12, height: 2.5 },
-        { radius: 13, height: 5.5 },
+        { radius: 18, height: 3 },
+        { radius: 17, height: 5 },
+        { radius: 16, height: 4 },
+        { radius: 17, height: 4.5 },  // high enough to see the superior motor strip flare
+        { radius: 18, height: 5.5 },
     ];
 
     let active = -1;
