@@ -300,6 +300,9 @@ function initRevealScene(stage: BrainStage) {
     if (!captions.length) return;
 
     section.classList.add("rvl-pinned");
+    // Captured BEFORE the pin trigger wraps `section` in its spacer div,
+    // after which nextElementSibling no longer reaches the next section.
+    const afterReveal = section.nextElementSibling;
 
     let reveal: any = null;
     let loadStarted = false;
@@ -391,6 +394,24 @@ function initRevealScene(stage: BrainStage) {
             if (i !== active) showCaption(i);
         },
     });
+
+    // Outro: from the end of the pinned reveal to the footer's arrival
+    // the figure slowly turns one full revolution, landing front-facing
+    // in a head-and-shoulders portrait just before the (opaque) footer
+    // slides over it. The next section's top hitting the viewport bottom
+    // coincides with the pin release, so outro p=0 lines up with reveal
+    // p=1.
+    const footer = document.querySelector("footer");
+    if (afterReveal) {
+        ScrollTrigger.create({
+            trigger: afterReveal,
+            start: "top bottom",
+            endTrigger: footer ?? document.body,
+            end: footer ? "top bottom" : "bottom bottom",
+            scrub: 0.8,
+            onUpdate: (self) => reveal?.setOutro(self.progress),
+        });
+    }
 }
 
 if (document.readyState === "loading") {

@@ -61,6 +61,7 @@ export class HumanoidReveal {
     /** Capture the live camera as the lerp origin (idle orbit varies). */
     enter() {
         this._active = true;
+        this.figure.group.rotation.y = 0;
         this._entry = {
             pos: this.stage.camera.position.clone(),
             target: this.stage._target.clone(),
@@ -122,8 +123,35 @@ export class HumanoidReveal {
     }
 
     /**
-     * Dimmed end-state for scrolling PAST the reveal: the figure stays as
-     * a quiet backdrop behind later sections without fighting the copy.
+     * Post-reveal outro, scrubbed from the end of the pinned reveal to
+     * the bottom of the page: the figure turns one slow full revolution
+     * while the camera eases from the full-body pose into a
+     * head-and-shoulders portrait, landing front-facing at the footer.
+     * p=0 matches the reveal's p=1 state exactly, so the hand-off is
+     * seamless in both directions.
+     */
+    setOutro(p) {
+        const t = smooth(clamp01(p));
+        const fig = this.figure;
+        this._active = false;
+        fig.group.visible = true;
+        fig.group.rotation.y = Math.PI * 2 * t;
+        this.stage.module.setScale(BRAIN_END_SCALE);
+
+        const az = lerp(0.18, 0, t);
+        const dist = lerp(11.5, 2.7, t);
+        this.stage.setCameraPose(
+            { x: Math.sin(az) * dist, y: lerp(-1.4, -0.1, t), z: Math.cos(az) * dist },
+            { x: 0, y: lerp(-2.6, -0.35, t), z: 0 },
+        );
+        // Skull glow eases down so late-page copy reads over a quiet head.
+        fig.setXray({ head: lerp(0.35, 0.25, t), body: 0 });
+        this.stage.setBloomStrength(lerp(0.18, 0.24, t));
+    }
+
+    /**
+     * Dimmed end-state fallback for landing PAST the reveal without ever
+     * scrubbing it (deep links): quiet figure behind the copy.
      */
     setBackdrop() {
         this._active = false;
