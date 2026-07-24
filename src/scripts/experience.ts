@@ -17,6 +17,7 @@ declare global {
         __experience?: {
             stage: BrainStage;
             audio: AudioController;
+            state?: any;
             reveal?: any;
         };
     }
@@ -43,7 +44,7 @@ function init() {
     });
 
     const audio = new AudioController();
-    window.__experience = { stage, audio };
+    window.__experience = { stage, audio, state: stageState };
 
     // Fade the canvas in once the first frames have rendered.
     canvasHost.style.opacity = "0";
@@ -82,9 +83,47 @@ const MOODS = {
 
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 
-function applyMood(stage: BrainStage, mood: { dim: number; bloom: number }) {
-    stage.module.setDim(mood.dim);
-    stage.setBloomStrength(mood.bloom);
+/**
+ * Live mood + orbit state shared by every scene. Scrubbed scenes write it
+ * directly; discrete hand-offs (pinned-scene enter/leave, step changes)
+ * tween it, so the brain always glides from wherever the previous scene
+ * left it instead of popping to the new pose.
+ */
+const stageState = {
+    mood: { ...MOODS.hero },
+    orbit: { radius: Math.hypot(14, 8), height: 4 },
+};
+
+function applyStageState(stage: BrainStage) {
+    stage.module.setDim(stageState.mood.dim);
+    stage.setBloomStrength(stageState.mood.bloom);
+    stage.setOrbit(stageState.orbit);
+}
+
+function setMood(stage: BrainStage, mood: { dim: number; bloom: number }) {
+    gsap.killTweensOf(stageState.mood);
+    Object.assign(stageState.mood, mood);
+    applyStageState(stage);
+}
+
+function tweenMood(stage: BrainStage, mood: { dim: number; bloom: number }, duration = 1) {
+    gsap.to(stageState.mood, {
+        ...mood, duration, ease: "power2.inOut", overwrite: true,
+        onUpdate: () => applyStageState(stage),
+    });
+}
+
+function setOrbit(stage: BrainStage, orbit: { radius: number; height: number }) {
+    gsap.killTweensOf(stageState.orbit);
+    Object.assign(stageState.orbit, orbit);
+    applyStageState(stage);
+}
+
+function tweenOrbit(stage: BrainStage, orbit: { radius: number; height: number }, duration = 1) {
+    gsap.to(stageState.orbit, {
+        ...orbit, duration, ease: "power2.inOut", overwrite: true,
+        onUpdate: () => applyStageState(stage),
+    });
 }
 
 /** Lenis drives scroll; GSAP's ticker drives Lenis; ScrollTrigger listens. */
@@ -112,14 +151,14 @@ function initHeroScene(stage: BrainStage) {
         trigger: hero,
         start: "top top",
         end: "bottom top",
-        scrub: true,
+        scrub: 0.8,
         onUpdate: (self) => {
             const p = self.progress;
-            stage.setOrbit({
+            setOrbit(stage, {
                 radius: lerp(ORBIT_START.radius, ORBIT_END.radius, p),
                 height: lerp(ORBIT_START.height, ORBIT_END.height, p),
             });
-            applyMood(stage, {
+            setMood(stage, {
                 dim: lerp(MOODS.hero.dim, MOODS.backdrop.dim, p),
                 bloom: lerp(MOODS.hero.bloom, MOODS.backdrop.bloom, p),
             });
@@ -146,14 +185,14 @@ function initCopyAsideScene(stage: BrainStage) {
         trigger: slideOut,
         start: "top bottom",
         end: "top top",
-        scrub: true,
+        scrub: 0.8,
         onUpdate: (self) => stage.setLateralOffset(COPY_ASIDE_PAN * self.progress),
     });
     ScrollTrigger.create({
         trigger: slideBack,
         start: "top bottom",
         end: "top top",
-        scrub: true,
+        scrub: 0.8,
         onUpdate: (self) => stage.setLateralOffset(COPY_ASIDE_PAN * (1 - self.progress)),
     });
 }
@@ -205,7 +244,10 @@ function initHowItWorksScene(stage: BrainStage) {
 
         const region = next.dataset.region!;
         stage.focusRegion(region);
-        stage.setOrbit(ORBITS[i % ORBITS.length]);
+        // Long eased glide instead of a pose snap -- entering the section
+        // this carries the camera all the way in from the backdrop orbit
+        // (radius 23), which is the "brain pops to size" fix.
+        tweenOrbit(stage, ORBITS[i % ORBITS.length], 1.6);
         // Flare the step's region on top of organic activity (~5s decay).
         stage.module.bridge.applyOverride({ [region]: 0.18 });
     };
@@ -213,7 +255,7 @@ function initHowItWorksScene(stage: BrainStage) {
     const leave = (restoreMood = true) => {
         stage.focusRegion(null);
         stage.module.bridge.clearOverride();
-        if (restoreMood) applyMood(stage, MOODS.backdrop);
+        if (restoreMood) tweenMood(stage, MOODS.backdrop, 1.0);
     };
 
     ScrollTrigger.create({
@@ -221,9 +263,9 @@ function initHowItWorksScene(stage: BrainStage) {
         start: "top top",
         end: () => "+=" + captions.length * window.innerHeight,
         pin: true,
-        scrub: true,
-        onEnter: () => applyMood(stage, MOODS.focus),
-        onEnterBack: () => applyMood(stage, MOODS.focus),
+        scrub: 0.8,
+        onEnter: () => tweenMood(stage, MOODS.focus, 1.2),
+        onEnterBack: () => tweenMood(stage, MOODS.focus, 1.2),
         onLeave: () => leave(),
         onLeaveBack: () => leave(),
         onUpdate: (self) => {
@@ -231,7 +273,16 @@ function initHowItWorksScene(stage: BrainStage) {
                 captions.length - 1,
                 Math.floor(self.progress * captions.length),
             );
-            if (i !== active) showCaption(i);
+            if (i !== active) {
+                showCaption(i);
+            } else if (
+                !gsap.isTweening(stageState.orbit) &&
+                Math.abs(stageState.orbit.radius - ORBITS[i % ORBITS.length].radius) > 0.1
+            ) {
+                // Heal after a writer race (e.g. a deep link lands here while
+                // the hero scrub is still flushing): re-run the step glide.
+                tweenOrbit(stage, ORBITS[i % ORBITS.length], 1.6);
+            }
         },
     });
 }
@@ -310,11 +361,15 @@ function initRevealScene(stage: BrainStage) {
         scrub: true,
         onEnter: () => {
             entered = true;
+            // The reveal scrub owns bloom directly from here; stop any
+            // in-flight mood tween so the two don't fight over it.
+            gsap.killTweensOf(stageState.mood);
             ensureLoaded();
             reveal?.enter();
         },
         onEnterBack: () => {
             entered = true;
+            gsap.killTweensOf(stageState.mood);
             reveal?.enter();
         },
         onLeave: () => {
@@ -324,7 +379,7 @@ function initRevealScene(stage: BrainStage) {
         onLeaveBack: () => {
             entered = false;
             reveal?.reset();
-            applyMood(stage, MOODS.backdrop);
+            tweenMood(stage, MOODS.backdrop, 1.0);
         },
         onUpdate: (self) => {
             lastProgress = self.progress;
