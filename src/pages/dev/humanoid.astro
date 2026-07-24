@@ -1,0 +1,242 @@
+---
+// Dev-only harness for the Phase 4 humanoid (material/lighting iteration
+// against docs/reference/humanoid-target-*.png). Not linked from anywhere.
+// Loads /models/humanoid.glb when it exists; also accepts a dragged-in
+// GLB or a ?src= override for iterating on cleanup passes.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>dev / humanoid module</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #c6bfb4;
+        overflow: hidden;
+        font-family: ui-monospace, monospace;
+      }
+      #stage {
+        position: fixed;
+        inset: 0;
+      }
+      #hud {
+        position: fixed;
+        left: 12px;
+        bottom: 12px;
+        color: #4a443b;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        pointer-events: none;
+        line-height: 1.7;
+      }
+      #hud b {
+        color: #16130e;
+        font-weight: 600;
+      }
+      #controls {
+        position: fixed;
+        right: 12px;
+        bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+        max-width: 300px;
+      }
+      #controls button {
+        background: rgba(22, 19, 14, 0.08);
+        border: 1px solid rgba(22, 19, 14, 0.25);
+        color: #16130e;
+        font: 11px ui-monospace, monospace;
+        letter-spacing: 0.08em;
+        padding: 6px 10px;
+        cursor: pointer;
+        border-radius: 6px;
+      }
+      #controls button.active {
+        background: rgba(22, 19, 14, 0.8);
+        color: #ede8de;
+      }
+      #tuning {
+        position: fixed;
+        right: 12px;
+        top: 12px;
+        display: grid;
+        grid-template-columns: auto 110px auto;
+        gap: 4px 8px;
+        align-items: center;
+        color: #4a443b;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(237, 232, 222, 0.7);
+        border: 1px solid rgba(22, 19, 14, 0.15);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+      #tuning input {
+        accent-color: #16130e;
+      }
+      #drop {
+        position: fixed;
+        inset: 0;
+        display: none;
+        place-items: center;
+        background: rgba(237, 232, 222, 0.85);
+        color: #16130e;
+        font-size: 14px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+      body.dragging #drop {
+        display: grid;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="hud">booting…</div>
+    <div id="tuning">
+      <label for="t-rough">rough</label>
+      <input id="t-rough" type="range" min="0" max="1" step="0.01" value="0.5" />
+      <span id="v-rough">0.50</span>
+      <label for="t-metal">metal</label>
+      <input id="t-metal" type="range" min="0" max="1" step="0.01" value="0.05" />
+      <span id="v-metal">0.05</span>
+      <label for="t-env">env</label>
+      <input id="t-env" type="range" min="0" max="2" step="0.05" value="0.9" />
+      <span id="v-env">0.90</span>
+      <label for="t-key">key</label>
+      <input id="t-key" type="range" min="0" max="4" step="0.1" value="1.6" />
+      <span id="v-key">1.60</span>
+      <label for="t-exp">expose</label>
+      <input id="t-exp" type="range" min="0.4" max="2" step="0.05" value="1.15" />
+      <span id="v-exp">1.15</span>
+    </div>
+    <div id="controls">
+      <button data-frame="fullbody" class="active">FULL</button>
+      <button data-frame="closeup">CLOSEUP</button>
+      <button data-mat="source" class="active">SOURCE</button>
+      <button data-mat="porcelain">PORCELAIN</button>
+      <button data-mat="xray">XRAY</button>
+    </div>
+    <div id="drop">drop a .glb to preview</div>
+
+    <script>
+      import { HumanoidStage } from "../../three/humanoid/humanoid-stage.js";
+
+      const stage = new HumanoidStage(document.getElementById("stage")!, {
+        interactive: true,
+      });
+      (window as any).stage = stage;
+
+      const hud = document.getElementById("hud")!;
+      let modelStatus = "no model";
+
+      async function load(src: string, label: string) {
+        modelStatus = `loading ${label}…`;
+        try {
+          await stage.loadModel(src);
+          modelStatus = `${label} · ${Math.round(stage.triangles / 1000)}k tris`;
+        } catch (err) {
+          modelStatus = `${label} FAILED (see console)`;
+          console.error(err);
+        }
+      }
+
+      // ?src= override > default /models/humanoid.glb (probe first so a
+      // missing default reads as "waiting", not a load error).
+      const override = new URLSearchParams(location.search).get("src");
+      if (override) {
+        load(override, "src param");
+      } else {
+        fetch("/models/humanoid.glb", { method: "HEAD" }).then((r) => {
+          if (r.ok) load("/models/humanoid.glb", "humanoid.glb");
+          else modelStatus = "no model -- drop a .glb or add public/models/humanoid.glb";
+        });
+      }
+
+      let frames = 0;
+      let fps = 0;
+      let last = performance.now();
+      function tick() {
+        frames++;
+        const now = performance.now();
+        if (now - last >= 1000) {
+          fps = frames;
+          frames = 0;
+          last = now;
+        }
+        hud.innerHTML = `<b>${fps}</b> fps · <b>${modelStatus}</b>`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+
+      function setActive(group: string, btn: HTMLButtonElement) {
+        document
+          .querySelectorAll<HTMLButtonElement>(`#controls button[data-${group}]`)
+          .forEach((b) => b.classList.toggle("active", b === btn));
+      }
+      document.querySelectorAll<HTMLButtonElement>("#controls button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (btn.dataset.frame) {
+            stage.frame(btn.dataset.frame);
+            setActive("frame", btn);
+          } else if (btn.dataset.mat) {
+            stage.setMaterialMode(btn.dataset.mat);
+            setActive("mat", btn);
+          }
+        });
+      });
+
+      const bindSlider = (id: string, apply: (v: number) => void) => {
+        const input = document.getElementById(`t-${id}`) as HTMLInputElement;
+        const label = document.getElementById(`v-${id}`)!;
+        input.addEventListener("input", () => {
+          const v = parseFloat(input.value);
+          label.textContent = v.toFixed(2);
+          apply(v);
+        });
+      };
+      bindSlider("rough", (v) => stage.setMaterialParams({ roughness: v }));
+      bindSlider("metal", (v) => stage.setMaterialParams({ metalness: v }));
+      bindSlider("env", (v) => stage.setMaterialParams({ envMapIntensity: v }));
+      bindSlider("key", (v) => (stage.keyLight.intensity = v));
+      bindSlider("exp", (v) => {
+        stage.renderer.toneMappingExposure = v;
+      });
+
+      // Drag-and-drop a GLB for cleanup-pass iteration.
+      let dragDepth = 0;
+      window.addEventListener("dragenter", (e) => {
+        e.preventDefault();
+        dragDepth++;
+        document.body.classList.add("dragging");
+      });
+      window.addEventListener("dragleave", () => {
+        if (--dragDepth <= 0) {
+          dragDepth = 0;
+          document.body.classList.remove("dragging");
+        }
+      });
+      window.addEventListener("dragover", (e) => e.preventDefault());
+      window.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dragDepth = 0;
+        document.body.classList.remove("dragging");
+        const file = e.dataTransfer?.files?.[0];
+        if (file && /\.glb$/i.test(file.name)) {
+          load(URL.createObjectURL(file), file.name);
+        }
+      });
+    </script>
+  </body>
+</html>

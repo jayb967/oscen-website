@@ -202,26 +202,31 @@ Reference: ref-go2-pinned-stat.jpeg caption system.
 
 Target: `docs/reference/humanoid-target-fullbody.png` + `humanoid-target-closeup.png`.
 
-- [~] Source the model (Q2: AI image-to-3D base). STAGED 2026-07-24, BLOCKED on
-      credits: both reference images uploaded + confirmed to Higgsfield
-      (media_ids `10baf21e-c6cd-4067-a2f6-10d01cf254a3` fullbody,
-      `0e7a3ea9-6117-4e31-8df9-5ab0de892e99` closeup). Ready-to-run call:
-      `multi_image_to_3d` with should_texture + enable_pbr + enable_rigging,
-      pose_mode a-pose, 1.75m, 100k tris, symmetry on, seed 42, matte-porcelain
-      texture prompt. Cost 35 credits; workspace has 0 (free plan). ACTION
-      (Jesus): top up Higgsfield credits, then re-run the staged call. After
-      generation: cleanup pass + draco compress; budget <= 8MB, <= 100k tris.
-- [ ] Environment to match screenshots: warm-gray concrete panel walls (large flat
-      boxes + subtle roughness texture), beige floor, soft HDRI key from back-left,
-      contact shadows, gentle fog. Keep it minimal -- 3 planes + lightmap-feel, not
-      a full room.
-- [ ] Head variant: cranium shell with fresnel/x-ray translucency state so the brain
-      can glow inside; eyes stay lit.
-- [ ] Idle animation: subtle breathing/weight-shift loop (AnimationMixer). If the
-      purchased rig lacks animation, add a 5s procedural sway + head tracking
-      toward cursor/scroll.
-- [ ] Standalone test page `/dev/humanoid` for material/lighting iteration against
-      the screenshots side-by-side.
+- [x] Source the model: GENERATED 2026-07-24 (job
+      `b89fb2d4-19ad-45eb-a9ab-f6689a1ccbac`, exact staged params, 35 credits).
+      Raw 8.5MB -> gltf-transform draco -> 5.4MB at `public/models/humanoid.glb`.
+      101k tris, rigged (24 bones, no clip). Face quality PASSES the
+      hero-closeup bar (sculpted features, irises, skull seams) -- Q2 fallback
+      (head swap) not needed. Optional later: cleanup pass on shoulder-joint
+      texture seams.
+- [x] Environment: built into `src/three/humanoid/humanoid-stage.js` -- concrete
+      panel walls (procedural noise + seam textures), off-left doorway with
+      bright daylight panel, beige carpet, hemisphere + warm back-left key
+      (PCF soft shadows) + contact-shadow disc, fog, RoomEnvironment PMREM.
+      Matches target framing; final color grade once real copy sits over it.
+- [~] Head variant: whole-body fresnel x-ray ShaderMaterial state works
+      (`setMaterialMode('xray')`; skinning chunks REQUIRED in custom shaders on
+      SkinnedMesh -- bind-pose garbage otherwise). Still to do: head-shell-ONLY
+      mask + lit eyes for the Phase 5 reveal.
+- [~] Idle animation: procedural breathing/weight-shift sway shipped (no clip in
+      the GLB; AnimationMixer path wired if one is added). Head tracking toward
+      cursor still to do.
+- [x] `/dev/humanoid` harness: frames (FULL/CLOSEUP vs targets), material modes
+      (SOURCE/PORCELAIN/XRAY), sliders (rough/metal/env/key/exposure), drag-drop
+      GLB preview + `?src=` override. 119 fps desktop with model + room.
+      GOTCHA: `Box3.setFromObject` ignores skinning -- HumanoidStage samples
+      verts via `applyBoneTransform` to normalize height (raw bbox was 4x off).
+      Draco decoder self-hosted at `public/draco/` (copied from three's libs).
 
 ## Phase 5 -- The reveal: brain -> head (2-3 days, the signature moment)
 
