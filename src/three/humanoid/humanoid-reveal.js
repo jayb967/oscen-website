@@ -21,18 +21,33 @@
 import { HumanoidFigure } from './humanoid-figure.js';
 
 const HEIGHT = 7;                 // figure height in brain-world units
-// Cinematic shell world extents at scale 1: AP 13.0 (anterior +X), SI 10.7,
-// LR 10.2. The figure faces +Z, so the brain must yaw -90deg to point its
-// nose at the face -- otherwise the 13-unit long axis lies EAR-TO-EAR and
-// pokes out both sides of the skull. Scale chosen so every axis fits the
-// cranium cavity (AP 13*s ~= 0.49 deep, LR 10.2*s ~= 0.39 wide).
-const BRAIN_END_SCALE = 0.038;
-const BRAIN_END_YAW = -Math.PI / 2;  // anterior +X -> +Z (the face)
+// Cinematic shell world extents at scale 1: 13.0 along X (long axis), SI
+// 10.7, LR 10.2. The figure faces +Z; without a yaw the long axis lies
+// EAR-TO-EAR and pokes out both sides of the skull. Yaw +90deg puts the
+// long axis front-back with the brainstem tapering to the BACK of the
+// neck (founder-verified 2026-07-25; -90deg had it backwards, stem at
+// the face).
+const BRAIN_END_SCALE = 0.06;   // founder call: ~60% bigger; glow may kiss the glass, reads fine
+const BRAIN_END_YAW = Math.PI / 2;   // anterior +X -> -Z: brainstem tapers to the BACK of the neck
 const CRANIUM_LIFT = 0.37;        // head-bone origin sits low; seat brain up in the cranium
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 const smooth = (t) => t * t * (3 - 2 * t);
 const lerp = (a, b, t) => a + (b - a) * t;
+
+// The brain's visual centroid sits at group-local (0, 0.5, -0.5), so a yaw
+// about the group origin swings it sideways (0.5 * scale world units --
+// visibly off the head's midline in a front view). Cancel the yaw-induced
+// drift so the centroid stays on the head's vertical axis. Identically
+// zero at yaw=0, so the dive entry matches the idle scene with no snap.
+const BRAIN_CENTROID_Z = -0.5;
+function seatBrainGroup(module, s, yaw) {
+    module.group.position.set(
+        -BRAIN_CENTROID_Z * Math.sin(yaw) * s,
+        0,
+        BRAIN_CENTROID_Z * (1 - Math.cos(yaw)) * s,
+    );
+}
 
 /** Async factory: constructs, loads the GLB, returns the ready instance. */
 export async function createReveal(stage, modelUrl = '/models/humanoid.glb') {
@@ -94,8 +109,11 @@ export class HumanoidReveal {
             // yaw happens during the shrink so the anatomy lands nose-forward
             // in the skull; at full size it reads as part of the dive.
             const t = smooth(clamp01(p / 0.4));
-            stage.module.setScale(lerp(1, BRAIN_END_SCALE, t));
-            stage.module.group.rotation.y = lerp(0, BRAIN_END_YAW, t);
+            const bs = lerp(1, BRAIN_END_SCALE, t);
+            const byaw = lerp(0, BRAIN_END_YAW, t);
+            stage.module.setScale(bs);
+            stage.module.group.rotation.y = byaw;
+            seatBrainGroup(stage.module, bs, byaw);
             const e = this._entry;
             cam.x = lerp(e.pos.x, -1.15, t);
             cam.y = lerp(e.pos.y, 0.42, t);
@@ -112,6 +130,7 @@ export class HumanoidReveal {
             const t = smooth((p - 0.4) / 0.3);
             stage.module.setScale(BRAIN_END_SCALE);
             stage.module.group.rotation.y = BRAIN_END_YAW;
+            seatBrainGroup(stage.module, BRAIN_END_SCALE, BRAIN_END_YAW);
             const az0 = Math.atan2(-1.15, 2.35);
             const az = lerp(az0, 0.75, t);
             const dist = lerp(2.6, 1.85, t);
@@ -127,6 +146,7 @@ export class HumanoidReveal {
             const t = smooth((p - 0.7) / 0.3);
             stage.module.setScale(BRAIN_END_SCALE);
             stage.module.group.rotation.y = BRAIN_END_YAW;
+            seatBrainGroup(stage.module, BRAIN_END_SCALE, BRAIN_END_YAW);
             const az = lerp(0.75, 0.18, t);
             const dist = lerp(1.85, 11.5, t);
             cam.x = Math.sin(az) * dist;
@@ -158,7 +178,9 @@ export class HumanoidReveal {
         this.stage.module.setScale(BRAIN_END_SCALE);
         // The anatomy is directional now -- the brain must turn WITH the
         // head during the revolution or it pokes through the rotating face.
-        this.stage.module.group.rotation.y = BRAIN_END_YAW + Math.PI * 2 * t;
+        const oyaw = BRAIN_END_YAW + Math.PI * 2 * t;
+        this.stage.module.group.rotation.y = oyaw;
+        seatBrainGroup(this.stage.module, BRAIN_END_SCALE, oyaw);
 
         const az = lerp(0.18, 0, t);
         const dist = lerp(11.5, 2.7, t);
@@ -191,6 +213,7 @@ export class HumanoidReveal {
         this.figure.setXray({ head: 0, body: 0 });
         this.stage.module.setScale(1);
         this.stage.module.group.rotation.y = 0;
+        this.stage.module.group.position.set(0, 0, 0);
         this.stage.releaseCameraPose();
     }
 }
