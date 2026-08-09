@@ -287,14 +287,20 @@ body::after {
    section to position:fixed and re-applies it every scroll frame. Under Lenis
    smooth-scroll that forces per-frame layout/paint of the pinned element --
    the desktop scroll-transition freeze. Profiled (real GPU, high tier): the
-   two pinned triggers alone took the average scroll frame from ~13ms to ~48ms
-   and dropped 3.5x of frames; the WebGL brain was NOT involved (freezing the
-   render loop changed nothing). Promoting the pinned sections + their
-   ScrollTrigger pin-spacers to their own compositor layer moves the pin work
-   off the layout/paint path and restores the average frame to ~16ms. */
+   WebGL brain was NOT involved (freezing the render loop changed nothing);
+   promoting the pinned SECTION to its own compositor layer takes the average
+   scroll frame from ~44ms to ~29ms.
+
+   CRITICAL: promote the section ONLY, never its ScrollTrigger `.pin-spacer`.
+   will-change:transform (like `transform`, `filter`, or `contain`) makes an
+   element the containing block for its position:fixed descendants -- so
+   promoting the spacer re-anchors the fixed pinned section to the *scrolling*
+   spacer instead of the viewport and slides its captions off-screen. That is
+   what hid every step but the first and last (each step's caption was parked
+   ~1500px above the viewport). A section's OWN will-change does not change its
+   own containing block, so promoting the section is safe. */
 .hiw-pinned,
-.rvl-pinned,
-.pin-spacer {
+.rvl-pinned {
   will-change: transform;
 }
 
