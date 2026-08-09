@@ -54,6 +54,17 @@ export async function createReveal(stage, modelUrl = '/models/humanoid.glb') {
     const reveal = new HumanoidReveal(stage);
     await reveal.figure.load(modelUrl);
     reveal._onModelReady();
+    // Pre-warm the x-ray programs before the reveal is ever scrubbed. The
+    // figure is already in the scene but invisible; three's compile()
+    // traverses every object regardless of visibility, so this links one
+    // ShaderMaterial per mesh (skinned, double-sided) off-thread NOW instead
+    // of synchronously on the reveal's first frame -- which was the
+    // multi-hundred-ms freeze at that section boundary.
+    try {
+        await stage.renderer.compileAsync?.(stage.scene, stage.camera);
+    } catch (e) {
+        console.warn('[reveal] shader pre-warm skipped', e);
+    }
     return reveal;
 }
 

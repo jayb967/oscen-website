@@ -422,6 +422,10 @@ export class BrainStage {
                 // Region anchors pick the camera-facing hemisphere for
                 // focus glides (and labels, if a page ever adds them).
                 this.module.regions.setLabelCamera(this.camera);
+                // Warm the freshly-created cinematic programs (point cloud,
+                // glass shell, grade) off the render path so the first frame
+                // that shows them doesn't stall on a synchronous shader link.
+                this.renderer.compileAsync?.(this.scene, this.camera);
             }).catch((e) => console.warn('[BrainStage] cinematic layer failed:', e));
         };
         if ('requestIdleCallback' in window) requestIdleCallback(kick, { timeout: 2000 });
@@ -471,9 +475,9 @@ export class BrainStage {
         const pr = this._computePixelRatio();
         if (Math.abs(pr - this.renderer.getPixelRatio()) > 0.01) {
             this.renderer.setPixelRatio(pr);
-            // Point sprites are sized in device pixels; keep them in step.
-            const cloudMat = this.module?.pointCloud?.material;
-            if (cloudMat) cloudMat.uniforms.uPixelRatio.value = pr;
+            // Point sprites AND their overdraw cap are sized in device pixels;
+            // keep both in step with the new ratio.
+            this.module?.pointCloud?.setPixelRatio?.(pr);
         }
         this.renderer.setSize(w, h);
         this.composer.setSize(w, h);

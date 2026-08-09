@@ -28,6 +28,16 @@ const NUM_REGIONS = REGIONS.length;
 const DEPTH_MAX = 2.7;
 const DEPTH_BIAS = 1.7;
 
+// Hard cap on a single sprite's on-screen footprint, in CSS px (multiplied
+// by DPR at build/resize). gl_PointSize grows as 1/z, so a close camera pass
+// -- the reveal dive, the How-It-Works focus glides -- would otherwise
+// inflate all ~330k additive points to hundreds of px each and overdraw the
+// whole framebuffer many times over. That fill-rate spike is the desktop
+// scroll stutter. At the hero / backdrop / in-skull framings points sit far
+// below this ceiling, so the cap is invisible there; it bites only the
+// pathological near-camera transit.
+const MAX_POINT_PX = 24;
+
 // ── Shaders ──────────────────────────────────────────────────────────────
 const VERT = /* glsl */ `
     attribute vec3 aColor;
@@ -40,6 +50,7 @@ const VERT = /* glsl */ `
     uniform float uTime;
     uniform float uSize;
     uniform float uPixelRatio;
+    uniform float uMaxSize;   // hard ceiling on sprite footprint (device px)
 
     varying vec3 vColor;
     varying float vIntensity;
@@ -67,7 +78,10 @@ const VERT = /* glsl */ `
         vDepth = -mv.z;
         // Size: base + firing swell, with perspective (depth-cued) attenuation.
         float size = uSize * (0.55 + intensity * 1.7) * tw * mix(0.7, 1.0, aWeight);
-        gl_PointSize = size * uPixelRatio * (12.0 / -mv.z);
+        // Clamp the perspective swell: without a ceiling a close camera pass
+        // balloons every additive sprite and the framebuffer overdraws N-deep,
+        // stalling the frame right as the brain glides between sections.
+        gl_PointSize = min(size * uPixelRatio * (12.0 / -mv.z), uMaxSize);
         gl_Position = projectionMatrix * mv;
     }
 `;
@@ -159,6 +173,7 @@ export class BrainPointCloud {
                 uTime: { value: 0 },
                 uSize: { value: 1.5 },
                 uPixelRatio: { value: this.pixelRatio },
+                uMaxSize: { value: MAX_POINT_PX * this.pixelRatio },
                 uTint: { value: new THREE.Color(0.10, 0.06, 0.0) },
                 // Rebalanced up from pass-3's blowout-panic lows (0.078 / 0.033)
                 // now that the synapse pulses are bilateral (activity no longer
@@ -324,6 +339,14 @@ export class BrainPointCloud {
     }
 
     setVisible(v) { if (this.points) this.points.visible = v; }
+
+    /** Keep sprite sizing + the overdraw cap in step with a live DPR change. */
+    setPixelRatio(pr) {
+        this.pixelRatio = pr;
+        if (!this.material) return;
+        this.material.uniforms.uPixelRatio.value = pr;
+        this.material.uniforms.uMaxSize.value = MAX_POINT_PX * pr;
+    }
 
     dispose() {
         if (this.points) {

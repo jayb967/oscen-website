@@ -71,7 +71,29 @@ function init() {
         initCopyAsideScene(stage);
         initHowItWorksScene(stage);
         initRevealScene(stage);
+        prefetchRevealModel();
     }
+}
+
+/**
+ * Warm the HTTP cache for the 5.6MB humanoid GLB during idle time, well
+ * before the reveal's own preload trigger fires (~two viewports out). Kept at
+ * prefetch priority on requestIdleCallback so it never competes with the hero
+ * paint; by the time the visitor reaches the reveal the file is already local
+ * and only the (worker) Draco decode + shader pre-warm remain.
+ */
+function prefetchRevealModel() {
+    const warm = () => {
+        if (document.querySelector('link[data-prefetch="humanoid"]')) return;
+        const link = document.createElement("link");
+        link.rel = "prefetch";
+        link.href = "/models/humanoid.glb";
+        link.setAttribute("data-prefetch", "humanoid");
+        document.head.appendChild(link);
+    };
+    const ric = (window as any).requestIdleCallback;
+    if (typeof ric === "function") ric(warm, { timeout: 4000 });
+    else setTimeout(warm, 1500);
 }
 
 /**
