@@ -65,8 +65,10 @@ function init() {
         new CustomEvent("oscen:datamode", { detail: stage.module.bridge.mode }),
     );
 
+    if (new URLSearchParams(location.search).has("perf")) initPerfHud();
+
     if (!prefersReduced) {
-        initSmoothScroll();
+        initSmoothScroll(stage);
         initHeroScene(stage);
         initCopyAsideScene(stage);
         initHowItWorksScene(stage);
@@ -155,11 +157,54 @@ function tweenOrbit(stage: BrainStage, orbit: { radius: number; height: number }
 }
 
 /** Lenis drives scroll; GSAP's ticker drives Lenis; ScrollTrigger listens. */
-function initSmoothScroll() {
+function initSmoothScroll(stage: BrainStage) {
     const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
+
+    // Drop the brain to a cheaper LOD while the page is actively scrolling,
+    // then restore shortly after it settles (see BrainStage.setScrollActive).
+    // Lenis stops emitting 'scroll' when motion ends, so a short idle timer
+    // marks the settle; the 180ms debounce keeps a scrub that pauses between
+    // wheel ticks from thrashing the toggle.
+    let idleTimer: number | undefined;
+    lenis.on("scroll", () => {
+        stage.setScrollActive(true);
+        if (idleTimer) clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(() => stage.setScrollActive(false), 180);
+    });
+}
+
+/**
+ * Opt-in frame profiler (?perf): logs fps + worst frame each second and
+ * whether the page was scrolling, so a transition stutter can be confirmed
+ * as a per-frame budget overrun (worst >> 16ms while scroll=Y) rather than
+ * guessed at. No effect unless the query flag is present.
+ */
+function initPerfHud() {
+    let last = performance.now();
+    let t0 = last, frames = 0, acc = 0, worst = 0;
+    const tick = (now: number) => {
+        const dt = now - last;
+        last = now;
+        frames++;
+        acc += dt;
+        if (dt > worst) worst = dt;
+        if (now - t0 >= 1000) {
+            const fps = Math.round((frames * 1000) / (now - t0));
+            const scrolling = (window.__experience?.stage as any)?._scrollActive ? "Y" : "n";
+            console.log(
+                `[perf] fps=${fps} avg=${(acc / frames).toFixed(1)}ms worst=${worst.toFixed(1)}ms scroll=${scrolling}`,
+            );
+            t0 = now;
+            frames = 0;
+            acc = 0;
+            worst = 0;
+        }
+        requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
 }
 
 /**

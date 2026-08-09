@@ -47,6 +47,12 @@ const BASE_BLOOM = BLOOM_CAP;
 const DEFAULT_CAMERA_POS = new THREE.Vector3(14, 4, 8);
 const DEFAULT_TARGET = new THREE.Vector3(0, 0.5, -0.5);
 
+// Fraction of the neuron cloud drawn while the page is actively scrolling.
+// The camera is moving then, so the thinned field is imperceptible, and the
+// freed GPU/CPU budget absorbs Lenis + ScrollTrigger + pin compositing --
+// the load that pushes a moving frame over 16ms and janks the brain glide.
+const SCROLL_LOD_FRACTION = 0.5;
+
 export class BrainStage {
     /**
      * @param {HTMLElement} container -- sized by the page; canvas fills it.
@@ -313,6 +319,20 @@ export class BrainStage {
      */
     setLateralOffset(x) {
         this._lateralOffset = x;
+    }
+
+    /**
+     * Shed per-frame cost while the page is actively scrolling. Both levers
+     * are realloc-free (point-cloud draw range + grade pass.enabled), so
+     * toggling on every scroll start / idle is cheap. Driven by Lenis in
+     * experience.ts; restored on scroll-idle. No-op before the cinematic
+     * cloud exists, and skips redundant toggles.
+     */
+    setScrollActive(active) {
+        if (this._scrollActive === active) return;
+        this._scrollActive = active;
+        this.module.pointCloud?.setDrawFraction?.(active ? SCROLL_LOD_FRACTION : 1);
+        if (this.gradePass) this.gradePass.enabled = !active;
     }
 
     /** Hand the camera back to the idle auto-orbit. */

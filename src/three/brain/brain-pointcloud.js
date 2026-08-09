@@ -348,6 +348,18 @@ export class BrainPointCloud {
         this.material.uniforms.uMaxSize.value = MAX_POINT_PX * pr;
     }
 
+    /**
+     * Draw only the first `f` fraction of the cloud. Points are stored in
+     * random sample order, so a prefix is a spatially-uniform subset -- a
+     * free density LOD (setDrawRange, no realloc) used to shed vertex +
+     * fill cost while the camera is moving, restored to 1.0 when it settles.
+     */
+    setDrawFraction(f) {
+        if (!this.points) return;
+        const clamped = Math.min(1, Math.max(0, f));
+        this.points.geometry.setDrawRange(0, Math.max(1, Math.floor(this.count * clamped)));
+    }
+
     dispose() {
         if (this.points) {
             this.scene.remove(this.points);
