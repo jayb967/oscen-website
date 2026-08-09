@@ -156,11 +156,16 @@ function tweenOrbit(stage: BrainStage, orbit: { radius: number; height: number }
     });
 }
 
+// The single Lenis instance, shared so scroll scenes can drive smooth
+// programmatic scrolls (e.g. How It Works step snapping) through it instead
+// of fighting it for the scroll position.
+let lenis: Lenis | null = null;
+
 /** Lenis drives scroll; GSAP's ticker drives Lenis; ScrollTrigger listens. */
 function initSmoothScroll() {
-    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
     lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.add((time) => lenis!.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
 }
 
@@ -319,22 +324,24 @@ function initHowItWorksScene(stage: BrainStage) {
         if (restoreMood) tweenMood(stage, MOODS.backdrop, 1.0);
     };
 
-    ScrollTrigger.create({
+    // Progress bands: one step per 1/N of the pinned scroll. Snapping (below)
+    // parks scroll on a step center so each caption is read before the next.
+    const stepFromProgress = (p: number) =>
+        Math.max(0, Math.min(captions.length - 1, Math.floor(p * captions.length)));
+
+    const st = ScrollTrigger.create({
         trigger: section,
         start: "top top",
         end: () => "+=" + captions.length * window.innerHeight,
         pin: true,
-        scrub: 0.8,
+        scrub: 0.6,
         anticipatePin: 1,
         onEnter: () => tweenMood(stage, MOODS.focus, 1.2),
         onEnterBack: () => tweenMood(stage, MOODS.focus, 1.2),
         onLeave: () => leave(),
         onLeaveBack: () => leave(),
         onUpdate: (self) => {
-            const i = Math.min(
-                captions.length - 1,
-                Math.floor(self.progress * captions.length),
-            );
+            const i = stepFromProgress(self.progress);
             if (i !== active) {
                 showCaption(i);
             } else if (
@@ -346,6 +353,36 @@ function initHowItWorksScene(stage: BrainStage) {
                 tweenOrbit(stage, ORBITS[i % ORBITS.length], 1.6);
             }
         },
+    });
+
+    // Step snapping. Continuous scrubbing let steps 2-4 flash past so only the
+    // top (step 1) and bottom (step 5) dwelled. Instead, when the scroll
+    // settles anywhere inside the pinned range, ease it to the nearest step so
+    // that step holds in place, then flows to the next. Snap targets are the N
+    // step positions i/(N-1) -- which include the section's entry (0) and exit
+    // (1), so the last step never traps the scroll. Driven through Lenis, not
+    // ScrollTrigger.snap (which would fight Lenis for the scroll position).
+    const lastStep = captions.length - 1;
+    let snapTimer: number | undefined;
+    const snapToNearestStep = () => {
+        if (!lenis || !st.isActive) return;
+        const range = st.end - st.start;
+        if (range <= 0) return;
+        const p = (window.scrollY - st.start) / range;
+        const step = Math.max(0, Math.min(lastStep, Math.round(p * lastStep)));
+        const targetY = st.start + (step / lastStep) * range;
+        if (Math.abs(targetY - window.scrollY) > 2) {
+            lenis.scrollTo(targetY, {
+                duration: 0.7,
+                easing: (t: number) => 1 - Math.pow(1 - t, 3), // easeOutCubic
+            });
+        }
+    };
+    lenis?.on("scroll", () => {
+        if (!st.isActive) return;
+        if (snapTimer) clearTimeout(snapTimer);
+        // Fires once scrolling settles (Lenis stops emitting 'scroll').
+        snapTimer = window.setTimeout(snapToNearestStep, 140);
     });
 }
 
