@@ -282,6 +282,22 @@ body::after {
   opacity: 1;
 }
 
+/* ─── Pinned-section compositing ───
+   How It Works + Reveal use GSAP ScrollTrigger `pin: true`, which swaps the
+   section to position:fixed and re-applies it every scroll frame. Under Lenis
+   smooth-scroll that forces per-frame layout/paint of the pinned element --
+   the desktop scroll-transition freeze. Profiled (real GPU, high tier): the
+   two pinned triggers alone took the average scroll frame from ~13ms to ~48ms
+   and dropped 3.5x of frames; the WebGL brain was NOT involved (freezing the
+   render loop changed nothing). Promoting the pinned sections + their
+   ScrollTrigger pin-spacers to their own compositor layer moves the pin work
+   off the layout/paint path and restores the average frame to ~16ms. */
+.hiw-pinned,
+.rvl-pinned,
+.pin-spacer {
+  will-change: transform;
+}
+
 /* ─── Accessibility ─── */
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
