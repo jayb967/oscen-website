@@ -8,11 +8,16 @@
 ---
 
 <section id="hero" class="h-screen w-full overflow-hidden flex items-center justify-center">
+  <!-- Full-bleed legibility scrim: darkens the brain behind the copy across
+       the whole viewport and fades to transparent at the edges, so there is
+       no visible box outline (the old bounded rounded scrim showed its edge). -->
+  <div class="hero-scrim absolute inset-0 pointer-events-none"></div>
+
   <!-- Bottom fade into the next section -->
   <div class="absolute bottom-0 left-0 right-0 h-64 pointer-events-none" style="background: linear-gradient(to top, var(--color-abyss), transparent);"></div>
 
   <!-- Content. Deliberately sparse. -->
-  <div class="relative text-center max-w-4xl mx-auto px-6 hero-backdrop">
+  <div class="relative text-center max-w-4xl mx-auto px-6">
     <p id="hero-eyebrow" class="hud-label !tracking-[0.35em] mb-6 text-scrim" style="color: var(--color-text-primary);">
       Brain software for robots
     </p>
@@ -28,13 +33,10 @@
       Everyone is building the body. <span class="text-text-primary italic">We're building the brain.</span>
     </p>
 
-    <!-- Minimal stat line. whisper-quiet -->
-    <div id="hero-stats" class="mt-12 flex items-center justify-center gap-6 text-text-secondary text-scrim" style="font-family: var(--font-tech);">
-      <span class="text-[12px] tracking-wider">1.15M neurons</span>
-      <span class="text-text-secondary/30">&middot;</span>
-      <span class="text-[12px] tracking-wider">~850M plastic synapses</span>
-      <span class="text-text-secondary/30">&middot;</span>
-      <span class="text-[12px] tracking-wider text-accent-green">Training now</span>
+    <!-- Positioning line (the live counts live in the fixed bottom-left HUD,
+         so the hero says what makes it different, not the same numbers). -->
+    <div id="hero-stats" class="mt-12 flex items-center justify-center text-scrim" style="font-family: var(--font-tech);">
+      <span class="text-[12px] tracking-[0.18em] text-text-secondary">Learns from experience, not training data.</span>
     </div>
   </div>
 
@@ -45,12 +47,16 @@
 </section>
 
 <style>
-  /* Darker scrim than v1: the eyebrow and stat line were washing out
-     over bright clusters on mobile (Phase 2 legibility leftover). */
-  .hero-backdrop {
-    background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(5, 8, 16, 0.82) 0%, rgba(5, 8, 16, 0.52) 55%, transparent 82%);
-    padding: 3rem 2rem;
-    border-radius: 2rem;
+  /* Full-viewport legibility scrim. Darker in the center behind the copy,
+     easing to fully transparent by the viewport edge so the brain's outer
+     glow + starfield still read and there is no visible box edge. A touch
+     darker than the old bounded scrim (center 0.90 vs 0.82). */
+  .hero-scrim {
+    background: radial-gradient(ellipse 82% 74% at 50% 46%,
+        rgba(3, 6, 12, 0.90) 0%,
+        rgba(3, 6, 12, 0.62) 40%,
+        rgba(3, 6, 12, 0.30) 66%,
+        transparent 100%);
   }
 </style>
 

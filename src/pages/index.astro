@@ -28,18 +28,17 @@ import Footer from "../components/Footer.astro";
   <ScrollIndicator />
   <ExperienceHUD />
 
-  <!-- Persistent experience layer. The bloom composer writes opaque
-       alpha, so a title UNDER the canvas can never show through; instead
-       the giant title sits ABOVE it with mix-blend-mode:screen -- bright
-       particles overpower the glyphs (reads as "brain in front of type"),
-       dark areas reveal them. Section content paints above via
-       main>section z-10. -->
+  <!-- Persistent experience layer. The brain canvas fills it; the OSCEN
+       wordmark is tucked into the bottom-right corner as a subtle watermark
+       (clear of the brain so it reads), with mix-blend-mode:screen over the
+       dark background. It fades out on scroll (see initHeroScene). Section
+       content paints above the whole layer via main>section z-10. -->
   <div id="experience" class="fixed inset-0 z-[1] pointer-events-none" aria-hidden="true">
     <div id="experience-canvas" class="absolute inset-0"></div>
     <div
       id="experience-title"
-      class="absolute inset-0 flex items-center justify-center select-none"
-      style="font-family: var(--font-tech); font-weight: 700; font-size: clamp(6rem, 19vw, 22rem); letter-spacing: -0.02em; color: rgba(226, 232, 244, 0.16); mix-blend-mode: screen;"
+      class="absolute inset-0 flex items-end justify-end select-none p-6 md:p-10"
+      style="font-family: var(--font-tech); font-weight: 700; font-size: clamp(2rem, 7vw, 5.5rem); line-height: 0.85; letter-spacing: -0.02em; color: rgba(226, 232, 244, 0.07); mix-blend-mode: screen;"
     >
       OSCEN
     </div>
