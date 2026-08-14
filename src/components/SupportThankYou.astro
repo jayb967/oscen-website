@@ -2,11 +2,14 @@
 /**
  * Post-checkout thank-you. Renders hidden by default; a client script makes it
  * visible when /support is loaded with ?ok=1 and reads &tier=X to drive copy.
- * Captures display name + email + tier and posts to BOTH Formspree (so Jay
- * sees the wall request) and Buttondown (so the supporter joins the right
- * segment for monthly notes / early demo access).
+ *
+ * The contributor wall + display name are now captured at Stripe checkout and
+ * written to the CRM by the Stripe webhook, so this form no longer feeds the
+ * wall. It only subscribes the supporter to Buttondown (updates keep flowing
+ * during the Buttondown -> CRM migration) and fires the CompleteRegistration
+ * pixel. Success = the Buttondown call settled.
  */
-import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
+import { BUTTONDOWN_ACTION } from "../lib/forms";
 ---
 
 <section id="support-thanks" class="max-w-5xl mx-auto px-6 mb-20 hidden">
@@ -20,25 +23,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
     </p>
 
     <form id="thanks-form" class="space-y-4 max-w-xl" novalidate>
-      <input type="hidden" name="kind" value="supporter-thanks" />
       <input type="hidden" name="tier" id="thanks-tier" value="" />
-      <input type="hidden" name="_subject" value="New supporter sign-up" />
-
-      <div>
-        <label for="thanks-name" class="block text-[11px] font-tech text-text-muted uppercase tracking-wider mb-1.5">
-          Display name for the contributor wall (optional)
-        </label>
-        <input
-          type="text"
-          id="thanks-name"
-          name="name"
-          maxlength="60"
-          autocomplete="name"
-          placeholder="Real name, pseudonym, or leave blank"
-          class="w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/30 focus:outline-none transition-colors"
-        />
-        <p class="text-[10px] text-text-muted/70 mt-1.5 font-tech">If you already entered one at Stripe checkout, you can leave this blank.</p>
-      </div>
 
       <div>
         <label for="thanks-email" class="block text-[11px] font-tech text-text-muted uppercase tracking-wider mb-1.5">
@@ -53,6 +38,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
           placeholder="your@email.com"
           class="w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/30 focus:outline-none transition-colors"
         />
+        <p class="text-[10px] text-text-muted/70 mt-1.5 font-tech">Your contributor-wall name comes from the display name you entered at Stripe checkout.</p>
       </div>
 
       <div class="flex items-center gap-3 pt-1">
@@ -61,7 +47,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
           id="thanks-submit"
           class="px-6 py-2.5 rounded-lg bg-accent-amber/10 border border-accent-amber/30 text-accent-amber text-sm font-medium hover:bg-accent-amber/20 hover:border-accent-amber/50 transition-all duration-300 cursor-pointer"
         >
-          Lock it in
+          Keep me posted
         </button>
         <button
           type="button"
@@ -82,7 +68,7 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
   </div>
 </section>
 
-<script define:vars={{ FORMSPREE_URL: FORMSPREE.contact, BUTTONDOWN_URL: BUTTONDOWN_ACTION }}>
+<script define:vars={{ BUTTONDOWN_URL: BUTTONDOWN_ACTION }}>
   const section = document.getElementById("support-thanks");
   if (section) {
     const url = new URL(window.location.href);
@@ -103,25 +89,25 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
         spark: {
           eyebrow: "Spark supporter",
           headline: "Thanks for the spark.",
-          body: "A day and a half of brain time on us. A receipt is on the way from Stripe. Leave a name if you want a footnote here.",
+          body: "A day and a half of brain time on us. A receipt is on the way from Stripe. Leave your email below for the occasional update.",
           hint: "for thanks and the occasional update",
         },
         synapse: {
           eyebrow: "Synapse supporter",
           headline: "You bought us a week of brain time.",
-          body: "Drop a name and you go up on the contributor wall below. Stripe will email a receipt.",
+          body: "The display name from your Stripe checkout goes up on the contributor wall below. Add your email for updates. Stripe will email a receipt.",
           hint: "for thanks and the occasional update",
         },
         cortex: {
           eyebrow: "Cortex supporter",
           headline: "Welcome to the monthly circle.",
-          body: "You bankroll a specialist brain. Leave your email and you get the monthly progress note and first crack at new demos. Drop a name to go on the wall.",
+          body: "You bankroll a specialist brain. Leave your email for the monthly progress note and first crack at new demos. Your wall name comes from your Stripe checkout.",
           hint: "required for monthly notes",
         },
         custom: {
           eyebrow: "Supporter",
           headline: "Thank you, for whatever it was.",
-          body: "Every dollar buys compute, sensors, or runway. Leave a name for the wall, leave an email for updates.",
+          body: "Every dollar buys compute, sensors, or runway. Leave your email for updates. Any display name you set at Stripe checkout shows on the wall.",
           hint: "for thanks and updates",
         },
       };
@@ -221,7 +207,6 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
         const t = /** @type {HTMLInputElement} */ (document.getElementById("thanks-tier")).value;
         const tag = TIER_TAG[t] || "supporter-custom";
 
-        window.injectAttribution?.(form);
         submit.disabled = true;
         const original = submit.textContent;
         submit.textContent = "Sending...";
@@ -231,27 +216,20 @@ import { FORMSPREE, BUTTONDOWN_ACTION } from "../lib/forms";
         buttondown.append("tag", tag);
         buttondown.append("embed", "1");
 
-        const results = await Promise.allSettled([
-          fetch(FORMSPREE_URL, {
-            method: "POST",
-            body: new FormData(form),
-            headers: { Accept: "application/json" },
-          }),
-          fetch(BUTTONDOWN_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: buttondown,
-          }),
-        ]);
+        // Buttondown's embed endpoint is cross-origin with no CORS headers, so
+        // we fire no-cors and treat a settled request as success.
+        let buttondownOk = false;
+        try {
+          await fetch(BUTTONDOWN_URL, { method: "POST", mode: "no-cors", body: buttondown });
+          buttondownOk = true;
+        } catch {
+          buttondownOk = false;
+        }
 
         submit.disabled = false;
         submit.textContent = original;
 
-        const formspreeOk =
-          results[0].status === "fulfilled" && results[0].value.ok;
-        const buttondownOk = results[1].status === "fulfilled";
-
-        if (formspreeOk || buttondownOk) {
+        if (buttondownOk) {
           fireRegistration(email, t);
           showDone();
         } else {

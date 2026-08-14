@@ -11,7 +11,7 @@
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import { FORMSPREE, SEGMENTS } from "../lib/forms";
+import { SEGMENTS } from "../lib/forms";
 ---
 
 <Base title="Build with us | OSCEN" description="Engineers, researchers, robotics partners. Apply to collaborate on the brain for every robot.">
@@ -53,7 +53,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
       <form
         id="collab-form-el"
         class="reveal glass-bright rounded-2xl p-7 md:p-9 space-y-6 shadow-2xl shadow-black/40"
-        action={FORMSPREE.build}
+        action="/.netlify/functions/inquiry/build"
         method="POST"
       >
         <input type="hidden" name="segment" value={SEGMENTS.collaboratorPending} />
@@ -182,7 +182,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 </Base>
 
 <script>
-  import { submitFormspree, trackingForCollaborator } from "../lib/forms";
+  import { submitInquiry, trackingForCollaborator } from "../lib/forms";
 
   const form = document.getElementById("collab-form-el") as HTMLFormElement | null;
   const btn = document.getElementById("collab-submit") as HTMLButtonElement | null;
@@ -192,8 +192,9 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
   if (form && btn && status && successCard) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      submitFormspree(
+      submitInquiry(
         form,
+        "build",
         btn,
         status,
         () => {

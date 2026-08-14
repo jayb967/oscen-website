@@ -6,7 +6,6 @@
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import { FORMSPREE } from "../lib/forms";
 
 const paths = [
   {
@@ -60,7 +59,7 @@ const paths = [
     <section class="max-w-4xl mx-auto px-6 mb-24">
       <div class="reveal glass-bright rounded-2xl p-8 md:p-10">
         <h2 class="text-2xl font-display text-text-primary mb-8">Get in touch</h2>
-        <form id="contact-form" class="space-y-6" action={FORMSPREE.contact} method="POST">
+        <form id="contact-form" class="space-y-6" action="/.netlify/functions/inquiry/contact" method="POST">
           <input type="hidden" name="_subject" value="New contact from oscen.ai" />
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -161,7 +160,7 @@ const paths = [
   <Footer />
 
   <script>
-    import { submitFormspree, trackingForContact } from "../lib/forms";
+    import { submitInquiry, trackingForContact } from "../lib/forms";
 
     const form = document.getElementById("contact-form") as HTMLFormElement | null;
     const btn = document.getElementById("contact-submit") as HTMLButtonElement | null;
@@ -170,8 +169,9 @@ const paths = [
     if (form && btn && status) {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
-        submitFormspree(
+        submitInquiry(
           form,
+          "contact",
           btn,
           status,
           () => {

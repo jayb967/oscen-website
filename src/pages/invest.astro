@@ -16,7 +16,7 @@
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import { FORMSPREE, SEGMENTS } from "../lib/forms";
+import { SEGMENTS } from "../lib/forms";
 ---
 
 <Base title="Invest | OSCEN" description="Back a brain-inspired AI for robots. Patent pending. Submit interest and we'll send the brief.">
@@ -349,7 +349,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
       <form
         id="investor-form-el"
         class="reveal glass-bright rounded-2xl p-7 md:p-9 space-y-6 shadow-2xl shadow-black/40"
-        action={FORMSPREE.investor}
+        action="/.netlify/functions/inquiry/invest"
         method="POST"
       >
         <!-- Routing field. JS upgrades based on accreditation answer.
@@ -482,7 +482,7 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
 </Base>
 
 <script>
-  import { SEGMENTS, submitFormspree, trackingForInvestor } from "../lib/forms";
+  import { SEGMENTS, submitInquiry, trackingForInvestor } from "../lib/forms";
 
   const form = document.getElementById("investor-form-el") as HTMLFormElement | null;
   const btn = document.getElementById("investor-submit") as HTMLButtonElement | null;
@@ -521,8 +521,9 @@ import { FORMSPREE, SEGMENTS } from "../lib/forms";
   if (form && btn && status && successCard && successDetail) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      submitFormspree(
+      submitInquiry(
         form,
+        "invest",
         btn,
         status,
         () => {

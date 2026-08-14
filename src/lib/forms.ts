@@ -11,10 +11,12 @@
  * window.gtmPush (set by consent-gated scripts in Base.astro).
  *
  * Set in Netlify (or .env.local for dev):
- *   PUBLIC_BUTTONDOWN_USERNAME
- *   PUBLIC_FORMSPREE_INVESTOR_ID
- *   PUBLIC_FORMSPREE_BUILD_ID
- *   PUBLIC_FORMSPREE_CONTACT_ID
+ *   PUBLIC_BUTTONDOWN_USERNAME   (newsletter handle)
+ *
+ * The 3 inquiry forms POST to the same-origin /.netlify/functions/inquiry
+ * relay, which forwards server-side to the CRM. Its CRM_ENDPOINT +
+ * INQUIRY_SECRET are server-only env vars (see netlify/functions/inquiry.ts),
+ * never inlined into this client bundle.
  */
 
 import {
@@ -30,11 +32,10 @@ const BUTTONDOWN_USERNAME = env.PUBLIC_BUTTONDOWN_USERNAME ?? "oscen";
 export const BUTTONDOWN_ACTION =
   `https://buttondown.com/api/emails/embed-subscribe/${BUTTONDOWN_USERNAME}`;
 
-export const FORMSPREE = {
-  investor: `https://formspree.io/f/${env.PUBLIC_FORMSPREE_INVESTOR_ID ?? "mjgdnzjw"}`,
-  build: `https://formspree.io/f/${env.PUBLIC_FORMSPREE_BUILD_ID ?? "mzdqnwyy"}`,
-  contact: `https://formspree.io/f/${env.PUBLIC_FORMSPREE_CONTACT_ID ?? "xzdkgdol"}`,
-};
+/** Same-origin relay. Sub-path picks the authoritative CRM kind/source. */
+const INQUIRY_BASE = "/.netlify/functions/inquiry";
+
+export type InquiryKey = "contact" | "invest" | "build";
 
 export const SEGMENTS = {
   investorAccredited: "investor-accredited",
@@ -77,7 +78,7 @@ function readFormString(form: HTMLFormElement, name: string): string | undefined
   return typeof raw === "string" && raw.trim() ? raw.trim() : undefined;
 }
 
-/** Investor form tracking config — accreditation field drives the segment. */
+/** Investor form tracking config. Accreditation field drives the segment. */
 export function trackingForInvestor(form: HTMLFormElement): TrackConfig {
   const accreditation = readFormString(form, "accreditation");
   const leadType = accreditationToLeadType(accreditation);
@@ -237,14 +238,28 @@ export async function subscribeButtondown(
   });
 }
 
+/** Serialize a form's text fields (incl. injected attribution + the _gotcha
+ *  honeypot) to a plain object for the JSON relay. The server drops _gotcha. */
+function formToObject(form: HTMLFormElement): Record<string, string> {
+  const out: Record<string, string> = {};
+  new FormData(form).forEach((value, key) => {
+    if (typeof value === "string") out[key] = value;
+  });
+  return out;
+}
+
 /**
- * Formspree returns JSON. On 2xx we hand off to onSuccess (used to swap the
- * form for a success card); on error we render the message in `status`.
- * Pass tracking={trackingForInvestor(form)} (or trackingForCollaborator /
- * trackingForContact) to fire Lead.
+ * Posts a form as JSON to the same-origin inquiry relay
+ * (/.netlify/functions/inquiry/<formKey>), which forwards it server-side to the
+ * CRM. On 2xx we hand off to onSuccess (used to swap the form for a success
+ * card); on error we render a message in `status`. Signature mirrors the prior
+ * submit helper so the form pages change minimally. Pass
+ * tracking={trackingForContact(form)} (or trackingForInvestor /
+ * trackingForCollaborator) to fire Lead.
  */
-export async function submitFormspree(
+export async function submitInquiry(
   form: HTMLFormElement,
+  formKey: InquiryKey,
   btn: HTMLButtonElement,
   status: HTMLElement,
   onSuccess: () => void,
@@ -254,17 +269,16 @@ export async function submitFormspree(
   status.classList.add("hidden");
   await withBusyButton(btn, async () => {
     try {
-      const res = await fetch(form.action, {
+      const res = await fetch(`${INQUIRY_BASE}/${formKey}`, {
         method: "POST",
-        body: new FormData(form),
-        headers: { Accept: "application/json" },
+        headers: { "content-type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(formToObject(form)),
       });
       if (res.ok) {
         if (tracking) fireConversion(form, tracking);
         onSuccess();
       } else {
-        const data = await res.json().catch(() => ({}));
-        showStatus(status, data?.errors?.[0]?.message || "Something went wrong. Please try again.", "error");
+        showStatus(status, "Something went wrong. Please try again.", "error");
       }
     } catch {
       showStatus(status, "Network error. Please try again.", "error");
