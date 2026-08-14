@@ -12,6 +12,35 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-08-14 FORMSPREE -> OWN CRM INTAKE + LIVE SUPPORTERS WALL
+
+Dropped Formspree on the 3 forms in favor of our own CRM intake, and made the
+`/support` contributor wall read live from the CRM (Stripe-backed) instead of a
+hand-edited list. Paired with the CRM-side program (see `oscencrm/progress.md`
+"BUILT 2026-08-14 (b)").
+
+- [x] `netlify/functions/inquiry.ts` -- same-origin relay cloned from
+  `meta-capi.ts` (CORS allowlist, per-IP rate limit on the unspoofable
+  `x-nf-client-connection-ip`, 5s timeout). Sub-paths `/contact` `/invest`
+  `/build` set the AUTHORITATIVE `{kind, source}` and strip any client-sent
+  kind/source/data/submission, then forward server-side to `CRM_ENDPOINT` with
+  the server-only `INQUIRY_SECRET` Bearer.
+- [x] `src/lib/forms.ts` -- `submitInquiry` replaces `submitFormspree`
+  (Formspree map removed); the 3 forms repointed; `_gotcha` honeypot + the
+  Meta/GTM/CAPI conversion pixels preserved.
+- [x] `ContributorWall.astro` -- fetches `PUBLIC_SUPPORTERS_URL` on the client
+  and renders `{displayName, tier, since}` via `textContent` (no XSS),
+  preserving the server's biggest-first order; keeps the "Be the first" empty
+  state. `contributors.ts` no longer hand-edited (keeps only the tier tokens).
+- [x] `SupportThankYou.astro` -- drops the Formspree POST, keeps the Buttondown
+  subscribe (wall name now comes from Stripe checkout, written by the CRM
+  webhook). `privacy.astro` updated (Formspree -> our CRM + Neon).
+- New site env: `INQUIRY_SECRET`, `CRM_ENDPOINT`, `PUBLIC_SUPPORTERS_URL`.
+- `npm run build` clean (16 pages). Formspree fully removed from the forms; the
+  CRM's `formspree-sync` stays live until the relay is verified post-deploy.
+
+---
+
 ## 2026-07-24 FEEDBACK ROUND 2 -- PERF + REVEAL FIXES (latest, post-swap)
 
 Jesus's testing round surfaced: HIW step lag/freezes, reveal jumping +

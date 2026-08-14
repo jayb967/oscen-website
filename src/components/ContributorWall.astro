@@ -1,9 +1,15 @@
 ---
-import { CONTRIBUTORS, TIER_DOT } from "../data/contributors";
+/**
+ * Contributor wall. Sourced live from the CRM at PUBLIC_SUPPORTERS_URL (the CRM
+ * filters to public + active + wall-eligible and sorts server-side). This is a
+ * static site, so the list is fetched client-side on page load and rendered
+ * into the DOM below. The "Be the first" empty state is the default markup and
+ * also stays if the list is empty or the fetch fails.
+ */
+import { TIER_DOT } from "../data/contributors";
 
-const sorted = [...CONTRIBUTORS].sort((a, b) =>
-  b.since.localeCompare(a.since) || a.name.localeCompare(b.name),
-);
+const SUPPORTERS_URL =
+  import.meta.env.PUBLIC_SUPPORTERS_URL ?? "https://crm.oscen.ai/api/public/supporters";
 ---
 
 <section class="max-w-5xl mx-auto px-6 mb-24">
@@ -12,24 +18,70 @@ const sorted = [...CONTRIBUTORS].sort((a, b) =>
     The people keeping the brain learning. Synapse and above show up here by choice.
   </p>
 
-  {sorted.length === 0 ? (
-    <div class="reveal glass rounded-xl p-8 text-center">
-      <p class="text-sm text-text-secondary">Be the first.</p>
-      <p class="text-xs text-text-muted mt-2 font-tech">The wall lights up the moment someone backs Synapse or above.</p>
-    </div>
-  ) : (
-    <div class="reveal glass rounded-xl p-6">
-      <ul class="flex flex-wrap gap-x-5 gap-y-3">
-        {sorted.map((c) => (
-          <li class="flex items-center gap-2 text-sm text-text-secondary">
-            <span class={`w-1.5 h-1.5 rounded-full ${TIER_DOT[c.tier]}`} aria-hidden="true"></span>
-            <span>{c.name}</span>
-          </li>
-        ))}
-      </ul>
-      <p class="text-[10px] font-tech text-text-muted mt-6">
-        {sorted.length} {sorted.length === 1 ? "supporter" : "supporters"}. Want off the wall? Email info@oscen.ai.
-      </p>
-    </div>
-  )}
+  <!-- Empty state: default, and what stays on an empty list or a failed fetch. -->
+  <div id="wall-empty" class="reveal glass rounded-xl p-8 text-center">
+    <p class="text-sm text-text-secondary">Be the first.</p>
+    <p class="text-xs text-text-muted mt-2 font-tech">The wall lights up the moment someone backs Synapse or above.</p>
+  </div>
+
+  <!-- Populated state: revealed by the script once the CRM returns supporters. -->
+  <div id="wall-list" class="glass rounded-xl p-6 hidden">
+    <ul id="wall-items" class="flex flex-wrap gap-x-5 gap-y-3"></ul>
+    <p id="wall-count" class="text-[10px] font-tech text-text-muted mt-6"></p>
+  </div>
 </section>
+
+<script define:vars={{ supportersUrl: SUPPORTERS_URL, tierDot: TIER_DOT }}>
+  (async () => {
+    const emptyEl = document.getElementById("wall-empty");
+    const listEl = document.getElementById("wall-list");
+    const itemsEl = document.getElementById("wall-items");
+    const countEl = document.getElementById("wall-count");
+    if (!emptyEl || !listEl || !itemsEl || !countEl) return;
+
+    let supporters = [];
+    try {
+      const res = await fetch(supportersUrl, { headers: { Accept: "application/json" } });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data?.supporters)) supporters = data.supporters;
+    } catch {
+      return; // Empty state stays on any network / parse failure.
+    }
+
+    // Keep only well-formed rows, preserving the server's order (biggest gifts
+    // first). We deliberately do NOT re-sort here: re-sorting by month would
+    // discard that ordering and bury larger backers under newer smaller ones.
+    const clean = supporters
+      .filter((s) => s && typeof s.displayName === "string" && s.displayName.trim())
+      .map((s) => ({
+        displayName: s.displayName.trim(),
+        tier: s.tier,
+        since: typeof s.since === "string" ? s.since : "",
+      }));
+
+    if (clean.length === 0) return; // Nothing eligible: leave the empty state.
+
+    const fallbackDot = tierDot.custom;
+    for (const s of clean) {
+      const li = document.createElement("li");
+      li.className = "flex items-center gap-2 text-sm text-text-secondary";
+
+      const dot = document.createElement("span");
+      dot.className = `w-1.5 h-1.5 rounded-full ${tierDot[s.tier] || fallbackDot}`;
+      dot.setAttribute("aria-hidden", "true");
+
+      const name = document.createElement("span");
+      name.textContent = s.displayName; // textContent = no HTML injection.
+
+      li.append(dot, name);
+      itemsEl.appendChild(li);
+    }
+
+    countEl.textContent =
+      `${clean.length} ${clean.length === 1 ? "supporter" : "supporters"}. Want off the wall? Email info@oscen.ai.`;
+
+    emptyEl.classList.add("hidden");
+    listEl.classList.remove("hidden");
+  })();
+</script>
