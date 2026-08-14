@@ -3,11 +3,15 @@
   command = "npm run build"
 
 [build.environment]
-  # Both values are intentionally public:
+  # These values are intentionally public and end up in the built output, so the secret scanner
+  # would flag them (their values match env vars):
   # - PUBLIC_META_DOMAIN_VERIFICATION must appear in <meta> for Meta to verify
   # - PUBLIC_META_PIXEL_ID appears in fbq('init', ...) on the page
-  # Netlify's secret scanner flags them because the values match env vars.
-  SECRETS_SCAN_OMIT_KEYS = "PUBLIC_META_DOMAIN_VERIFICATION,PUBLIC_META_PIXEL_ID"
+  # - PUBLIC_SUPPORTERS_URL (crm.oscen.ai/api/public/supporters) is inlined by Astro + a hardcoded
+  #   fallback in ContributorWall.astro. It is a public read-only endpoint, not a secret.
+  # INQUIRY_SECRET is NOT here on purpose: it is a real secret, read only server-side in the relay
+  # function, and must stay scanned so it can never leak into the build.
+  SECRETS_SCAN_OMIT_KEYS = "PUBLIC_META_DOMAIN_VERIFICATION,PUBLIC_META_PIXEL_ID,PUBLIC_SUPPORTERS_URL"
 
 [functions]
   directory = "netlify/functions"
