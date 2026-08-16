@@ -6,10 +6,10 @@
  * into the DOM below. The "Be the first" empty state is the default markup and
  * also stays if the list is empty or the fetch fails.
  */
-import { TIER_DOT } from "../data/contributors";
+import { LOCAL_SAMPLE_SUPPORTERS, TIER_DOT } from "../data/contributors";
 
-const SUPPORTERS_URL =
-  import.meta.env.PUBLIC_SUPPORTERS_URL ?? "https://crm.oscen.ai/api/public/supporters";
+const SUPPORTERS_URL = "https://crm.oscen.ai/api/public/supporters"
+const SAMPLE_SUPPORTERS = LOCAL_SAMPLE_SUPPORTERS
 ---
 
 <section class="max-w-5xl mx-auto px-6 mb-24">
@@ -31,7 +31,7 @@ const SUPPORTERS_URL =
   </div>
 </section>
 
-<script define:vars={{ supportersUrl: SUPPORTERS_URL, tierDot: TIER_DOT }}>
+<script define:vars={{ supportersUrl: SUPPORTERS_URL, sampleSupporters: SAMPLE_SUPPORTERS, tierDot: TIER_DOT }}>
   (async () => {
     const emptyEl = document.getElementById("wall-empty");
     const listEl = document.getElementById("wall-list");
@@ -42,12 +42,15 @@ const SUPPORTERS_URL =
     let supporters = [];
     try {
       const res = await fetch(supportersUrl, { headers: { Accept: "application/json" } });
-      if (!res.ok) return;
-      const data = await res.json();
-      if (Array.isArray(data?.supporters)) supporters = data.supporters;
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data?.supporters)) supporters = [...data.supporters, ...sampleSupporters];
+      }
     } catch {
-      return; // Empty state stays on any network / parse failure.
+      supporters = sampleSupporters;
     }
+
+    if (supporters.length === 0 && sampleSupporters.length > 0) supporters = sampleSupporters;
 
     // Keep only well-formed rows, preserving the server's order (biggest gifts
     // first). We deliberately do NOT re-sort here: re-sorting by month would
