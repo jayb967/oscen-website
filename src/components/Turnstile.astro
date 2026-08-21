@@ -1,0 +1,25 @@
+---
+/**
+ * Cloudflare Turnstile widget for the inquiry forms (contact / invest / build).
+ *
+ * Anti-spam CAPTCHA (added 2026-08-21). Renders ONLY when
+ * PUBLIC_TURNSTILE_SITE_KEY is set, so the site keeps working unchanged until
+ * the key is configured in Netlify + redeployed. When rendered, Cloudflare's
+ * api.js auto-injects a hidden `cf-turnstile-response` input into the enclosing
+ * <form>; `src/lib/forms.ts` serializes it with the other fields and
+ * `netlify/functions/inquiry.ts` verifies it server-side via /siteverify (only
+ * when TURNSTILE_SECRET_KEY is set). Place this INSIDE the <form>, before the
+ * submit button.
+ *
+ * PUBLIC_TURNSTILE_SITE_KEY is inlined into the client bundle at BUILD time, so
+ * setting it in Netlify requires a redeploy for the widget to appear.
+ */
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+---
+
+{siteKey && (
+  <Fragment>
+    <div class="cf-turnstile" data-sitekey={siteKey} data-theme="dark" data-size="flexible"></div>
+    <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  </Fragment>
+)}

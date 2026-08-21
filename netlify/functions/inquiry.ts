@@ -154,6 +154,37 @@ function parseBody(event: HandlerEvent): Record<string, unknown> | null {
   }
 }
 
+/**
+ * Verify a Cloudflare Turnstile token server-side. Only enforced when
+ * TURNSTILE_SECRET_KEY is set; if it is not configured we skip verification so
+ * the relay keeps working without CAPTCHA (the honeypot + rate limiter + kill
+ * switch still apply). Returns true = human/allowed, false = reject.
+ */
+async function verifyTurnstile(token: string, ip: string | undefined): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // not configured -> do not block
+  if (!token) return false;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 5000);
+  try {
+    const body = new URLSearchParams({ secret, response: token });
+    if (ip) body.set("remoteip", ip);
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+      signal: ctrl.signal,
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { success?: boolean };
+    return data.success === true;
+  } catch {
+    return false; // fail closed on network/timeout when CAPTCHA is configured
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function postToCrm(
   endpoint: string,
   secret: string,
@@ -219,11 +250,28 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
     return json(200, { ok: true }, origin);
   }
 
-  // Forward every submitted field EXCEPT the honeypot and any client-supplied
-  // kind/source/data/submission. Dropping data/submission is critical: the CRM
-  // also reads fields nested under those keys, so leaving them in would let a
-  // caller smuggle {data:{kind:"INVESTOR"}} past this authoritative mapping.
-  const { _gotcha, kind: _k, source: _s, data: _d, submission: _sub, ...rest } = fields;
+  // CAPTCHA: verify the Cloudflare Turnstile token. No-op unless
+  // TURNSTILE_SECRET_KEY is configured (see verifyTurnstile).
+  const tokenRaw = fields["cf-turnstile-response"];
+  const token = typeof tokenRaw === "string" ? tokenRaw : "";
+  if (!(await verifyTurnstile(token, ip))) {
+    return json(400, { error: "captcha_failed" }, origin);
+  }
+
+  // Forward every submitted field EXCEPT the honeypot, the CAPTCHA token, and any
+  // client-supplied kind/source/data/submission. Dropping data/submission is
+  // critical: the CRM also reads fields nested under those keys, so leaving them
+  // in would let a caller smuggle {data:{kind:"INVESTOR"}} past this
+  // authoritative mapping.
+  const {
+    _gotcha,
+    "cf-turnstile-response": _cf,
+    kind: _k,
+    source: _s,
+    data: _d,
+    submission: _sub,
+    ...rest
+  } = fields;
   const payload = { ...rest, kind: mapping.kind, source: mapping.source };
 
   try {

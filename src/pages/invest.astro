@@ -16,6 +16,7 @@
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import Turnstile from "../components/Turnstile.astro";
 import { SEGMENTS } from "../lib/forms";
 ---
 
@@ -449,6 +450,9 @@ import { SEGMENTS } from "../lib/forms";
           <input type="checkbox" name="consent" required class="mt-0.5" style="accent-color: var(--color-accent-blue);" />
           <span>I consent to OSCEN contacting me about this inquiry. We won't share your info.</span>
         </label>
+
+        <!-- Anti-spam CAPTCHA (renders only when PUBLIC_TURNSTILE_SITE_KEY is set) -->
+        <Turnstile />
 
         <button
           type="submit"

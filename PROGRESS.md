@@ -32,34 +32,49 @@ A spam bot is flooding the public forms: same `Name: RobertJaf`, `Company: googl
   dropped silently. Re-enable as soon as the CAPTCHA below is live.
 - `npx tsc --noEmit` + `npm run build` clean (16 pages).
 
-**Real fix -- CAPTCHA (do next, then flip the switch back on):**
+**Real fix -- CAPTCHA (CODE WIRED; awaiting keys + activation):**
 
-Recommended: **Cloudflare Turnstile** (we already run Cloudflare; free, privacy-
-friendly, no user puzzle in most cases). Google reCAPTCHA v3 is the alternative
-but adds Google tracking + a score threshold to tune. Prefer Turnstile.
+Chose **Cloudflare Turnstile** (we already run Cloudflare; free, privacy-
+friendly, no user puzzle in most cases). Google reCAPTCHA v3 was the alternative
+but adds Google tracking + a score threshold to tune. Turnstile is dormant until
+the keys are set, so shipping the code changes nothing live.
 
-- [ ] Cloudflare dash -> Turnstile -> add a widget for `oscen.ai`. Get the
+Code done (this commit):
+- [x] `src/components/Turnstile.astro` -- renders the `.cf-turnstile` widget +
+  loads `challenges.cloudflare.com/turnstile/v0/api.js` ONLY when
+  `PUBLIC_TURNSTILE_SITE_KEY` is set. Dropped into all 3 forms
+  (`contact.astro`, `invest.astro`, `build.astro`) inside the `<form>`, before
+  the submit button. Verified: no key -> nothing renders (honeypot intact);
+  key set -> widget + api.js appear.
+- [x] `src/lib/forms.ts` needs NO change -- Cloudflare auto-injects a hidden
+  `cf-turnstile-response` input into the form, which the existing `formToObject`
+  `FormData` serialize already sends in the JSON body.
+- [x] `netlify/functions/inquiry.ts` -- `verifyTurnstile()` POSTs the token +
+  client IP to `/siteverify` with `TURNSTILE_SECRET_KEY`; rejects
+  (`400 {error:"captcha_failed"}`) unless `success === true`. NO-OP when
+  `TURNSTILE_SECRET_KEY` is unset (fails open to honeypot + rate limiter so the
+  relay still works pre-config; fails CLOSED once the secret is set). Strips
+  `cf-turnstile-response` from the CRM payload alongside `_gotcha`.
+- [x] `netlify.toml` -- `PUBLIC_TURNSTILE_SITE_KEY` added to
+  `SECRETS_SCAN_OMIT_KEYS` (public, appears in built HTML). `.env.example`
+  documents both keys. `tsc` + `npm run build` clean.
+
+Founder steps to ACTIVATE (in order):
+- [ ] Cloudflare dash -> Turnstile -> add a widget for `oscen.ai`. Copy the
   **site key** (public) + **secret key** (server-only).
-- [ ] Netlify env: `PUBLIC_TURNSTILE_SITE_KEY` (inlined, client) +
-  `TURNSTILE_SECRET_KEY` (server-only, un-prefixed). Add
-  `PUBLIC_TURNSTILE_SITE_KEY` to `SECRETS_SCAN_OMIT_KEYS` in `netlify.toml`
-  (it is public and appears in the built HTML).
-- [ ] Front end: load `https://challenges.cloudflare.com/turnstile/v0/api.js`
-  and drop `<div class="cf-turnstile" data-sitekey="...">` into the 3 forms
-  (`contact.astro`, `invest.astro`, `build.astro`). In `src/lib/forms.ts`
-  `formToObject`, the `cf-turnstile-response` field is already picked up by the
-  existing `FormData` serialize (it is a normal input), so it rides along in the
-  JSON body -- no bespoke wiring.
-- [ ] `inquiry.ts`: before forwarding, POST the token +
-  `x-nf-client-connection-ip` to
-  `https://challenges.cloudflare.com/turnstile/v0/siteverify` with
-  `TURNSTILE_SECRET_KEY`; reject (`400 {error:"captcha_failed"}`) unless
-  `success === true`. Strip `cf-turnstile-response` from the CRM payload (add it
-  to the destructured drop-list next to `_gotcha`). Keep the honeypot +
-  rate limiter as defence in depth.
-- [ ] Flip the default: change `INQUIRIES_ENABLED` back to enabled (or just set
-  `INQUIRY_ENABLED=true` in Netlify) and remove the kill-switch comment block.
-- [ ] Verify a real submit end-to-end reaches the CRM; confirm the spam stops.
+- [ ] Netlify env vars: set `PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`,
+  and `INQUIRY_ENABLED=true` (turns the kill switch back on).
+- [ ] Redeploy (trigger a build) -- required so `PUBLIC_TURNSTILE_SITE_KEY`
+  bakes into the client bundle and the widget renders. (Because the site key is
+  build-time, activation needs a redeploy, not just an env flip.)
+- [ ] Verify a real submit end-to-end reaches the CRM + shows in the dashboard;
+  confirm the spam stops. Then remove the kill-switch comment block in
+  `inquiry.ts` (optional cleanup; leaving `INQUIRY_ENABLED=true` set also works).
+
+Note: Turnstile tokens are single-use (~300s). The forms submit once via
+`fetch`; if a user hits an error and retries, the widget may need
+`window.turnstile.reset()`. Left minimal for now -- add a reset on the error
+path in `forms.ts` if repeat-submit failures show up.
 
 ---
 

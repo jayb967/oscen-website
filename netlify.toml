@@ -9,9 +9,11 @@
   # - PUBLIC_META_PIXEL_ID appears in fbq('init', ...) on the page
   # - PUBLIC_SUPPORTERS_URL (crm.oscen.ai/api/public/supporters) is inlined by Astro + a hardcoded
   #   fallback in ContributorWall.astro. It is a public read-only endpoint, not a secret.
-  # INQUIRY_SECRET is NOT here on purpose: it is a real secret, read only server-side in the relay
-  # function, and must stay scanned so it can never leak into the build.
-  SECRETS_SCAN_OMIT_KEYS = "PUBLIC_META_DOMAIN_VERIFICATION,PUBLIC_META_PIXEL_ID,PUBLIC_SUPPORTERS_URL"
+  # - PUBLIC_TURNSTILE_SITE_KEY is the Cloudflare Turnstile CAPTCHA site key; it is public by
+  #   design and appears in the rendered widget markup on the form pages.
+  # INQUIRY_SECRET and TURNSTILE_SECRET_KEY are NOT here on purpose: they are real secrets, read
+  # only server-side in the relay function, and must stay scanned so they can never leak into the build.
+  SECRETS_SCAN_OMIT_KEYS = "PUBLIC_META_DOMAIN_VERIFICATION,PUBLIC_META_PIXEL_ID,PUBLIC_SUPPORTERS_URL,PUBLIC_TURNSTILE_SITE_KEY"
 
 [functions]
   directory = "netlify/functions"

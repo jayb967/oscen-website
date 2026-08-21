@@ -91,12 +91,15 @@ function normalizeAndHash(field: "em" | "ph" | "fn" | "ln" | "external_id", raw:
 }
 
 function clientIp(headers: Record<string, string | undefined>): string | undefined {
+  // Prefer the Netlify-set client IP: it is the real TCP source and cannot be spoofed by the
+  // caller. Fall back to the client-controlled X-Forwarded-For only if it is absent. (Trusting
+  // XFF first let a caller rotate a fake header to bypass the per-IP rate limiter and spoof the
+  // IP forwarded to Meta -- matched to inquiry.ts's ordering.)
+  const nf = headers["x-nf-client-connection-ip"];
+  if (nf) return nf;
   const xff = headers["x-forwarded-for"];
-  if (xff) {
-    const first = xff.split(",")[0]?.trim();
-    if (first) return first;
-  }
-  return headers["x-nf-client-connection-ip"] || undefined;
+  const first = xff?.split(",")[0]?.trim();
+  return first || undefined;
 }
 
 function rateLimit(ip: string | undefined): boolean {
