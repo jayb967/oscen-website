@@ -1,0 +1,16 @@
+# Baseline security headers for every page (Netlify serves this from the publish dir).
+# Added 2026-08-21 from the security scan (M2). Intentionally conservative:
+#  - X-Frame-Options DENY: the marketing site is never framed by us; blocks
+#    clickjacking. (This governs OTHERS framing us; it does NOT stop us embedding
+#    the Cloudflare Turnstile iframe, which is us->them.)
+#  - HSTS has NO includeSubDomains / preload on purpose: oscen.ai has live
+#    subdomains (crm/demo/dashboard) and preload is hard to undo. Apex/www only.
+#  - No Content-Security-Policy yet: the site loads Meta Pixel / GTM / Plausible /
+#    Google Fonts / three.js, so a CSP needs a Report-Only rollout first (tracked
+#    in PROGRESS.md, M2 follow-up). These headers do not touch script loading.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000

@@ -19,7 +19,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
 {siteKey && (
   <Fragment>
-    <div class="cf-turnstile" data-sitekey={siteKey} data-theme="dark" data-size="flexible"></div>
+    <div class="cf-turnstile" data-sitekey={siteKey} data-action="inquiry" data-theme="dark" data-size="flexible"></div>
     <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   </Fragment>
 )}

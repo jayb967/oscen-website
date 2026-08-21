@@ -59,17 +59,18 @@ Code done (this commit):
   `SECRETS_SCAN_OMIT_KEYS` (public, appears in built HTML). `.env.example`
   documents both keys. `tsc` + `npm run build` clean.
 
-Founder steps to ACTIVATE (in order):
-- [ ] Cloudflare dash -> Turnstile -> add a widget for `oscen.ai`. Copy the
-  **site key** (public) + **secret key** (server-only).
-- [ ] Netlify env vars: set `PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`,
-  and `INQUIRY_ENABLED=true` (turns the kill switch back on).
-- [ ] Redeploy (trigger a build) -- required so `PUBLIC_TURNSTILE_SITE_KEY`
-  bakes into the client bundle and the widget renders. (Because the site key is
-  build-time, activation needs a redeploy, not just an env flip.)
-- [ ] Verify a real submit end-to-end reaches the CRM + shows in the dashboard;
-  confirm the spam stops. Then remove the kill-switch comment block in
-  `inquiry.ts` (optional cleanup; leaving `INQUIRY_ENABLED=true` set also works).
+ACTIVATION (2026-08-21):
+- [x] Turnstile widget created; site key `0x4AAAAAAEXiX7yza-IvEYa8`.
+  `PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` set in Netlify + local
+  `.env`. Confirmed the recommended Cloudflare "existing widget" flow (implicit
+  `.cf-turnstile` render + `api.js`, `/siteverify` checking `success===true`)
+  matches what we built; added `data-action="inquiry"` for dashboard analytics.
+- [x] Kill switch flipped to ON by DEFAULT (`INQUIRY_ENABLED !== "false"`) now
+  that Turnstile guards the forms. Emergency off = set `INQUIRY_ENABLED="false"`
+  in Netlify (no redeploy). No longer need `INQUIRY_ENABLED=true`.
+- [ ] Founder: trigger a Netlify redeploy so `PUBLIC_TURNSTILE_SITE_KEY` bakes
+  into the client bundle + the widget renders (build-time var). Then submit each
+  form once and confirm it reaches the CRM + dashboard, and the spam stops.
 
 Note: Turnstile tokens are single-use (~300s). The forms submit once via
 `fetch`; if a user hits an error and retries, the widget may need
@@ -85,23 +86,24 @@ server-only + never echoed, attribution injects hidden `.value` only, the
 bypass). Root cause of the spam = CORS is response-only, so direct POSTs run
 regardless of Origin; the Turnstile token check above is the fix.
 
-Done from the scan: `meta-capi.ts` IP-spoof fix (this commit). Remaining:
-- [ ] **M1 (Medium) allowlist the CRM payload** -- `inquiry.ts:207` forwards
-  every unknown top-level field to the CRM (denylist). Switch to an ALLOWLIST of
-  the fields the forms actually send (`name`, `email`, `message`, `company`,
-  `type`, `role`, `accreditation`, `check_size`, `linkedin`, `consent`,
-  `_subject`, + the injected `utm_*` / `referrer` / `landing_page` attribution
-  keys) so no key like `status`/`verified`/`id` can be smuggled in
-  (mass-assignment). Must enumerate attribution field names first so no genuine
-  field is dropped.
-- [ ] **M2 (Medium) security headers** -- no `_headers`/CSP anywhere. Add a
-  `public/_headers` baseline: `X-Frame-Options: DENY`,
-  `X-Content-Type-Options: nosniff`, `Referrer-Policy:
-  strict-origin-when-cross-origin`, `Permissions-Policy` (camera/mic/geo off).
-  HSTS + a real CSP need care: oscen.ai has live subdomains (crm/demo/dashboard)
-  so avoid `includeSubDomains; preload` blindly, and start CSP as
-  `Content-Security-Policy-Report-Only` (site loads Meta Pixel / GTM / Plausible
-  / Google Fonts / three.js). Founder call.
+Done from the scan:
+- [x] `meta-capi.ts` IP-spoof fix (prefer unspoofable `x-nf-client-connection-ip`).
+- [x] **M1 allowlist the CRM payload** -- `inquiry.ts` now builds the outbound
+  payload from an `ALLOWED_FIELDS` allowlist (all real form fields enumerated
+  from contact/invest/build + attribution keys: name/email/company/message/why/
+  type/role/accreditation/check_size/segment/linkedin/link/consent/_subject +
+  utm_*/referrer/landing_page). Unknown keys (status/verified/id/...) are dropped
+  and their NAMES logged (no values -> no PII/spam in logs) so probing is visible.
+- [x] **M2 security headers** -- added `public/_headers` baseline
+  (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy:
+  strict-origin-when-cross-origin`, `Permissions-Policy` camera/mic/geo off, HSTS
+  `max-age=31536000` with NO includeSubDomains/preload -- apex/www only, subdomain-
+  safe). CSP deferred (needs a Report-Only rollout across Meta/GTM/Plausible/
+  Fonts/three.js hosts -- see below).
+
+Remaining:
+- [ ] **M2b (Medium) Content-Security-Policy** -- start `Content-Security-Policy-
+  Report-Only` enumerating the third-party script hosts, then enforce.
 - [ ] **M3 (Medium) `meta-capi.ts` is an open forwarder** -- no honeypot/kill
   switch; any client can POST events forwarded to Meta with the server access
   token, and it reflects Meta's raw response body (`details: result.body`) to

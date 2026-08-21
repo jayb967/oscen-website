@@ -44,16 +44,29 @@ const ALLOWED_ORIGINS = [
   "https://www.oscen.ai",
 ];
 
-// KILL SWITCH (2026-08-21): temporarily stop forwarding inquiries to the CRM
-// while a spam flood is coming through the public forms. Disabled by DEFAULT so
-// merging/deploying this change turns submissions off with no dashboard step.
-// To re-enable WITHOUT a redeploy, set INQUIRY_ENABLED="true" in the Netlify env.
-// The real fix is a CAPTCHA (Cloudflare Turnstile) on the forms; see
-// oscen-website/PROGRESS.md "Spam / CAPTCHA plan". Remove this switch once that
-// ships. While disabled the relay returns a normal 200 {ok:true} (matching the
-// honeypot path) so bots see success and do not retry, and nothing reaches the
-// CRM. NOTE: genuine inquiries are also dropped while off, so re-enable soon.
-const INQUIRIES_ENABLED = process.env.INQUIRY_ENABLED === "true";
+// KILL SWITCH: emergency off-switch for inquiry forwarding. Enabled by DEFAULT
+// now that Cloudflare Turnstile guards the forms (see verifyTurnstile). To
+// hard-disable in an emergency (e.g. a fresh spam wave that slips past the
+// CAPTCHA), set INQUIRY_ENABLED="false" in the Netlify env -- takes effect with
+// no redeploy. While disabled the relay returns a normal 200 {ok:true} (matching
+// the honeypot path) so bots see success and do not retry, and nothing reaches
+// the CRM. NOTE: genuine inquiries are also dropped while off.
+const INQUIRIES_ENABLED = process.env.INQUIRY_ENABLED !== "false";
+
+// Allowlist of fields the public forms actually send (contact/invest/build) +
+// the attribution keys injected by src/scripts/attribution.ts. Only these are
+// forwarded to the CRM; anything else a caller adds (status/verified/id/owner/
+// ...) is dropped, so the relay can't be used for mass-assignment. kind/source
+// are set authoritatively below and never trusted from the client.
+const ALLOWED_FIELDS = new Set<string>([
+  "name", "email", "company", "message", "why",
+  "type", "role", "accreditation", "check_size", "segment",
+  "linkedin", "link", "consent", "_subject",
+  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+  "referrer", "landing_page",
+]);
+// Internal fields consumed by the relay itself (not forwarded, and not "unexpected").
+const INTERNAL_FIELDS = new Set<string>(["_gotcha", "cf-turnstile-response"]);
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 100;
@@ -222,7 +235,7 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
   // submission (same 200 {ok:true} shape as the honeypot) instead of forwarding
   // to the CRM. Stops the spam flood at the relay with no bot-retry signal.
   if (!INQUIRIES_ENABLED) {
-    console.warn("[inquiry] submissions disabled (INQUIRY_ENABLED != true); dropping request");
+    console.warn("[inquiry] submissions disabled (INQUIRY_ENABLED=false); dropping request");
     return json(200, { ok: true }, origin);
   }
 
@@ -258,21 +271,21 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
     return json(400, { error: "captcha_failed" }, origin);
   }
 
-  // Forward every submitted field EXCEPT the honeypot, the CAPTCHA token, and any
-  // client-supplied kind/source/data/submission. Dropping data/submission is
-  // critical: the CRM also reads fields nested under those keys, so leaving them
-  // in would let a caller smuggle {data:{kind:"INVESTOR"}} past this
-  // authoritative mapping.
-  const {
-    _gotcha,
-    "cf-turnstile-response": _cf,
-    kind: _k,
-    source: _s,
-    data: _d,
-    submission: _sub,
-    ...rest
-  } = fields;
-  const payload = { ...rest, kind: mapping.kind, source: mapping.source };
+  // Allowlist the outbound payload: forward ONLY the known form fields, then set
+  // the authoritative kind/source. This drops any client-supplied
+  // kind/source/data/submission (so {data:{kind:"INVESTOR"}} can't smuggle past
+  // the mapping) AND any unexpected key a bot adds (status/verified/id/...).
+  const payload: Record<string, unknown> = { kind: mapping.kind, source: mapping.source };
+  const dropped: string[] = [];
+  for (const [key, value] of Object.entries(fields)) {
+    if (ALLOWED_FIELDS.has(key)) payload[key] = value;
+    else if (!INTERNAL_FIELDS.has(key)) dropped.push(key);
+  }
+  // Log only the KEY NAMES (never values -> no PII / spam content in logs) so
+  // field-probing is visible without leaking submission contents.
+  if (dropped.length) {
+    console.warn(`[inquiry] dropped ${dropped.length} unexpected field(s): ${dropped.join(", ")}`);
+  }
 
   try {
     const result = await postToCrm(endpoint, secret, payload);
