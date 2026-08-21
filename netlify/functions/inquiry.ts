@@ -68,6 +68,59 @@ const ALLOWED_FIELDS = new Set<string>([
 // Internal fields consumed by the relay itself (not forwarded, and not "unexpected").
 const INTERNAL_FIELDS = new Set<string>(["_gotcha", "cf-turnstile-response"]);
 
+/**
+ * Lightweight spam scoring. FLAG-ONLY: the score + matched signals are attached
+ * to the payload (spam_score / spam_signals) and forwarded to the CRM, which
+ * surfaces them. Nothing is ever DROPPED here on the basis of the score -- a
+ * marketing wave of real leads must always get through, so borderline cases are
+ * tagged, not blocked. High-precision signals only: URLs in the free-text
+ * message (real leads use the dedicated linkedin/link field, not the body),
+ * link markup, bare domains, and an env-configurable substring denylist for
+ * known campaigns (SPAM_DENYLIST="robertjaf,casino,...", matched case-
+ * insensitively across name/company/email/message; add/remove with no redeploy).
+ */
+function scoreSpam(fields: Record<string, unknown>): { score: number; signals: string[] } {
+  const get = (k: string) => (typeof fields[k] === "string" ? (fields[k] as string) : "");
+  const message = `${get("message")} ${get("why")}`.trim();
+  const signals: string[] = [];
+  let score = 0;
+
+  const urls = message.match(/https?:\/\/|www\./gi) || [];
+  if (urls.length) {
+    score += 2 + Math.min(urls.length, 3);
+    signals.push(`urls:${urls.length}`);
+  }
+
+  if (/\[url[=\]]|\[link[=\]]|<a\s|href\s*=/i.test(message)) {
+    score += 4;
+    signals.push("link_markup");
+  }
+
+  if (!urls.length) {
+    const bare =
+      message.match(/\b[a-z0-9][a-z0-9-]*\.(?:com|net|org|ru|de|it|cn|top|xyz|info|biz|shop|online)\b/gi) || [];
+    if (bare.length) {
+      score += 1 + Math.min(bare.length, 3);
+      signals.push(`domains:${bare.length}`);
+    }
+  }
+
+  const deny = (process.env.SPAM_DENYLIST || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  if (deny.length) {
+    const haystack = `${get("name")} ${get("company")} ${get("email")} ${message}`.toLowerCase();
+    const hits = deny.filter((d) => haystack.includes(d));
+    if (hits.length) {
+      score += 3 * hits.length;
+      signals.push(`denylist:${hits.length}`);
+    }
+  }
+
+  return { score, signals };
+}
+
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 100;
 const ipHits = new Map<string, number[]>();
@@ -286,6 +339,13 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
   if (dropped.length) {
     console.warn(`[inquiry] dropped ${dropped.length} unexpected field(s): ${dropped.join(", ")}`);
   }
+
+  // Spam scoring is FLAG-ONLY (never blocks). Server-set here AFTER the allowlist
+  // so a client cannot spoof its own spam_score (any client-sent one was dropped
+  // above). The CRM surfaces these; a marketing wave still flows through.
+  const spam = scoreSpam(fields);
+  payload.spam_score = spam.score;
+  payload.spam_signals = spam.signals.join(",");
 
   try {
     const result = await postToCrm(endpoint, secret, payload);

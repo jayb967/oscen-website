@@ -77,6 +77,28 @@ Note: Turnstile tokens are single-use (~300s). The forms submit once via
 `window.turnstile.reset()`. Left minimal for now -- add a reset on the error
 path in `forms.ts` if repeat-submit failures show up.
 
+**Spam FLAG-ONLY scoring (2026-08-21, for marketing waves):**
+
+Marketing will drive real traffic waves, so the design must never DROP a real
+lead. Turnstile + honeypot block automated bots; for anything that slips past,
+we FLAG (never block) so the CRM can triage.
+- [x] `inquiry.ts` `scoreSpam()` -- high-precision signals only: URLs in the
+  free-text message, `[url]`/`<a>` link markup, bare domains (2+), and an
+  env-configurable `SPAM_DENYLIST` (comma substrings, case-insensitive over
+  name/company/email/message; add campaign tells like `robertjaf` with no
+  redeploy). Server-sets `spam_score` + `spam_signals` on the payload AFTER the
+  allowlist (client can't spoof). Verified: 0 false positives on real
+  contact/investor samples; flags link/bbcode spam + the live campaign once its
+  tell is in the denylist. A lone casual domain stays under threshold on purpose
+  (protects "see github.com/me").
+- [x] CRM side (`oscencrm`, separate repo): `notifyAdminsNewInquiry` +
+  `/api/inquiries` read `spam_score` (threshold 3) -> `[likely spam]` email
+  subject + banner, `[LIKELY SPAM]` note marker, and SKIP the auto-reply for
+  flagged spam (don't confirm the address to a spammer). No DB migration (the
+  intake absorbs unknown fields). Rides the CRM's own branch/deploy.
+- Rich board badge + filter would need a Prisma column + UI (deferred; the email
+  banner + note marker cover triage for now).
+
 **Security scan (2026-08-21, read-only sub-agent) -- outstanding hardening:**
 
 Confirmed SAFE: ContributorWall + SupportThankYou render via `textContent`
