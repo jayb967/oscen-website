@@ -76,6 +76,49 @@ Note: Turnstile tokens are single-use (~300s). The forms submit once via
 `window.turnstile.reset()`. Left minimal for now -- add a reset on the error
 path in `forms.ts` if repeat-submit failures show up.
 
+**Security scan (2026-08-21, read-only sub-agent) -- outstanding hardening:**
+
+Confirmed SAFE: ContributorWall + SupportThankYou render via `textContent`
+(no XSS), no SSRF (fetch hosts are server env, never user input), secrets are
+server-only + never echoed, attribution injects hidden `.value` only, the
+`*.netlify.app` CORS regex is anchored (no `evil.netlify.app.attacker.com`
+bypass). Root cause of the spam = CORS is response-only, so direct POSTs run
+regardless of Origin; the Turnstile token check above is the fix.
+
+Done from the scan: `meta-capi.ts` IP-spoof fix (this commit). Remaining:
+- [ ] **M1 (Medium) allowlist the CRM payload** -- `inquiry.ts:207` forwards
+  every unknown top-level field to the CRM (denylist). Switch to an ALLOWLIST of
+  the fields the forms actually send (`name`, `email`, `message`, `company`,
+  `type`, `role`, `accreditation`, `check_size`, `linkedin`, `consent`,
+  `_subject`, + the injected `utm_*` / `referrer` / `landing_page` attribution
+  keys) so no key like `status`/`verified`/`id` can be smuggled in
+  (mass-assignment). Must enumerate attribution field names first so no genuine
+  field is dropped.
+- [ ] **M2 (Medium) security headers** -- no `_headers`/CSP anywhere. Add a
+  `public/_headers` baseline: `X-Frame-Options: DENY`,
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy:
+  strict-origin-when-cross-origin`, `Permissions-Policy` (camera/mic/geo off).
+  HSTS + a real CSP need care: oscen.ai has live subdomains (crm/demo/dashboard)
+  so avoid `includeSubDomains; preload` blindly, and start CSP as
+  `Content-Security-Policy-Report-Only` (site loads Meta Pixel / GTM / Plausible
+  / Google Fonts / three.js). Founder call.
+- [ ] **M3 (Medium) `meta-capi.ts` is an open forwarder** -- no honeypot/kill
+  switch; any client can POST events forwarded to Meta with the server access
+  token, and it reflects Meta's raw response body (`details: result.body`) to
+  the caller. Add a same-origin nonce / CAPTCHA gate and stop reflecting the
+  body (log server-side, return a generic error).
+- [ ] **L2 (Low) dev pages** -- `/dev/humanoid` reads `?src=` and loads an
+  arbitrary GLB URL in the visitor's browser (noindex'd but reachable). Exclude
+  `src/pages/dev/**` from prod builds or restrict `?src=` to same-origin
+  `/models/`.
+- [ ] **L3 (Low) build-only deps** -- `npm audit` flags `vite`/`svgo` via astro;
+  dev/build-time only (not in `dist/` or the Functions runtime). `npm audit fix`
+  + bump Astro at a maintenance window.
+
+Higher-value follow-up OUT OF SCOPE here: stored-XSS from these free-text
+message bodies renders in the **CRM admin UI** (`oscencrm/`, separate repo), not
+on this static site. That repo is the right target for an injection scan.
+
 ---
 
 ## 2026-08-14 FORMSPREE -> OWN CRM INTAKE + LIVE SUPPORTERS WALL
