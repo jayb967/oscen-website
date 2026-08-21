@@ -12,6 +12,57 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-08-21 SPAM KILL SWITCH (inquiry forms OFF) + CAPTCHA plan
+
+A spam bot is flooding the public forms: same `Name: RobertJaf`, `Company: google`,
+`Kind: OTHER`, rotating multilingual link-spam in the message body. It skips the
+`_gotcha` honeypot, so the honeypot + per-IP rate limiter are not enough.
+
+**Done now (stops the flood):**
+- [x] `netlify/functions/inquiry.ts` -- added an env-gated KILL SWITCH
+  `INQUIRIES_ENABLED = process.env.INQUIRY_ENABLED === "true"`. Disabled by
+  DEFAULT, so deploying this change turns all inquiry forwarding off with no
+  dashboard step. While off, the relay returns a normal `200 {ok:true}` (same
+  shape as the honeypot path) and drops the request before it reaches the CRM,
+  so bots see success and do not retry and no "New website inquiry" emails fire.
+  Logs `[inquiry] submissions disabled ...` for observability.
+- [x] `.env.example` documents `INQUIRY_ENABLED`. To turn submissions back on
+  WITHOUT a redeploy: set `INQUIRY_ENABLED="true"` in the Netlify env.
+- Tradeoff while OFF: genuine inquiries (contact / invest / build) are also
+  dropped silently. Re-enable as soon as the CAPTCHA below is live.
+- `npx tsc --noEmit` + `npm run build` clean (16 pages).
+
+**Real fix -- CAPTCHA (do next, then flip the switch back on):**
+
+Recommended: **Cloudflare Turnstile** (we already run Cloudflare; free, privacy-
+friendly, no user puzzle in most cases). Google reCAPTCHA v3 is the alternative
+but adds Google tracking + a score threshold to tune. Prefer Turnstile.
+
+- [ ] Cloudflare dash -> Turnstile -> add a widget for `oscen.ai`. Get the
+  **site key** (public) + **secret key** (server-only).
+- [ ] Netlify env: `PUBLIC_TURNSTILE_SITE_KEY` (inlined, client) +
+  `TURNSTILE_SECRET_KEY` (server-only, un-prefixed). Add
+  `PUBLIC_TURNSTILE_SITE_KEY` to `SECRETS_SCAN_OMIT_KEYS` in `netlify.toml`
+  (it is public and appears in the built HTML).
+- [ ] Front end: load `https://challenges.cloudflare.com/turnstile/v0/api.js`
+  and drop `<div class="cf-turnstile" data-sitekey="...">` into the 3 forms
+  (`contact.astro`, `invest.astro`, `build.astro`). In `src/lib/forms.ts`
+  `formToObject`, the `cf-turnstile-response` field is already picked up by the
+  existing `FormData` serialize (it is a normal input), so it rides along in the
+  JSON body -- no bespoke wiring.
+- [ ] `inquiry.ts`: before forwarding, POST the token +
+  `x-nf-client-connection-ip` to
+  `https://challenges.cloudflare.com/turnstile/v0/siteverify` with
+  `TURNSTILE_SECRET_KEY`; reject (`400 {error:"captcha_failed"}`) unless
+  `success === true`. Strip `cf-turnstile-response` from the CRM payload (add it
+  to the destructured drop-list next to `_gotcha`). Keep the honeypot +
+  rate limiter as defence in depth.
+- [ ] Flip the default: change `INQUIRIES_ENABLED` back to enabled (or just set
+  `INQUIRY_ENABLED=true` in Netlify) and remove the kill-switch comment block.
+- [ ] Verify a real submit end-to-end reaches the CRM; confirm the spam stops.
+
+---
+
 ## 2026-08-14 FORMSPREE -> OWN CRM INTAKE + LIVE SUPPORTERS WALL
 
 Dropped Formspree on the 3 forms in favor of our own CRM intake, and made the

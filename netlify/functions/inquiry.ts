@@ -44,6 +44,17 @@ const ALLOWED_ORIGINS = [
   "https://www.oscen.ai",
 ];
 
+// KILL SWITCH (2026-08-21): temporarily stop forwarding inquiries to the CRM
+// while a spam flood is coming through the public forms. Disabled by DEFAULT so
+// merging/deploying this change turns submissions off with no dashboard step.
+// To re-enable WITHOUT a redeploy, set INQUIRY_ENABLED="true" in the Netlify env.
+// The real fix is a CAPTCHA (Cloudflare Turnstile) on the forms; see
+// oscen-website/PROGRESS.md "Spam / CAPTCHA plan". Remove this switch once that
+// ships. While disabled the relay returns a normal 200 {ok:true} (matching the
+// honeypot path) so bots see success and do not retry, and nothing reaches the
+// CRM. NOTE: genuine inquiries are also dropped while off, so re-enable soon.
+const INQUIRIES_ENABLED = process.env.INQUIRY_ENABLED === "true";
+
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 100;
 const ipHits = new Map<string, number[]>();
@@ -174,6 +185,14 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
   }
   if (event.httpMethod !== "POST") {
     return json(405, { error: "method_not_allowed" }, origin);
+  }
+
+  // Kill switch: while inquiries are disabled, accept and silently drop every
+  // submission (same 200 {ok:true} shape as the honeypot) instead of forwarding
+  // to the CRM. Stops the spam flood at the relay with no bot-retry signal.
+  if (!INQUIRIES_ENABLED) {
+    console.warn("[inquiry] submissions disabled (INQUIRY_ENABLED != true); dropping request");
+    return json(200, { ok: true }, origin);
   }
 
   const endpoint = process.env.CRM_ENDPOINT;
