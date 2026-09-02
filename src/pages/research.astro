@@ -95,10 +95,10 @@ import SupportStrip from "../components/SupportStrip.astro";
       <div class="reveal glass rounded-xl p-6 mb-6">
         <div class="space-y-4">
           {[
-            { label: "GPU Inference", power: "50–200W", bar: 100, color: "accent-red" },
-            { label: "LLM API Call", power: "~0.3 Wh/query", bar: 60, color: "accent-amber" },
-            { label: "OSCEN (CPU sim)", power: "~45W", bar: 40, color: "accent-blue" },
-            { label: "OSCEN (event-driven)", power: "<5W", bar: 5, color: "accent-green" },
+            { label: "GPU Inference", power: "50–200 J/s", bar: 100, color: "accent-red" },
+            { label: "LLM API Call", power: "~1,080 J/query", bar: 60, color: "accent-amber" },
+            { label: "OSCEN (CPU sim)", power: "~45 J/s", bar: 40, color: "accent-blue" },
+            { label: "OSCEN (event-driven)", power: "<5 J/s", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -111,18 +111,19 @@ import SupportStrip from "../components/SupportStrip.astro";
             </div>
           ))}
         </div>
+        <p class="text-[10px] text-text-muted mt-4">1 watt = 1 joule per second. Continuous systems are shown in joules per second; per-task energy in joules. An LLM query costs ~1,080 J (~0.3 Wh, Epoch AI 2025).</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="reveal glass rounded-xl p-5">
           <div class="text-2xl font-tech text-accent-green font-bold">73×</div>
           <div class="text-xs text-text-muted mt-1">less energy than CPU</div>
-          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Published spiking-network benchmark for robotics peg-in-hole task. IEEE 2024.</p>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Robotic peg-in-hole task on Intel Loihi: 52 microjoules vs 3,800 microjoules per inference on CPU. IEEE 2024.</p>
         </div>
         <div class="reveal glass rounded-xl p-5">
           <div class="text-2xl font-tech text-accent-green font-bold">109×</div>
           <div class="text-xs text-text-muted mt-1">less energy than GPU</div>
-          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Published spiking-network benchmark for keyword spotting.</p>
+          <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">Keyword spotting on Intel Loihi: 109x lower energy per inference than GPU. Blouw et al., 2019.</p>
         </div>
       </div>
     </section>
@@ -280,7 +281,8 @@ import SupportStrip from "../components/SupportStrip.astro";
           <p><span class="text-text-muted font-tech">Reward</span>. Schultz, W. (1998). Predictive reward signal of dopamine neurons. <em>J. Neurophysiol.</em></p>
           <p><span class="text-text-muted font-tech">Scaling</span>. Turrigiano, G. et al. (1998). Activity-dependent scaling of quantal amplitude in neocortical neurons. <em>Nature.</em></p>
           <p><span class="text-text-muted font-tech">Critical</span>. Hensch, T. (2005). Critical period plasticity in local cortical circuits. <em>Nature Rev. Neurosci.</em></p>
-          <p><span class="text-text-muted font-tech">SNN energy</span>. Published spiking neural network energy benchmarks (2024). <em>IEEE IJCNN.</em></p>
+          <p><span class="text-text-muted font-tech">SNN energy</span>. Published spiking neural network energy benchmarks, joules per inference (2024). <em>IEEE IJCNN.</em></p>
+          <p><span class="text-text-muted font-tech">KWS energy</span>. Blouw, P. et al. (2019). Benchmarking keyword spotting efficiency on neuromorphic hardware. <em>NICE '19 / arXiv:1812.01739.</em></p>
         </div>
       </div>
     </section>

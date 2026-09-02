@@ -20,9 +20,9 @@ export interface ProblemStat {
 /** All problem stats are red on purpose: they are the wound. */
 export const PROBLEM_STATS: ProblemStat[] = [
   {
-    value: "~0.3 Wh",
+    value: "~1,080 J",
     label: "per query",
-    back: "GPT-4o uses ~0.3 Wh per query. Multiply by billions of daily requests.",
+    back: "GPT-4o uses about 1,080 joules (~0.3 Wh) per query. Multiply by billions of daily requests.",
     source: "Epoch AI, 2025",
   },
   {
@@ -56,7 +56,7 @@ export const SOLUTION_FEATURES: SolutionFeature[] = [
   },
   {
     title: "Runs on a sip of power",
-    body: "Today's robot brains burn power like a space heater. OSCEN sips it like a phone charger. Up to 109x less energy on the right chip. That means robots that work all day on one battery.",
+    body: "Today's robot brains burn power like a space heater. OSCEN sips it like a phone charger. Up to 109x less energy per inference on the right chip, microjoules instead of millijoules. That means robots that work all day on one battery.",
     link: "/research",
     linkLabel: "See the benchmarks",
   },
@@ -242,7 +242,7 @@ export interface MarketStat {
 export const MARKET_STATS: MarketStat[] = [
   { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs" },
   { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3x increase from 2024" },
-  { value: "73-109x", label: "Energy advantage", sub: "Published spiking-network benchmarks" },
+  { value: "73-109x", label: "Energy advantage", sub: "Joules per inference, published SNN benchmarks" },
   { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment" },
 ];
 

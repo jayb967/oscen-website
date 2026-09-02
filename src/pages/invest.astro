@@ -122,10 +122,10 @@ import { SEGMENTS } from "../lib/forms";
       <div class="reveal glass rounded-xl p-6 mb-4">
         <div class="space-y-4">
           {[
-            { label: "GPT-4o", value: "~0.3 Wh per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
-            { label: "Gemini", value: "~0.24 Wh per prompt", source: "Google official", bar: 80, color: "accent-amber" },
-            { label: "GPU Robot Brain", value: "50-200W continuous", source: "Industry standard", bar: 90, color: "accent-red" },
-            { label: "OSCEN (event-driven)", value: "<5W continuous", source: "Spiking-network benchmarks", bar: 5, color: "accent-green" },
+            { label: "GPT-4o", value: "~1,080 joules per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
+            { label: "Gemini", value: "~864 joules per prompt", source: "Google official", bar: 80, color: "accent-amber" },
+            { label: "GPU Robot Brain", value: "50-200 joules per second", source: "Industry standard", bar: 90, color: "accent-red" },
+            { label: "OSCEN (event-driven)", value: "<5 joules per second", source: "Spiking-network benchmarks", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -145,6 +145,9 @@ import { SEGMENTS } from "../lib/forms";
 
       <p class="reveal text-xs text-text-muted italic text-center">
         Event-driven compute only runs when neurons fire, not idle GPU cycles. The architecture is ready; the compute layer is catching up.
+      </p>
+      <p class="reveal text-[10px] text-text-muted text-center mt-2">
+        1 watt = 1 joule per second. LLM figures are energy per interaction (~0.3 Wh and ~0.24 Wh converted to joules); robot brains draw power continuously.
       </p>
     </section>
 
