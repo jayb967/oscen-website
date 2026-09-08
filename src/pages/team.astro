@@ -1,0 +1,98 @@
+---
+/**
+ * /team. Public team page. Our approach, then the people building OSCEN.
+ * Cards are shared with the investor-pitch team page via TeamCards.
+ */
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import TeamCards from "../components/TeamCards.astro";
+
+// Approach pillars, drawn from the site's own positioning (Solution +
+// Research). One decorative accent, blue, per the site accent policy.
+const APPROACH = [
+  {
+    title: "Grounded in neuroscience",
+    body: "Every mechanism maps to established research: spike-timing plasticity, BCM theory, eligibility traces, and neuromodulation. Not a metaphor for the brain, a working model of one.",
+  },
+  {
+    title: "Learns from experience",
+    body: "Like a child learning to catch a ball, the brain rewires itself with every try. No hundred-million-dollar training run, no frozen weights. It learns from outcomes, not curated datasets.",
+  },
+  {
+    title: "Grows up in stages",
+    body: "OSCEN develops through five stages, infant to adult. Each phase prunes, myelinates, and consolidates, changing what it can learn next while older skills stay intact.",
+  },
+  {
+    title: "Efficient, and body-agnostic",
+    body: "Event-driven spikes compute only when neurons fire, so it sips power instead of burning it. Cameras, microphones, motors, speakers: the brain is the product, the body plugs in.",
+  },
+];
+---
+
+<Base title="Team | OSCEN" description="The people building OSCEN and the approach behind a brain-inspired AI that learns from experience.">
+  <Nav />
+
+  <main class="pt-32 pb-24">
+    <!-- Header -->
+    <section class="max-w-5xl mx-auto px-6 mb-24">
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Team</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
+        The people behind<br />
+        <span class="italic gradient-text">the brain.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        A small, cross-disciplinary team building a brain-inspired AI for robots. Deep expertise on the architecture, paired with the operational footing to scale it.
+      </p>
+    </section>
+
+    <!-- Our approach -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Our approach
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">
+        We don't scale a frozen model. We grow a brain, grounded in decades of computational neuroscience.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {APPROACH.map((item) => (
+          <div class="reveal glass rounded-xl p-6">
+            <h3 class="text-base font-medium text-accent-blue mb-2">{item.title}</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Who's building it -->
+    <section class="max-w-5xl mx-auto px-6 mb-32">
+      <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
+        Who's building it
+      </h2>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">Founders and researchers behind OSCEN.</p>
+
+      <TeamCards />
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="mailto:info@oscen.ai?subject=OSCEN"
+          class="px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
+        >
+          Get in touch
+        </a>
+        <a
+          href="/architecture"
+          class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+        >
+          Explore the architecture
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>

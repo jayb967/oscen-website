@@ -7,6 +7,7 @@ const links = [
   { href: "/architecture", label: "Architecture" },
   { href: "/research", label: "Research" },
   { href: "/build", label: "Build" },
+  { href: "/team", label: "Team" },
   { href: "/invest", label: "Invest" },
   { href: "/support", label: "Support" },
   { href: "/contact", label: "Contact" },
@@ -21,7 +22,7 @@ const links = [
     </a>
 
     <!-- Desktop -->
-    <div class="hidden md:flex items-center gap-1">
+    <div class="hidden lg:flex items-center gap-1">
       {links.map((link) => (
         <a
           href={link.href}
@@ -41,7 +42,7 @@ const links = [
     <!-- Mobile -->
     <button
       id="nav-toggle"
-      class="md:hidden p-2 text-text-muted hover:text-text-primary transition-colors"
+      class="lg:hidden p-2 text-text-muted hover:text-text-primary transition-colors"
       aria-label="Toggle navigation"
       aria-expanded="false"
     >
@@ -51,7 +52,7 @@ const links = [
     </button>
   </div>
 
-  <div id="nav-mobile" class="hidden md:hidden glass mx-4 mb-4 rounded-xl overflow-hidden">
+  <div id="nav-mobile" class="hidden lg:hidden glass mx-4 mb-4 rounded-xl overflow-hidden">
     <div class="p-3 flex flex-col gap-1">
       {links.map((link) => (
         <a

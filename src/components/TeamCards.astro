@@ -1,0 +1,132 @@
+---
+/**
+ * TeamCards. The founding-team bio cards (full-height blended photo panel +
+ * bio), shared between the public /team page and the investor-pitch team page
+ * so both render the exact same cards from one source.
+ */
+import BioPhoto from "./BioPhoto.astro";
+---
+
+<div class="reveal glass-bright rounded-2xl overflow-hidden mb-4">
+  <div class="flex flex-col md:flex-row items-stretch">
+    <BioPhoto src="/headshots/rio.jpg" alt="Rio Bold" />
+    <div class="flex-1 p-8 md:p-10">
+      <h2 class="text-xl text-text-primary font-medium">Rio Bold</h2>
+      <p class="text-xs text-text-muted font-tech mt-1">Cofounder & Architect</p>
+      <div class="flex items-center gap-4 mt-3">
+        <a href="mailto:info@oscen.ai" class="text-[11px] font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">info@oscen.ai</a>
+        <a href="https://linkedin.com/in/rio-bold" target="_blank" rel="noopener" class="text-[11px] font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">LinkedIn</a>
+      </div>
+      <div class="mt-6 space-y-3 text-sm text-text-secondary leading-relaxed">
+        <p>
+          Marine Corps veteran. <span class="text-text-primary font-medium">13 years of professional software engineering</span> across multiple Fortune 500 companies,
+          building AI integrations, enterprise business processes, and full-stack systems at scale.
+          Combined with nearly a decade of independent research in computational neuroscience, distributed systems, and real-time sensor fusion.
+        </p>
+        <p>
+          5 years of planning and architectural design, then 7 months of focused build to bring the complete OSCEN architecture from concept to 1M-neuron deployment.
+        </p>
+        <p>
+          <span class="text-text-primary font-medium">Domain expertise:</span> Spiking neural network theory, STDP/BCM learning rules,
+          sparse matrix computation (CSR/COO), real-time event-driven systems, neuromorphic hardware constraints (Loihi, SpiNNaker),
+          robotic motor control, and sensor fusion pipelines.
+        </p>
+        <p>
+          Every architectural decision. Every learning mechanism. Every line of code.
+          Sensory gateway, brain simulation, motor output, cognitive action channel, speech motor, developmental phases,
+          persistence layer, monitoring pipeline, and 660+ tests.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="reveal glass-bright rounded-2xl overflow-hidden mb-4">
+  <div class="flex flex-col md:flex-row items-stretch">
+    <BioPhoto src="/headshots/adam.jpg" alt="Adam Hamersky" />
+    <div class="flex-1 p-8 md:p-10">
+      <h2 class="text-xl text-text-primary font-medium">Adam Hamersky</h2>
+      <p class="text-xs text-text-muted font-tech mt-1">Cofounder & Operations</p>
+      <div class="flex items-center gap-4 mt-3">
+        <a href="mailto:info@oscen.ai" class="text-[11px] font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">info@oscen.ai</a>
+      </div>
+      <div class="mt-6 space-y-3 text-sm text-text-secondary leading-relaxed">
+        <p>
+          <span class="text-text-primary font-medium">Marine Corps veteran</span> with a record of leading people and running fleets under pressure.
+          Served as Chief Motor Pool Dispatcher for the 7th Marine Regiment, coordinating personnel, vehicles, and mission readiness against tight operational windows.
+        </p>
+        <p>
+          Brings that same discipline and mission focus to building the brain that will move the next generation of robots, turning architectural ambition into a fundable, hireable, deployable company.
+        </p>
+        <p>
+          <span class="text-text-primary font-medium">Operating focus:</span> fleet logistics, program management, partnership development,
+          and the operational footing required to take OSCEN from research artifact to commercial deployment.
+        </p>
+        <p>
+          Every operational decision. Every hire. Every milestone.
+          The mission discipline that keeps the build on track.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="reveal glass-bright rounded-2xl overflow-hidden mb-4">
+  <div class="flex flex-col md:flex-row items-stretch">
+    <BioPhoto src="/headshots/rob.jpg" alt="Robert Robancho" />
+    <div class="flex-1 p-8 md:p-10">
+      <h2 class="text-xl text-text-primary font-medium">Robert Robancho</h2>
+      <p class="text-xs text-text-muted font-tech mt-1">Partner, Intelligence & Threat</p>
+      <div class="flex items-center gap-4 mt-3">
+        <a href="mailto:info@oscen.ai" class="text-[11px] font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">info@oscen.ai</a>
+      </div>
+      <div class="mt-6 space-y-3 text-sm text-text-secondary leading-relaxed">
+        <p>
+          <span class="text-text-primary font-medium">Marine Corps veteran</span> with a record of evaluating and neutralizing asymmetric threats in high-stakes environments.
+          Built foundational expertise in tactical military intelligence, reading adversary intent under time pressure and translating ambiguous signals into defensive posture.
+        </p>
+        <p>
+          Transitioned to the consulting sector as an analyst at Deloitte, where he led complex operational logistics and data tracking for United States Space Force contracts.
+          Recognized with the 2026 Charlie Allen Achievement Edwin Land Industry Award for outsized impact on the national security mission.
+        </p>
+        <p>
+          <span class="text-text-primary font-medium">Operating focus:</span> intelligence frameworks, threat modeling, OPSEC discipline, security clearance management,
+          and hardening emerging physical AI platforms against modern vulnerabilities. Bridges ground-level tactical realities with high-level strategic intelligence.
+        </p>
+        <p>
+          Every intelligence assessment. Every threat surface. Every hardened deployment.
+          The OPSEC discipline that keeps the architecture defensible from day one.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="reveal glass-bright rounded-2xl overflow-hidden">
+  <div class="flex flex-col md:flex-row items-stretch">
+    <BioPhoto src="/headshots/sully.jpg" alt="Sully Regmi" />
+    <div class="flex-1 p-8 md:p-10">
+      <h2 class="text-xl text-text-primary font-medium">Sully Regmi</h2>
+      <p class="text-xs text-text-muted font-tech mt-1">Research Scientist</p>
+      <div class="flex items-center gap-4 mt-3">
+        <a href="mailto:info@oscen.ai" class="text-[11px] font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">info@oscen.ai</a>
+      </div>
+      <div class="mt-6 space-y-3 text-sm text-text-secondary leading-relaxed">
+        <p>
+          <span class="text-text-primary font-medium">Neuroscience and emotion-science researcher.</span> Holds a degree in neuroscience.
+          Studies how emotion and social judgment arise from neurocognitive processes at UC Santa Barbara's Yu Emotion Science Lab,
+          with earlier work on visual attention and eye-tracking at UCSB's Vision and Image Understanding Lab.
+          Brings that grounding in how the brain processes signals together with a machine-learning practice across natural language processing and computer vision.
+        </p>
+        <p>
+          On the OSCEN team, contributes on the speech and language side, connecting how biological auditory and speech-motor pathways learn
+          to the platform's spiking implementation, and supporting the research program and experimental validation.
+        </p>
+        <p>
+          <span class="text-text-primary font-medium">Research focus:</span> natural language processing, computer vision,
+          emotion and affective modeling, and reproducible evaluation of the learning system.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
