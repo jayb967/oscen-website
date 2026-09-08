@@ -1,0 +1,68 @@
+---
+/**
+ * Headshot. Circular team avatar with a vignette and a soft accent glow ring.
+ * The photo edges darken into the card (vignette) so a square photo settles
+ * cleanly into the glass card. Falls back to text initials when no `src` is
+ * given, matching the original gradient-circle look.
+ *
+ * Tailwind note: gradient utilities (e.g. "from-accent-blue/30") must appear
+ * as literal strings at the call site so the JIT scanner emits them.
+ */
+interface Props {
+  src?: string;
+  alt?: string;
+  initials: string;
+  gradient?: string; // e.g. "from-accent-blue/30 to-accent-purple/30"
+  size?: string; // tailwind sizing, e.g. "w-20 h-20"
+  initialsSize?: string; // tailwind text size for the fallback initials
+}
+const {
+  src,
+  alt = "",
+  initials,
+  gradient = "from-accent-blue/30 to-accent-purple/30",
+  size = "w-20 h-20",
+  initialsSize = "text-3xl",
+} = Astro.props;
+---
+
+<div class:list={["relative shrink-0", size]}>
+  <!-- soft accent glow behind the photo, keyed to each person's color -->
+  <div
+    class:list={["absolute -inset-1 rounded-full bg-gradient-to-br blur-md opacity-50", gradient]}
+    aria-hidden="true"
+  >
+  </div>
+
+  {
+    src ? (
+      <img
+        src={src}
+        alt={alt}
+        width="160"
+        height="160"
+        loading="lazy"
+        decoding="async"
+        class:list={["relative rounded-full object-cover border border-border-bright", size]}
+      />
+    ) : (
+      <div
+        class:list={[
+          "relative rounded-full bg-gradient-to-br border border-border-bright flex items-center justify-center",
+          gradient,
+          size,
+        ]}
+      >
+        <span class:list={["font-display text-text-primary", initialsSize]}>{initials}</span>
+      </div>
+    )
+  }
+
+  <!-- vignette: darken the photo edges into the card background (#050810) -->
+  <div
+    class="absolute inset-0 rounded-full pointer-events-none"
+    style="box-shadow: inset 0 0 16px 5px rgba(5,8,16,0.62), inset 0 0 4px 1px rgba(5,8,16,0.55);"
+    aria-hidden="true"
+  >
+  </div>
+</div>

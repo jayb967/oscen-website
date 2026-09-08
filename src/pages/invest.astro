@@ -17,6 +17,7 @@ import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import Turnstile from "../components/Turnstile.astro";
+import Headshot from "../components/Headshot.astro";
 import { SEGMENTS } from "../lib/forms";
 ---
 
@@ -301,9 +302,7 @@ import { SEGMENTS } from "../lib/forms";
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="reveal glass rounded-xl p-6">
           <div class="flex flex-col gap-4 items-start">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-blue/5 border border-border-bright flex items-center justify-center shrink-0">
-              <span class="text-2xl font-display text-text-primary">RB</span>
-            </div>
+            <Headshot src="/headshots/rio.jpg" alt="Rio Bold" initials="RB" gradient="from-accent-blue/30 to-accent-purple/30" size="w-16 h-16" initialsSize="text-2xl" />
             <div>
               <h3 class="text-lg text-text-primary font-medium">Rio Bold</h3>
               <p class="text-xs text-text-secondary font-tech mt-1">Cofounder & Lead Architect</p>
@@ -321,9 +320,7 @@ import { SEGMENTS } from "../lib/forms";
 
         <div class="reveal glass rounded-xl p-6">
           <div class="flex flex-col gap-4 items-start">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-blue/20 to-accent-blue/5 border border-border-bright flex items-center justify-center shrink-0">
-              <span class="text-2xl font-display text-text-primary">AH</span>
-            </div>
+            <Headshot src="/headshots/adam.jpg" alt="Adam Hamersky" initials="AH" gradient="from-accent-amber/30 to-accent-pink/30" size="w-16 h-16" initialsSize="text-2xl" />
             <div>
               <h3 class="text-lg text-text-primary font-medium">Adam Hamersky</h3>
               <p class="text-xs text-text-secondary font-tech mt-1">Cofounder & Operations</p>
