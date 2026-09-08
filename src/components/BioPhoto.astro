@@ -1,0 +1,49 @@
+---
+/**
+ * BioPhoto. Full-bleed team photo that fills the card height and fades into
+ * the bio text via an alpha mask, so the photo blends into the card instead
+ * of sitting in a hard-edged box.
+ *   - Desktop (photo left, bio right): fades out on the right edge.
+ *   - Mobile  (photo top, bio below): fades out on the bottom edge.
+ * The mask reveals the card's glass background, so the blend works over the
+ * translucent card without matching an exact color.
+ */
+interface Props {
+  src: string;
+  alt: string;
+}
+const { src, alt } = Astro.props;
+---
+
+<div class="bio-photo">
+  <img class="bio-photo__img" src={src} alt={alt} width="512" height="512" loading="lazy" decoding="async" />
+</div>
+
+<style>
+  .bio-photo {
+    width: 100%;
+    align-self: stretch;
+  }
+  .bio-photo__img {
+    display: block;
+    width: 100%;
+    height: 15rem;
+    object-fit: cover;
+    object-position: 50% 28%;
+    -webkit-mask-image: linear-gradient(to bottom, #000 56%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 56%, transparent 100%);
+  }
+
+  @media (min-width: 768px) {
+    .bio-photo {
+      width: 16rem;
+      flex-shrink: 0;
+    }
+    .bio-photo__img {
+      height: 100%;
+      object-position: 50% 45%;
+      -webkit-mask-image: linear-gradient(to right, #000 52%, transparent 100%);
+      mask-image: linear-gradient(to right, #000 52%, transparent 100%);
+    }
+  }
+</style>
