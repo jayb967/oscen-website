@@ -20,7 +20,7 @@ export const REVEAL_STEPS: RevealStep[] = [
     desc: "The same million neurons now drive a humanoid. The skull is packaging. The mind is the product.",
   },
   {
-    verb: "Skills transfer",
-    desc: "Specialist brains train in parallel, each mastering one domain, then teach what they learned to the one that ships.",
+    verb: "Many brains",
+    desc: "Specialist brains train in parallel, each mastering one domain, on one commodity server. No GPUs, no dataset, no retraining run.",
   },
 ];
