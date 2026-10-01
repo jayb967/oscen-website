@@ -404,7 +404,7 @@ export class BrainScene {
         const el = (id) => document.getElementById(id);
 
         el('hud-neurons').textContent = this._formatNum(m.totalNeurons);
-        el('hud-synapses').textContent = '1.31B';
+        el('hud-synapses').textContent = '814M';
         el('hud-step').textContent = this._formatNum(m.step);
         el('hud-rate').textContent = m.stepsPerSec.toFixed(2);
 

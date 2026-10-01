@@ -97,8 +97,7 @@ import SupportStrip from "../components/SupportStrip.astro";
           {[
             { label: "GPU Inference", power: "50–200 J/s", bar: 100, color: "accent-red" },
             { label: "LLM API Call", power: "~1,080 J/query", bar: 60, color: "accent-amber" },
-            { label: "OSCEN (CPU sim)", power: "~45 J/s", bar: 40, color: "accent-blue" },
-            { label: "OSCEN (event-driven)", power: "<5 J/s", bar: 5, color: "accent-green" },
+            { label: "OSCEN on neuromorphic silicon (projected)", power: "<5 J/s (estimate)", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -111,7 +110,7 @@ import SupportStrip from "../components/SupportStrip.astro";
             </div>
           ))}
         </div>
-        <p class="text-[10px] text-text-muted mt-4">1 watt = 1 joule per second. Continuous systems are shown in joules per second; per-task energy in joules. An LLM query costs ~1,080 J (~0.3 Wh, Epoch AI 2025).</p>
+        <p class="text-[10px] text-text-muted mt-4">1 watt = 1 joule per second. Continuous systems are shown in joules per second; per-task energy in joules. An LLM query costs ~1,080 J (~0.3 Wh, Epoch AI 2025). The OSCEN figure is a projection from published spiking-network benchmarks on neuromorphic hardware, not a measurement of our system; today the brain runs as a simulation on a CPU server and we have not yet measured its power draw.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -231,15 +230,15 @@ import SupportStrip from "../components/SupportStrip.astro";
         {[
           {
             q: "Can OSCEN match GPT-4 at language?",
-            a: "No. And it's not designed to. OSCEN is built for embodied intelligence: real-time sensor processing, motor control, and continuous adaptation. For language, it queries LLMs as tools.",
+            a: "No. And it's not designed to. OSCEN is built for embodied intelligence: real-time sensor processing, motor control, and continuous adaptation. The design lets it query LLMs as tools (patent Claim 3).",
           },
           {
             q: "Is it training on one server really enough?",
-            a: "For proof of concept, yes. We're demonstrating that a million spiking neurons can learn from raw sensory data. Production deployment on next-generation low-power compute will scale to billions of neurons at a fraction of the power.",
+            a: "For proof of concept, yes. We're demonstrating that a million spiking neurons can learn from raw sensory data. Production deployment on next-generation low-power compute is designed to scale to billions of neurons at a fraction of the power.",
           },
           {
             q: "What about accuracy benchmarks?",
-            a: "We don't yet have published benchmarks on standard tasks. The brain is currently in its adolescent developmental phase. Early results show cross-modal association formation and motor pattern learning. Formal benchmarks are planned for Q2 2026.",
+            a: "We don't yet have published benchmarks on standard tasks. The brain is currently in its adolescent developmental phase. Early results show cross-modal association formation and motor pattern learning. Formal benchmarks are in progress; a pre-registered retention pilot started in October 2026.",
           },
           {
             q: "What about LeCun's AMI Labs and JEPA world models?",

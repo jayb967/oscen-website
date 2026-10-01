@@ -5,57 +5,57 @@
 
 export const REGIONS = [
     {
-        id: 'brainstem', label: 'Brainstem', neurons: 1800, color: [1.0, 0.3, 0.2],
+        id: 'brainstem', label: 'Brainstem', neurons: 18600, color: [1.0, 0.3, 0.2],
         description: 'Manages basic survival drives like energy, temperature, and fatigue. Converts raw sensor signals into neural spikes. Always active — the brain\'s heartbeat.',
         connections: 'Feeds sensory cortex and motor cortex',
     },
     {
-        id: 'reflex_arc', label: 'Reflex Arc', neurons: 2000, color: [1.0, 0.6, 0.2],
+        id: 'reflex_arc', label: 'Reflex Arc', neurons: 11600, color: [1.0, 0.6, 0.2],
         description: 'Ultra-fast sensory-to-motor pathway that bypasses higher cognition. Handles immediate danger responses in under 10ms — like pulling away from heat.',
         connections: 'Receives from sensory cortex, drives motor cortex',
     },
     {
-        id: 'sensory_cortex', label: 'Sensory Cortex', neurons: 200000, color: [0.13, 0.83, 0.93],
+        id: 'sensory_cortex', label: 'Sensory Cortex', neurons: 232500, color: [0.13, 0.83, 0.93],
         description: 'Processes all incoming sensory data — vision, audio, touch, proprioception. Each modality occupies a dedicated sub-region. The brain\'s primary input layer.',
         connections: 'Sends to association, motor, cerebellum, features',
     },
     {
-        id: 'motor_cortex', label: 'Motor Cortex', neurons: 100000, color: [0.22, 0.85, 0.48],
+        id: 'motor_cortex', label: 'Motor Cortex', neurons: 116200, color: [0.22, 0.85, 0.48],
         description: 'Generates movement commands for locomotion, manipulation, head control, and speech. Contains 6 specialized sub-ranges including a cognitive action channel.',
         connections: 'Receives from all regions, outputs motor commands',
     },
     {
-        id: 'cerebellum', label: 'Cerebellum', neurons: 50000, color: [0.95, 0.85, 0.2],
+        id: 'cerebellum', label: 'Cerebellum', neurons: 116200, color: [0.95, 0.85, 0.2],
         description: 'Learns precise timing and coordination through error correction. Smooths motor output and builds internal models of body dynamics.',
         connections: 'Receives from sensory, refines motor output',
     },
     {
-        id: 'association_cortex', label: 'Association', neurons: 500000, color: [0.37, 0.64, 0.96],
+        id: 'association_cortex', label: 'Association', neurons: 232500, color: [0.37, 0.64, 0.96],
         description: 'The brain\'s largest region — binds different sensory modalities together. "Seeing a face while hearing a voice" creates cross-modal associations via STDP learning.',
         connections: 'Hub connecting all other regions',
     },
     {
-        id: 'predictive_layer', label: 'Predictive', neurons: 100000, color: [0.65, 0.45, 0.96],
+        id: 'predictive_layer', label: 'Predictive', neurons: 116200, color: [0.65, 0.45, 0.96],
         description: 'Continuously predicts what sensory input comes next. When prediction error is high, the brain pays attention and learns faster. Drives curiosity and surprise.',
         connections: 'Bidirectional with association and concepts',
     },
     {
-        id: 'working_memory', label: 'Working Memory', neurons: 20000, color: [0.96, 0.45, 0.71],
+        id: 'working_memory', label: 'Working Memory', neurons: 27900, color: [0.96, 0.45, 0.71],
         description: 'Holds recent context for short-term reasoning. Sustained firing patterns maintain information across multiple time steps — like keeping a thought in mind.',
         connections: 'Receives from association and concepts, drives motor',
     },
     {
-        id: 'feature_layer', label: 'Feature Layer', neurons: 20000, color: [0.13, 0.78, 0.75],
+        id: 'feature_layer', label: 'Feature Layer', neurons: 93000, color: [0.13, 0.78, 0.75],
         description: 'Extracts intermediate features from raw sensory input — edges, textures, phonemes. Learns hierarchical representations automatically through STDP.',
         connections: 'Sits between sensory cortex and association',
     },
     {
-        id: 'concept_layer', label: 'Concept Layer', neurons: 5000, color: [0.96, 0.73, 0.15],
+        id: 'concept_layer', label: 'Concept Layer', neurons: 23200, color: [0.96, 0.73, 0.15],
         description: 'Forms abstract concepts using winner-take-all competition. Sparse representations where only a few neurons fire for each concept — like how "dog" is a single idea.',
         connections: 'Receives from association and predictive layers',
     },
     {
-        id: 'meta_controller', label: 'Meta Control', neurons: 3000, color: [0.9, 0.9, 0.95],
+        id: 'meta_controller', label: 'Meta Control', neurons: 13900, color: [0.9, 0.9, 0.95],
         description: 'Top-level executive control — modulates attention, gates learning, and coordinates global brain state. The closest analog to conscious decision-making.',
         connections: 'Modulates association and motor cortex',
     },
@@ -124,7 +124,7 @@ export const REGION_SHAPES = {
 };
 
 // Synapse pathway definitions (source -> target) for 3D visualization.
-// Matches the real neuromorphic network's 64 synapse groups from network.py.
+// Matches the real neuromorphic network's 65 synapse groups from network.py.
 export const SYNAPSE_PATHWAYS = [
     // Brainstem arousal fan-out (reticular activating system -- tonic excitation to all regions)
     { id: 'brainstem_sensory',       src: 'brainstem',         dst: 'sensory_cortex' },

@@ -1,3 +1,4 @@
+import { BRAIN_STATS, SYNAPSES_DISPLAY } from "./brain";
 /**
  * Landing-section copy, rehoused from inline frontmatter across the
  * section components (Phase 6 audit finding: copy lived in 13 .astro
@@ -56,7 +57,7 @@ export const SOLUTION_FEATURES: SolutionFeature[] = [
   },
   {
     title: "Runs on a sip of power",
-    body: "Today's robot brains burn power like a space heater. OSCEN sips it like a phone charger. Up to 109x less energy per inference on the right chip, microjoules instead of millijoules. That means robots that work all day on one battery.",
+    body: "Today's robot brains burn power like a space heater. OSCEN is built to sip it like a phone charger. Published spiking-chip benchmarks show up to 109x less energy per inference (Blouw et al. 2019), microjoules instead of millijoules. OSCEN is built to run on that class of chip, so robots can work all day on one battery.",
     link: "/research",
     linkLabel: "See the benchmarks",
   },
@@ -68,7 +69,7 @@ export const SOLUTION_FEATURES: SolutionFeature[] = [
   },
   {
     title: "Works with any body",
-    body: "Cameras, microphones, motors, speakers. OSCEN doesn't care what body you bolt it to. The brain is the product. The body plugs in.",
+    body: "Cameras, microphones, motors, speakers. Built body-agnostic: a new body is a manifest and a plugin, with no brain changes. The brain is the product. The body plugs in.",
     link: "/architecture",
     linkLabel: "View the integration",
   },
@@ -120,9 +121,9 @@ export interface ProofCard {
 
 export const PROOF_CARDS: ProofCard[] = [
   {
-    value: "~850M",
-    label: "plastic synapses",
-    back: "1,156,800 neurons across 15 brain regions. 66 synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning.",
+    value: SYNAPSES_DISPLAY,
+    label: "synapses",
+    back: `${BRAIN_STATS.totalNeurons.toLocaleString("en-US")} neurons across ${BRAIN_STATS.brainRegions} brain regions. ${BRAIN_STATS.synapseGroups} synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning.`,
   },
   {
     value: "6",
@@ -130,8 +131,8 @@ export const PROOF_CARDS: ProofCard[] = [
     back: "STDP, eligibility traces, BCM metaplasticity, neuromodulation, homeostatic scaling, and reward-modulated learning. All running simultaneously, every step.",
   },
   {
-    value: "7 months",
-    label: "training continuously",
+    value: "12M+",
+    label: "learning steps so far",
     back: "Started as a blank slate. Watching video, listening to audio. Forming associations through temporal correlation. Growing through developmental phases.",
   },
   {
@@ -158,15 +159,15 @@ export interface RealWorldPair {
 export const REAL_WORLD_PAIRS: RealWorldPair[] = [
   {
     today: "Need a full retrain for every new task",
-    oscen: "Pick it up by watching, like a person",
+    oscen: "Built to learn by watching, like a person",
   },
   {
     today: "Forget old skills when learning new ones",
-    oscen: "Keep every skill they ever learned",
+    oscen: "Designed to keep old skills as they learn new ones",
   },
   {
     today: "Need big batteries or a cloud connection",
-    oscen: "All day on a phone-sized battery, no internet",
+    oscen: "Aiming for all day on a small battery, no internet",
   },
   {
     today: "Same script in every house",
@@ -222,14 +223,14 @@ export const VLA_LIMITS: VlaLimit[] = [
     label: "Tethered to the cloud",
     stat: "50-500ms",
     statLabel: "round-trip latency on cloud inference",
-    body: "Most VLAs are too large to run on-device efficiently. Physical Intelligence requires cloud. When your robot arm is holding a baby or a surgical tool, 200ms of network latency isn't an engineering tradeoff. It's a liability. OSCEN runs entirely on-edge. No internet, no latency, no data leaving the device.",
+    body: "Most VLAs are too large to run on-device efficiently. Physical Intelligence requires cloud. When your robot arm is holding a baby or a surgical tool, 200ms of network latency isn't an engineering tradeoff. It's a liability. OSCEN is designed to run entirely on-edge. No internet, no latency, no data leaving the device.",
   },
   {
     icon: "&#x1F9F1;",
     label: "Catastrophic forgetting",
     stat: "100%",
     statLabel: "of old skills at risk when fine-tuning",
-    body: "Fine-tune a VLA on new tasks and it forgets old ones. This is a fundamental limitation of gradient-based learning in large models. OSCEN's homeostatic synaptic scaling, myelination, and identity tagging (Patent Claim 6) explicitly solve this. Learned skills are preserved even as new ones are acquired.",
+    body: "Fine-tune a VLA on new tasks and it forgets old ones. This is a fundamental limitation of gradient-based learning in large models. OSCEN's homeostatic synaptic scaling, myelination, and identity tagging (Patent Claim 6) are designed to prevent this, preserving learned skills as new ones are acquired. A retention experiment is running now.",
   },
 ];
 
@@ -242,8 +243,8 @@ export interface MarketStat {
 export const MARKET_STATS: MarketStat[] = [
   { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs" },
   { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3x increase from 2024" },
-  { value: "73-109x", label: "Energy advantage", sub: "Joules per inference, published SNN benchmarks" },
-  { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment" },
+  { value: "73-109x", label: "Energy gap on neuromorphic chips", sub: "Published Loihi results (third party), not OSCEN measurements" },
+  { value: "Few", label: "SNN players building robot brains", sub: "Most sell chips, not brains" },
 ];
 
 // ── Vision ─────────────────────────────────────────────────────────
@@ -257,7 +258,7 @@ export const VISION_PILLARS: VisionPillar[] = [
   {
     icon: "◎",
     title: "Any intelligence",
-    body: "From 1 million neurons today to eventually 86 billion, like humans. From baby videos to embodied manipulation. From one brain to a fleet sharing learned experiences.",
+    body: "From 1 million neurons today to eventually 86 billion, like humans. The goal: from watching video to embodied manipulation, and one day a fleet that shares what it learns.",
   },
   {
     icon: "◈",
@@ -267,7 +268,7 @@ export const VISION_PILLARS: VisionPillar[] = [
   {
     icon: "◇",
     title: "Any body",
-    body: "Robot arms. Humanoids. Surgical assistants. Any sensor, any actuator, any form factor. The brain travels between bodies. The body is interchangeable.",
+    body: "Robot arms. Humanoids. Surgical assistants. Any sensor, any actuator, any form factor. The goal is one brain that can move between bodies. The body is interchangeable.",
   },
 ];
 

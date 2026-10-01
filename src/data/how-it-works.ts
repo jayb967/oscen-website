@@ -31,14 +31,14 @@ export const PIPELINE_STEPS: PipelineStep[] = [
     {
         num: "03",
         title: "Think",
-        desc: "Half a million neurons connect the dots. The brain links what it is sensing now to what it has seen before. Memory, prediction, and decision happen together.",
+        desc: "A quarter of a million neurons connect the dots. The brain links what it is sensing now to what it has seen before. Memory, prediction, and decision happen together.",
         accent: "accent-purple",
         region: "association_cortex",
     },
     {
         num: "04",
         title: "Act",
-        desc: "Signals fire out to the body. Walk. Grab. Speak. The robot moves in real time, with no round trip to a data center.",
+        desc: "Signals fire out to the body every step, in real time, with no round trip to a data center.",
         accent: "accent-green",
         region: "motor_cortex",
     },

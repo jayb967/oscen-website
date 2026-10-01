@@ -14,7 +14,7 @@
  *   data.start('ws://host:8080/ws', 'http://host:8080');
  */
 
-// Default standing pose (22 bodies) — 29-DOF humanoid (Optimus/G1/Atlas class)
+// Default standing pose (22 bodies), 29-DOF simulated humanoid
 // v3 MJCF frame (oscen_humanoid_v3, 2026-07-24): X=forward, Y=lateral
 // (right side = -Y), Z=up. Pelvis at 0.92m. Matches humanoid_29dof.xml
 // body attachments (shoulders +/-0.18 Y, hips +/-0.09 Y).

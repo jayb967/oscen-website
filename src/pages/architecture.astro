@@ -8,7 +8,7 @@ import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import SupportStrip from "../components/SupportStrip.astro";
-import { REGIONS, SYNAPSE_PATHWAYS, BRAIN_STATS, formatNeurons, rgbToHex } from "../data/brain";
+import { REGIONS, SYNAPSE_PATHWAYS, BRAIN_STATS, REGION_POPULATIONS, SYNAPSES_DISPLAY, formatNeurons, rgbToHex, regionNeurons } from "../data/brain";
 
 const learningRules = [
   {
@@ -86,8 +86,8 @@ const motorRanges = [
         <span class="italic gradient-text">living brain.</span>
       </h1>
       <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
-        {BRAIN_STATS.totalNeurons.toLocaleString()} neurons. {(BRAIN_STATS.totalSynapses / 1_000_000_000).toFixed(2)}B synapses.
-        {BRAIN_STATS.synapseGroups} synapse groups. {BRAIN_STATS.learningMechanisms} learning rules running simultaneously, every step.
+        {BRAIN_STATS.totalNeurons.toLocaleString()} neurons. {SYNAPSES_DISPLAY} synapses (live count).
+        {BRAIN_STATS.synapseGroups} synapse groups. {BRAIN_STATS.learningMechanisms} learning rules running together, continuously.
       </p>
     </section>
 
@@ -121,7 +121,7 @@ const motorRanges = [
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         6 learning rules
       </h2>
-      <p class="reveal text-sm text-text-muted mb-4 max-w-xl">All six operate simultaneously every simulation step. This is Patent Claim #1.</p>
+      <p class="reveal text-sm text-text-muted mb-4 max-w-xl">All six operate together, continuously. This is Patent Claim #1.</p>
 
       <!-- Three-factor pipeline -->
       <div class="reveal flex items-center gap-2 mb-12 text-[10px] font-tech text-text-muted overflow-x-auto pb-2">
@@ -236,12 +236,12 @@ const motorRanges = [
       <div class="reveal glass rounded-xl p-6">
         <div class="space-y-3">
           {[
-            { layer: "Sensory Cortex", n: "200K", role: "Raw input encoding: vision, audio, touch, proprioception", color: "accent-blue" },
-            { layer: "Feature Layer", n: "20K", role: "Edge, texture, and phoneme extraction", color: "accent-blue" },
-            { layer: "Association Cortex", n: "500K", role: "Cross-modal binding via spike-timing coincidence", color: "accent-blue" },
-            { layer: "Concept Layer", n: "5K", role: "Sparse winner-take-all abstract representations", color: "accent-blue" },
-            { layer: "Predictive Layer", n: "100K", role: "Sequence learning and world model", color: "accent-blue" },
-            { layer: "Meta Controller", n: "3K", role: "Executive attention and learning gating", color: "accent-blue" },
+            { layer: "Sensory Cortex", n: formatNeurons(REGION_POPULATIONS.sensory), role: "Raw input encoding: vision, audio, touch, proprioception", color: "accent-blue" },
+            { layer: "Feature Layer", n: formatNeurons(REGION_POPULATIONS.feature), role: "Edge, texture, and phoneme extraction", color: "accent-blue" },
+            { layer: "Association Cortex", n: formatNeurons(REGION_POPULATIONS.association), role: "Cross-modal binding via spike-timing coincidence", color: "accent-blue" },
+            { layer: "Concept Layer", n: formatNeurons(REGION_POPULATIONS.concept), role: "Sparse winner-take-all abstract representations", color: "accent-blue" },
+            { layer: "Predictive Layer", n: formatNeurons(REGION_POPULATIONS.predictive), role: "Sequence learning and world model", color: "accent-blue" },
+            { layer: "Meta Controller", n: formatNeurons(REGION_POPULATIONS.meta), role: "Executive attention and learning gating", color: "accent-blue" },
           ].map((l, i) => (
             <div class="flex items-center gap-4">
               <span class={`w-2 h-2 rounded-full bg-${l.color}`}></span>
@@ -259,7 +259,7 @@ const motorRanges = [
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         Motor output
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">100,000 motor neurons divided into 6 functional sub-ranges. Speech and cognitive action channels emerge through development.</p>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">{regionNeurons("motor_cortex").toLocaleString("en-US")} motor neurons divided into 6 functional sub-ranges. Speech and cognitive action channels emerge through development.</p>
 
       <div class="reveal glass rounded-xl p-6">
         <div class="space-y-2">
@@ -281,7 +281,7 @@ const motorRanges = [
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         Cognitive action channel
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">When the brain encounters something it can't predict, it learns to ask for help. The decision to query is emergent, not hardcoded. Patent Claim #3.</p>
+      <p class="reveal text-sm text-text-muted mb-12 max-w-xl">When the brain encounters something it can't predict, it learns to ask for help. The decision to query is emergent, not hardcoded. This is the Patent Claim #3 design.</p>
 
       <div class="reveal glass rounded-xl p-6">
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">

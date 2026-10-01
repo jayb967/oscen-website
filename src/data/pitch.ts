@@ -1,3 +1,4 @@
+import { BRAIN_STATS, SYNAPSES_DISPLAY } from "./brain";
 /**
  * Investor pitch data. single source of truth for all pitch-related
  * numbers, market data, competitor intelligence, and financial projections.
@@ -142,6 +143,8 @@ export const COMPETITORS: Competitor[] = [
   },
 ];
 
+// Lower bound: AMI + Figure + Physical Intelligence + Unconventional AI.
+// Unconventional AI is not GPU-based, so copy must not say "all GPU-dependent".
 export const TOTAL_COMPETITOR_FUNDING = "$4.5B+";
 
 // ─── Energy Comparison ───
@@ -181,10 +184,10 @@ export const ENERGY_DATA: EnergyComparison[] = [
     color: "accent-amber",
   },
   {
-    system: "OSCEN on Loihi 2",
+    system: "OSCEN target on neuromorphic silicon",
     power: "<5W",
-    detail: "1–5% of robot power budget",
-    source: "Intel Loihi benchmarks",
+    detail: "Design goal, not yet measured. 1-5% of robot power budget",
+    source: "Target, based on published Loihi results",
     barWidth: 1,
     color: "accent-green",
   },
@@ -192,13 +195,17 @@ export const ENERGY_DATA: EnergyComparison[] = [
 
 // ─── The Ask ───
 
-export const RAISE_AMOUNT = "$10M";
-export const PRE_MONEY_VALUATION = "$30M";
-export const POST_MONEY_VALUATION = "$40M";
-export const FOUNDER_OWNERSHIP_POST = "75%";
-export const INVESTOR_OWNERSHIP = "25%";
-export const SERIES_A_TARGET = "$50M";
-export const SERIES_A_VALUATION = "$200M";
+// Current round, DECIDED 2026-08-06 (oscen-internal DE-RISKING-ROADMAP-TRACKER.md
+// Risk 8; fundraising/PRESEED-2026-TERM-SHEET.md): $2M pre-seed, YC post-money
+// SAFE, $10M post-money cap, cap-only, MFN, $10K accredited minimum.
+export const RAISE_AMOUNT = "$2M";
+export const RAISE_INSTRUMENT = "Post-money SAFE";
+export const VALUATION_CAP = "$10M";
+export const MIN_CHECK = "$10K";
+export const FOUNDER_OWNERSHIP_POST = "~64%"; // fully diluted, illustrative (term sheet)
+// The earlier $10M plan at $30M pre-money is deferred to the NEXT round, to be
+// priced on the evidence the pre-seed produces. It is not part of this offering.
+export const SERIES_A_TARGET = "$10M";
 
 export interface FundAllocation {
   category: string;
@@ -313,9 +320,9 @@ export const MILESTONES: Milestone[] = [
   },
   {
     quarter: "Q7–Q8",
-    title: "Series A",
-    description: "Published benchmarks. Robot demo on real hardware. IP portfolio at 5+ patents filed. Raise $50M Series A at $200M pre-money.",
-    metric: "Series A ready",
+    title: "Next raise",
+    description: "Published benchmarks. Robot demo on real hardware. IP portfolio at 5+ patents filed. Raise the following round, priced on that evidence.",
+    metric: "Next round ready",
   },
 ];
 
@@ -333,7 +340,7 @@ export const REVENUE_MODEL: RevenuePhase[] = [
     year: "Year 1",
     model: "Government + POCs",
     range: "$275K–$600K",
-    description: "DARPA/SBIR contracts (non-dilutive), paid proof-of-concept engagements with defense integrators. SDVOSB veteran-owned status enables sole-source contracts up to $5M.",
+    description: "DARPA/SBIR contracts (non-dilutive), paid proof-of-concept engagements with defense integrators. SDVOSB certification is in progress. Once certified, it opens sole-source eligibility up to $5M.",
   },
   {
     year: "Year 2",
@@ -361,7 +368,7 @@ export interface RevenueSource {
 export const REVENUE_SOURCES: RevenueSource[] = [
   {
     name: "Government Contracts",
-    description: "DARPA, SBIR, ONR, and defense integrator contracts. Non-dilutive funding that validates technology credibility. SDVOSB status (veteran-owned) unlocks sole-source contracts up to $5M.",
+    description: "DARPA, SBIR, ONR, and defense integrator contracts. Non-dilutive funding that validates technology credibility. SDVOSB certification (veteran-owned) is in progress. Once certified, it opens sole-source eligibility up to $5M.",
     timeline: "Now",
     color: "accent-blue",
   },
@@ -436,28 +443,30 @@ export const COMPARABLES: Comparable[] = [
   },
   {
     company: "OSCEN",
-    valuation: "$30M (proposed)",
-    raised: "$10M (seeking)",
-    stage: "Seed",
-    hadProduct: true,
+    valuation: "$10M cap (post-money SAFE)",
+    raised: "$2M (seeking)",
+    stage: "Pre-seed",
+    hadProduct: false,
     hadPatent: true,
-    note: "1M neurons training live. Patent filed. Seed to prove hardware + robot integration.",
+    note: "1M neurons training live, no customers yet. Patent filed. Seed to prove hardware + robot integration.",
   },
 ];
 
 // ─── Key Stats ───
 
 export const KEY_STATS = {
-  neurons: "1,156,800",
-  synapses: "~850M plastic",
-  trainingVideos: 688,
+  neurons: BRAIN_STATS.totalNeurons.toLocaleString("en-US"),
+  synapses: SYNAPSES_DISPLAY,
   trainingPhase: "Adolescent",
-  trainingSteps: "3.95M+",
-  stepsPerSec: 0.30,
-  brainRegions: 15,
-  synapseGroups: 66,
-  learningRules: 6,
-  devPhases: 5,
+  // Live 1M step_count 12,257,890 on 2026-10-01; stated as a lower bound so it
+  // cannot go stale in the wrong direction. Step rate from the live mean step
+  // time (424 ms, p50 348 ms) on the same read.
+  trainingSteps: "12M+",
+  stepsPerSec: 2.4,
+  brainRegions: BRAIN_STATS.brainRegions,
+  synapseGroups: BRAIN_STATS.synapseGroups,
+  learningRules: BRAIN_STATS.learningMechanisms,
+  devPhases: BRAIN_STATS.developmentalPhases,
   patentClaims: 6,
   priorArtSearched: 258,
   priorArtOverlap: 0,
@@ -522,10 +531,10 @@ export interface NonDilutive {
 
 export const NON_DILUTIVE: NonDilutive[] = [
   {
-    source: "DARPA (BTO + DSO)",
+    source: "DARPA DSO",
     amount: "$1.5–5M",
     timeline: "6–12 months",
-    status: "Submitted",
+    status: "Abstract submitted (BTO declined)",
   },
   {
     source: "In-Q-Tel",
@@ -534,15 +543,15 @@ export const NON_DILUTIVE: NonDilutive[] = [
     status: "Submitted",
   },
   {
-    source: "Navy SBIR",
+    source: "Navy SBIR (NP002, NV063)",
     amount: "$275K–$1.5M",
     timeline: "6–9 months",
-    status: "In progress",
+    status: "Submitted, awaiting decision",
   },
   {
     source: "ONR (Office of Naval Research)",
     amount: "$1–3M",
     timeline: "12 months",
-    status: "Contact established",
+    status: "White paper in preparation",
   },
 ];

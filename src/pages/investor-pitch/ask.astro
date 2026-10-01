@@ -1,15 +1,14 @@
 ---
 /**
  * Investor Pitch. The Ask
- * Staged raise: seed now, Series A after proof.
+ * Staged raise: $2M pre-seed SAFE now (decided 2026-08-06), the $10M plan is the next round.
  */
 import Base from "../../layouts/Base.astro";
 import Nav from "../../components/Nav.astro";
 import PitchNav from "../../components/PitchNav.astro";
 import {
-  RAISE_AMOUNT, PRE_MONEY_VALUATION, POST_MONEY_VALUATION,
-  FOUNDER_OWNERSHIP_POST, INVESTOR_OWNERSHIP,
-  SERIES_A_TARGET, SERIES_A_VALUATION,
+  RAISE_AMOUNT, RAISE_INSTRUMENT, VALUATION_CAP, MIN_CHECK,
+  FOUNDER_OWNERSHIP_POST, SERIES_A_TARGET,
   USE_OF_FUNDS, MILESTONES, REVENUE_MODEL, REVENUE_SOURCES, COMPARABLES, NON_DILUTIVE,
 } from "../../data/pitch";
 ---
@@ -24,11 +23,11 @@ import {
     <section class="max-w-5xl mx-auto px-6 pt-16 mb-20">
       <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">The Ask</p>
       <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.85]">
-        <span class="gradient-text">{RAISE_AMOUNT}</span> seed.
+        <span class="gradient-text">{RAISE_AMOUNT}</span> pre-seed.
       </h1>
       <p class="reveal text-text-secondary mt-6 max-w-2xl leading-relaxed">
-        To hire 5 elite engineers, deploy on neuromorphic hardware, build the first robot demo, and reach paid pilots within 18 months.
-        A {SERIES_A_TARGET} Series A follows after hardware validation and first revenue.
+        Sized to the milestones that de-risk OSCEN into a Series A: independent technical validation, a physical embodiment, clean IP ownership, and a first federal award or pilot.
+        The {SERIES_A_TARGET} plan below is the next round, priced on the evidence this round produces.
       </p>
     </section>
 
@@ -41,7 +40,18 @@ import {
           <div class="glass rounded-xl p-6 border border-accent-blue/20">
             <span class="text-[9px] font-tech text-accent-blue uppercase tracking-wider">Now</span>
             <div class="text-3xl font-tech font-bold text-accent-blue mt-2">{RAISE_AMOUNT}</div>
-            <div class="text-sm text-text-primary font-medium mt-1">Seed Round</div>
+            <div class="text-sm text-text-primary font-medium mt-1">Pre-seed ({RAISE_INSTRUMENT})</div>
+            <div class="text-[11px] text-text-secondary mt-3 leading-relaxed space-y-1">
+              <p>Independent technical validation</p>
+              <p>A physical embodiment</p>
+              <p>Clean IP ownership</p>
+              <p>First federal award or pilot</p>
+            </div>
+          </div>
+          <div class="glass rounded-xl p-6 border border-border/50 opacity-70">
+            <span class="text-[9px] font-tech text-text-muted uppercase tracking-wider">After proof</span>
+            <div class="text-3xl font-tech font-bold text-text-secondary mt-2">{SERIES_A_TARGET}</div>
+            <div class="text-sm text-text-primary font-medium mt-1">Next round (Series A)</div>
             <div class="text-[11px] text-text-secondary mt-3 leading-relaxed space-y-1">
               <p>5 elite hires</p>
               <p>Neuromorphic hardware deployment</p>
@@ -49,40 +59,29 @@ import {
               <p>First paid pilots</p>
             </div>
           </div>
-          <div class="glass rounded-xl p-6 border border-border/50 opacity-70">
-            <span class="text-[9px] font-tech text-text-muted uppercase tracking-wider">After proof</span>
-            <div class="text-3xl font-tech font-bold text-text-secondary mt-2">{SERIES_A_TARGET}</div>
-            <div class="text-sm text-text-primary font-medium mt-1">Series A</div>
-            <div class="text-[11px] text-text-secondary mt-3 leading-relaxed space-y-1">
-              <p>Scale to 10M+ neurons</p>
-              <p>Multiple robot form factors</p>
-              <p>IP portfolio at 8+ patents</p>
-              <p>Revenue from OEM licensing</p>
-            </div>
-          </div>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
             <div class="text-xl md:text-2xl font-tech font-bold text-accent-blue">{RAISE_AMOUNT}</div>
-            <div class="text-[10px] text-text-muted mt-1">Seed raise</div>
+            <div class="text-[10px] text-text-muted mt-1">Pre-seed raise</div>
           </div>
           <div>
-            <div class="text-xl md:text-2xl font-tech font-bold text-accent-purple">{PRE_MONEY_VALUATION}</div>
-            <div class="text-[10px] text-text-muted mt-1">Pre-money valuation</div>
+            <div class="text-xl md:text-2xl font-tech font-bold text-accent-purple">{VALUATION_CAP}</div>
+            <div class="text-[10px] text-text-muted mt-1">Post-money valuation cap</div>
           </div>
           <div>
             <div class="text-xl md:text-2xl font-tech font-bold text-accent-cyan">{FOUNDER_OWNERSHIP_POST}</div>
-            <div class="text-[10px] text-text-muted mt-1">Founder retains</div>
+            <div class="text-[10px] text-text-muted mt-1">Founder retains (fully diluted, illustrative)</div>
           </div>
           <div>
-            <div class="text-xl md:text-2xl font-tech font-bold text-accent-green">{INVESTOR_OWNERSHIP}</div>
-            <div class="text-[10px] text-text-muted mt-1">Investor equity</div>
+            <div class="text-xl md:text-2xl font-tech font-bold text-accent-green">{MIN_CHECK}</div>
+            <div class="text-[10px] text-text-muted mt-1">Accredited minimum</div>
           </div>
         </div>
 
         <p class="text-[10px] text-text-muted text-center mt-6">
-          Priced equity round. Investors prefer staged de-risking. Seed proves the technology, Series A scales the business.
+          Post-money SAFE, cap only, no discount, MFN. Every close at the same cap. The pre-seed proves the technology, the next round scales the business.
         </p>
       </div>
     </section>
@@ -92,7 +91,7 @@ import {
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         Use of funds
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12">18-month deployment plan. Every dollar mapped to a milestone.</p>
+      <p class="reveal text-sm text-text-muted mb-12">The {SERIES_A_TARGET} next-round plan, over 18 months. Every dollar mapped to a milestone.</p>
 
       <!-- Visual bar chart -->
       <div class="reveal glass rounded-xl p-6 mb-6">
@@ -140,7 +139,7 @@ import {
     <!-- 24-Month Milestones -->
     <section class="max-w-5xl mx-auto px-6 mb-32">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
-        18-month milestones
+        18-month milestones (next-round plan)
       </h2>
 
       <div class="reveal glass-bright rounded-2xl p-6">
@@ -268,7 +267,7 @@ import {
 
       <div class="reveal glass rounded-xl p-4 mt-4">
         <p class="text-[11px] text-text-secondary text-center leading-relaxed">
-          OSCEN's seed raise is a fraction of comparable rounds, with a working product and filed patent that most lack.
+          OSCEN's pre-seed raise is a fraction of comparable rounds, with a running system and filed patent that most lack.
           This is a capital-efficient entry point into a market where others have raised billions.
         </p>
       </div>

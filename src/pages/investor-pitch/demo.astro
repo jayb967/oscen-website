@@ -25,8 +25,8 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
         <span class="italic gradient-text">The brain is running.</span>
       </h1>
       <p class="reveal text-text-secondary mt-6 max-w-2xl leading-relaxed">
-        Right now, on a dedicated server, 1,156,800 spiking neurons are processing a multimodal video curriculum
-        and learning through 6 simultaneous mechanisms.
+        Right now, on a dedicated server, {BRAIN_STATS.totalNeurons.toLocaleString("en-US")} spiking neurons are processing a multimodal video curriculum
+        and learning through {BRAIN_STATS.learningMechanisms} simultaneous mechanisms.
       </p>
     </section>
 
@@ -64,7 +64,7 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
             { label: "Training Steps", value: KEY_STATS.trainingSteps, color: "text-accent-green" },
             { label: "Phase", value: KEY_STATS.trainingPhase, color: "text-accent-amber" },
             { label: "Step Rate", value: `${KEY_STATS.stepsPerSec}/sec`, color: "text-accent-purple" },
-            { label: "Curriculum", value: `${KEY_STATS.trainingVideos} videos`, color: "text-accent-pink" },
+            { label: "Body", value: "Sim humanoid, 29 DOF", color: "text-accent-pink" },
             { label: "Learning Rules", value: `${KEY_STATS.learningRules} active`, color: "text-accent-cyan" },
           ].map((s) => (
             <div class="text-center">
@@ -151,7 +151,7 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         6 simultaneous learning rules
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12">All running on every simulation step. This is what the patent protects.</p>
+      <p class="reveal text-sm text-text-muted mb-12">All running together, continuously. This is what the patent protects.</p>
 
       <div class="reveal glass-bright rounded-2xl p-6">
         <div class="space-y-4">
@@ -199,9 +199,9 @@ import { REGIONS, BRAIN_STATS, formatNeurons, rgbToHex } from "../../data/brain"
               { metric: "Power draw", gpu: "50-200W", oscen: "<5W", advantage: true },
               { metric: "Learns after deployment", gpu: "No", oscen: "Yes", advantage: true },
               { metric: "Cloud required", gpu: "Often", oscen: "No", advantage: true },
-              { metric: "Adaptation to new tasks", gpu: "Retrain (hours-days)", oscen: "Continuous (minutes)", advantage: true },
+              { metric: "Adaptation to new tasks", gpu: "Retrain (hours-days)", oscen: "Continuous (design)", advantage: true },
               { metric: "Edge-native", gpu: "Limited", oscen: "Designed for it", advantage: true },
-              { metric: "Catastrophic forgetting", gpu: "Yes (without replay)", oscen: "Protected (homeostatic)", advantage: true },
+              { metric: "Catastrophic forgetting", gpu: "Yes (without replay)", oscen: "Designed against it (under test)", advantage: true },
             ].map((row) => (
               <tr class="border-b border-border/50">
                 <td class="px-5 py-3 text-sm text-text-primary">{row.metric}</td>

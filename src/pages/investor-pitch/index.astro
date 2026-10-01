@@ -6,7 +6,7 @@
 import Base from "../../layouts/Base.astro";
 import Nav from "../../components/Nav.astro";
 import PitchNav from "../../components/PitchNav.astro";
-import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } from "../../data/pitch";
+import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, RAISE_INSTRUMENT, VALUATION_CAP, SERIES_A_TARGET } from "../../data/pitch";
 ---
 
 <Base title="Investor Pitch | OSCEN" description="Confidential investor materials. Shared by link only." noindex={true}>
@@ -28,7 +28,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
       </p>
       <div class="reveal flex flex-col sm:flex-row gap-3 mt-8">
         {[
-          "Runs on low-power neuromorphic hardware (<5W)",
+          "Designed to target low-power neuromorphic hardware (<5W goal)",
           "Learns continuously after deployment",
           "Designed for mobile and field robotics",
         ].map((point) => (
@@ -46,7 +46,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
         {[
           { value: KEY_STATS.neurons, label: "Spiking neurons", sub: "Training live 24/7", color: "text-accent-blue" },
           { value: "Patent Pending", label: "US 63/986,737", sub: "6 claims, 0 prior art overlap", color: "text-accent-purple" },
-          { value: `${KEY_STATS.trainingVideos}`, label: "Training videos", sub: "Multimodal curriculum", color: "text-accent-cyan" },
+          { value: KEY_STATS.trainingSteps, label: "Training steps", sub: "Live 1M brain", color: "text-accent-cyan" },
           { value: "<5W", label: "Target power", sub: "vs 200–700W GPU", color: "text-accent-green" },
         ].map((stat) => (
           <div class="glass-bright rounded-xl p-4 text-center">
@@ -65,20 +65,20 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
         <div class="space-y-6 text-lg text-text-secondary leading-relaxed max-w-3xl">
           <p>
             <span class="text-text-primary font-medium">Autonomous robots need on-device intelligence.</span> Today, {TOTAL_COMPETITOR_FUNDING} has been poured into robot AI,
-            and every dollar depends on GPUs that burn 200-700 watts, can't learn after deployment, and need cloud connectivity to function.
+            and nearly all of it depends on GPUs that burn 200-700 watts, can't learn after deployment, and need cloud connectivity to function.
           </p>
           <p>
             <span class="text-text-primary font-medium">We built an adaptive low-power learning architecture for robotics.</span> OSCEN is a spiking neural network with
-            <span class="text-accent-blue">6 patented learning mechanisms</span> that targets <span class="text-accent-green">&lt;5 watts</span> on neuromorphic silicon.
+            <span class="text-accent-blue">six learning mechanisms, integrated in a patent-pending architecture,</span> that targets <span class="text-accent-green">&lt;5 watts</span> on neuromorphic silicon.
             It learns continuously from experience: no retraining, no cloud, no GPUs.
           </p>
           <p>
             <span class="text-text-primary font-medium">It's not a paper.</span> A network with {KEY_STATS.neurons} neurons and {KEY_STATS.synapses} synapses
-            is training right now on a {KEY_STATS.trainingVideos}-video multimodal curriculum, currently in the adolescent developmental phase past {KEY_STATS.trainingSteps} training steps.
+            is training right now on a multimodal curriculum, currently in the adolescent developmental phase past {KEY_STATS.trainingSteps} training steps.
           </p>
           <p>
-            <span class="text-text-primary font-medium">We're raising {RAISE_AMOUNT}</span> to hire 5 elite engineers, deploy on neuromorphic hardware, and build the first robot demo.
-            The patent is filed. The architecture is running. A Series A of {SERIES_A_TARGET} follows after hardware validation.
+            <span class="text-text-primary font-medium">We're raising a {RAISE_AMOUNT} pre-seed</span> ({RAISE_INSTRUMENT}, {VALUATION_CAP} cap) for independent technical validation, a physical embodiment, clean IP ownership, and a first federal award or pilot.
+            The patent is filed. The architecture is running. A {SERIES_A_TARGET} Series A, to hire 5 engineers and deploy on neuromorphic hardware, follows on that evidence.
           </p>
         </div>
       </div>
@@ -117,14 +117,14 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
           {
             href: "/investor-pitch/team",
             title: "Team & Hiring",
-            desc: "Founding team, build velocity, first 5 hires, and advisory board.",
+            desc: "Founding team, build velocity, and the first 5 hires.",
             accent: "accent-green",
             num: "5 hires",
           },
           {
             href: "/architecture",
             title: "Architecture",
-            desc: "15 brain regions, 64 synapse pathways, 6 learning rules, 5 developmental phases. Full technical deep-dive.",
+            desc: `${KEY_STATS.brainRegions} brain regions, ${KEY_STATS.synapseGroups} synapse pathways, ${KEY_STATS.learningRules} learning rules, ${KEY_STATS.devPhases} developmental phases. Full technical deep-dive.`,
             accent: "accent-purple",
             num: "15 regions",
           },
@@ -156,7 +156,7 @@ import { KEY_STATS, TOTAL_COMPETITOR_FUNDING, RAISE_AMOUNT, SERIES_A_TARGET } fr
           <span class="italic text-text-secondary">We're building the alternative.</span>
         </p>
         <p class="text-sm text-text-muted mt-6 max-w-xl mx-auto">
-          {TOTAL_COMPETITOR_FUNDING} in competitor funding, all GPU-dependent, all frozen after training, all requiring cloud or high-wattage edge compute.
+          {TOTAL_COMPETITOR_FUNDING} in competitor funding, nearly all GPU-dependent, frozen after training, all requiring cloud or high-wattage edge compute.
           OSCEN targets neuromorphic silicon at &lt;5W with continuous on-device learning.
         </p>
       </div>

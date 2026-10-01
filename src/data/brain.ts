@@ -21,57 +21,57 @@ export interface SynapsePathway {
 
 export const REGIONS: Region[] = [
   {
-    id: "brainstem", label: "Brainstem", neurons: 1800, color: [1.0, 0.3, 0.2],
+    id: "brainstem", label: "Brainstem", neurons: 18_600, color: [1.0, 0.3, 0.2],
     description: "Manages basic survival drives like energy, temperature, and fatigue. Converts raw sensor signals into neural spikes. Always active, the brain's heartbeat.",
     connections: "Feeds sensory cortex and motor cortex",
   },
   {
-    id: "reflex_arc", label: "Reflex Arc", neurons: 2000, color: [1.0, 0.6, 0.2],
+    id: "reflex_arc", label: "Reflex Arc", neurons: 11_600, color: [1.0, 0.6, 0.2],
     description: "Ultra-fast sensory-to-motor pathway that bypasses higher cognition. Handles immediate danger responses in under 10ms, like pulling away from heat.",
     connections: "Receives from sensory cortex, drives motor cortex",
   },
   {
-    id: "sensory_cortex", label: "Sensory Cortex", neurons: 200_000, color: [0.13, 0.83, 0.93],
+    id: "sensory_cortex", label: "Sensory Cortex", neurons: 232_500, color: [0.13, 0.83, 0.93],
     description: "Processes all incoming sensory data: vision, audio, touch, proprioception. Each modality occupies a dedicated sub-region.",
     connections: "Sends to association, motor, cerebellum, features",
   },
   {
-    id: "motor_cortex", label: "Motor Cortex", neurons: 100_000, color: [0.22, 0.85, 0.48],
+    id: "motor_cortex", label: "Motor Cortex", neurons: 116_200, color: [0.22, 0.85, 0.48],
     description: "Generates movement commands across 6 sub-ranges: locomotion, manipulation, head, speech, expression, and cognitive action.",
     connections: "Receives from all regions, outputs motor commands",
   },
   {
-    id: "cerebellum", label: "Cerebellum", neurons: 50_000, color: [0.95, 0.85, 0.2],
+    id: "cerebellum", label: "Cerebellum", neurons: 116_200, color: [0.95, 0.85, 0.2],
     description: "Learns precise timing and coordination through error correction. Smooths motor output and builds internal models of body dynamics.",
     connections: "Receives from sensory, refines motor output",
   },
   {
-    id: "association_cortex", label: "Association Cortex", neurons: 500_000, color: [0.37, 0.64, 0.96],
+    id: "association_cortex", label: "Association Cortex", neurons: 232_500, color: [0.37, 0.64, 0.96],
     description: "The brain's largest region. Binds different sensory modalities together. Cross-modal associations form via STDP learning.",
     connections: "Hub connecting all other regions",
   },
   {
-    id: "predictive_layer", label: "Predictive Layer", neurons: 100_000, color: [0.65, 0.45, 0.96],
+    id: "predictive_layer", label: "Predictive Layer", neurons: 116_200, color: [0.65, 0.45, 0.96],
     description: "Continuously predicts what comes next. High prediction error triggers attention and accelerated learning. Drives curiosity.",
     connections: "Bidirectional with association and concepts",
   },
   {
-    id: "working_memory", label: "Working Memory", neurons: 20_000, color: [0.96, 0.45, 0.71],
+    id: "working_memory", label: "Working Memory", neurons: 27_900, color: [0.96, 0.45, 0.71],
     description: "Sustained firing patterns maintain information across time steps, holding a thought in mind for short-term reasoning.",
     connections: "Receives from association and concepts, drives motor",
   },
   {
-    id: "feature_layer", label: "Feature Layer", neurons: 20_000, color: [0.13, 0.78, 0.75],
+    id: "feature_layer", label: "Feature Layer", neurons: 93_000, color: [0.13, 0.78, 0.75],
     description: "Extracts intermediate features: edges, textures, phonemes. Learns hierarchical representations automatically through STDP.",
     connections: "Sits between sensory cortex and association",
   },
   {
-    id: "concept_layer", label: "Concept Layer", neurons: 5_000, color: [0.96, 0.73, 0.15],
+    id: "concept_layer", label: "Concept Layer", neurons: 23_200, color: [0.96, 0.73, 0.15],
     description: "Forms abstract concepts using winner-take-all competition. Sparse codes where only a few neurons fire per concept.",
     connections: "Receives from association and predictive layers",
   },
   {
-    id: "meta_controller", label: "Meta Controller", neurons: 3_000, color: [0.9, 0.9, 0.95],
+    id: "meta_controller", label: "Meta Controller", neurons: 13_900, color: [0.9, 0.9, 0.95],
     description: "Executive control. Modulates attention, gates learning, coordinates global brain state. The closest analog to conscious decision-making.",
     connections: "Modulates association and motor cortex",
   },
@@ -165,15 +165,45 @@ export const SYNAPSE_PATHWAYS: SynapsePathway[] = [
   { id: "fi_meta",                 src: "fi",                dst: "meta_controller" },
 ];
 
-/** Aggregate stats for the 1M neuron deployment */
+/**
+ * Aggregate stats for the 1M neuron deployment. THE ONLY PLACE A BRAIN NUMBER
+ * LIVES: every page and data file imports from here, never retypes a value.
+ *
+ * Source: live GET https://demo.oscen.ai/api/neuromorphic (total_neurons,
+ * len(synapse_stats), sum of synapse_stats[*].nnz, len(firing_rates)) and
+ * oscen/neuromorphic/profiles/size/1m.toml (region populations), read
+ * 2026-10-01. The synapse count is a live reading that drifts down slowly as
+ * the brain prunes (818,962,332 at birth of the current topology), so it is
+ * shown rounded and labelled as a live count.
+ */
 export const BRAIN_STATS = {
   totalNeurons: 1_156_800,
-  totalSynapses: 1_500_000_000,
-  synapseGroups: 64,
+  totalSynapses: 814_063_178,
+  synapseGroups: 65,
   brainRegions: 15,
   neuromodulators: 5,
   learningMechanisms: 6,
   developmentalPhases: 5,
+} as const;
+
+/** Synapse count for display, e.g. "814M". */
+export const SYNAPSES_DISPLAY = `${Math.round(BRAIN_STATS.totalSynapses / 1_000_000)}M`;
+
+/** Population of one region, read from REGIONS (profiles/size/1m.toml, 2026-10-01). */
+export function regionNeurons(id: string): number {
+  const r = REGIONS.find((x) => x.id === id);
+  if (!r) throw new Error(`unknown region ${id}`);
+  return r.neurons;
+}
+
+/** The six cortical layers shown in the processing hierarchy. */
+export const REGION_POPULATIONS = {
+  sensory: regionNeurons("sensory_cortex"),
+  feature: regionNeurons("feature_layer"),
+  association: regionNeurons("association_cortex"),
+  concept: regionNeurons("concept_layer"),
+  predictive: regionNeurons("predictive_layer"),
+  meta: regionNeurons("meta_controller"),
 } as const;
 
 /** Format large numbers for display: 1156800 → "1.2M" */

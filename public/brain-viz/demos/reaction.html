@@ -1320,68 +1320,22 @@
         <!-- ─── Module: Concept Probe (stub) ────────────────── -->
         <div class="module-body" data-module="concepts">
             <div class="section">
-                <div class="section-label">Probe Word</div>
-                <div class="text-input-row">
-                    <input type="text" class="text-input" placeholder='Type "dog" then probe...' disabled>
-                    <button class="btn-send" disabled>PROBE</button>
-                </div>
+                <div class="caption">Loading live data from the brain...</div>
             </div>
-            <div class="section">
-                <div class="section-label">Cosine Similarity (sample)</div>
-                <div class="sim-row"><span>dog ↔ cat</span><span class="val">0.82</span></div>
-                <div class="sim-row"><span>dog ↔ car</span><span class="val">0.11</span></div>
-                <div class="sim-row"><span>cat ↔ car</span><span class="val">0.09</span></div>
-                <div class="sim-row"><span>walk ↔ run</span><span class="val">0.74</span></div>
-                <div class="sim-row"><span>music ↔ sound</span><span class="val">0.66</span></div>
-            </div>
-            <div class="section">
-                <div class="section-label">Concept Neurons Firing</div>
-                <div class="big-metric">347 / 5,000</div>
-                <div class="caption">Sparse code, average 6.9% active</div>
-            </div>
-            <div class="mock-note">Mock preview. Real probe + heatmap wires in next pass.</div>
         </div>
 
         <!-- ─── Module: Speech Motor Output (stub) ──────────── -->
         <div class="module-body" data-module="speech">
             <div class="section">
-                <div class="section-label">Live Babble Stream</div>
-                <div class="babble-stream-mock">tə kɪɾ æʃu mɪɾə ɡo ʃa lɪn pe...</div>
+                <div class="caption">Loading live data from the brain...</div>
             </div>
-            <div class="section">
-                <div class="section-label">Tokens Today</div>
-                <div class="big-metric">4,128</div>
-                <div class="caption">From 3,486 speech motor neurons. Pre-linguistic phase.</div>
-            </div>
-            <div class="section">
-                <div class="section-label">Vocabulary Anchored</div>
-                <div class="progress-bar"><div class="fill" style="width:11%; background:var(--warn)"></div></div>
-                <div class="metric">28 / 256 tokens with stable mapping</div>
-            </div>
-            <div class="mock-note">Mock preview. Live token stream wires via NATS speech.* next pass.</div>
         </div>
 
         <!-- ─── Module: Continual Learning (stub) ───────────── -->
         <div class="module-body" data-module="continual">
             <div class="section">
-                <div class="section-label">Last Benchmark</div>
-                <div class="big-metric warn">60.0%</div>
-                <div class="caption">Mean retention across 8 synapse groups after Task A → Task B switch.</div>
+                <div class="caption">Loading live data from the brain...</div>
             </div>
-            <div class="section">
-                <div class="section-label">Per-Group Retention</div>
-                <div class="retention-row"><span>brainstem_motor</span><div class="bar"><div class="fill ok" style="width:97%"></div></div><span class="pct">97%</span></div>
-                <div class="retention-row"><span>feature_association</span><div class="bar"><div class="fill ok" style="width:91%"></div></div><span class="pct">91%</span></div>
-                <div class="retention-row"><span>sensory_motor</span><div class="bar"><div class="fill ok" style="width:70%"></div></div><span class="pct">70%</span></div>
-                <div class="retention-row"><span>cerebellum_motor</span><div class="bar"><div class="fill warn" style="width:58%"></div></div><span class="pct">58%</span></div>
-                <div class="retention-row"><span>working_motor</span><div class="bar"><div class="fill warn" style="width:48%"></div></div><span class="pct">48%</span></div>
-                <div class="retention-row"><span>motor_cerebellum</span><div class="bar"><div class="fill err" style="width:28%"></div></div><span class="pct">28%</span></div>
-            </div>
-            <div class="section">
-                <div class="section-label">Patent Claim 6</div>
-                <div class="caption">Eligibility traces + homeostatic scaling preserve learned weights across task switches without batch retraining.</div>
-            </div>
-            <div class="mock-note">Mock preview. Live benchmark replay wires in next pass.</div>
         </div>
 
         <!-- ─── Module: Belief Graph ────────────────────────── -->
@@ -1420,11 +1374,7 @@
             <div class="section">
                 <div class="section-label">Recent Kernel Decisions</div>
                 <div class="audit-mock" id="belief-audit">
-                    <div><span class="badge allow">allow</span> walk forward 1m</div>
-                    <div><span class="badge deny">deny</span> reach for hot surface</div>
-                    <div><span class="badge allow">allow</span> turn head left</div>
-                    <div><span class="badge deny">deny</span> query LLM (rate limited)</div>
-                    <div><span class="badge allow">allow</span> reach for cup</div>
+                    <div>Waiting for live kernel decisions.</div>
                 </div>
             </div>
         </div>
@@ -1448,23 +1398,13 @@
                     <div class="bar"><div class="fill" style="width:27%; background:var(--warn)"></div></div>
                     <span class="val">288 J</span>
                 </div>
-                <div class="energy-row">
-                    <span>OSCEN CPU</span>
-                    <div class="bar"><div class="fill" style="width:4%"></div></div>
-                    <span class="val">43.2 J</span>
-                </div>
-                <div class="energy-row">
-                    <span>OSCEN Loihi</span>
-                    <div class="bar"><div class="fill ok" style="width:1%"></div></div>
-                    <span class="val">1.08 J</span>
-                </div>
             </div>
             <div class="section">
                 <div class="section-label">Loihi vs GPU Advantage</div>
                 <div class="big-metric ok">109×</div>
-                <div class="caption">Less energy per inference. Loihi 2 neuromorphic hardware.</div>
+                <div class="caption">Less energy per inference on Intel Loihi. Published third-party result (Blouw et al. 2019), not an OSCEN measurement.</div>
             </div>
-            <div class="mock-note">Mock preview. Pulls live power telemetry in next pass.</div>
+            <div class="mock-note">Published third-party comparisons. OSCEN power is not yet measured.</div>
         </div>
 
         </div><!-- /.drawer-body -->
@@ -1824,9 +1764,9 @@
     <span class="bottombar-sep"></span>
     <span class="bottombar-item"><strong>1,156,800</strong> neurons</span>
     <span class="bottombar-sep"></span>
-    <span class="bottombar-item"><strong>1.5B</strong> synapses</span>
+    <span class="bottombar-item"><strong>~814M</strong> synapses</span>
     <span class="bottombar-sep"></span>
-    <span class="bottombar-item"><strong>64</strong> synapse groups</span>
+    <span class="bottombar-item"><strong>65</strong> synapse groups</span>
 </div>
 
 <script>
@@ -1835,17 +1775,17 @@
 // ═══════════════════════════════════════════════════════════════════
 
 const REGION_META = {
-    sensory_cortex:     { label: 'Sensory Cortex',   color: '#22d3ee', neurons: 200000 },
-    brainstem:          { label: 'Brainstem',         color: '#ff4d4d', neurons: 1800 },
-    reflex_arc:         { label: 'Reflex Arc',        color: '#ff9933', neurons: 1000 },
-    feature_layer:      { label: 'Feature Layer',     color: '#22c7c0', neurons: 20000 },
-    association_cortex: { label: 'Association',        color: '#5ea4f5', neurons: 500000 },
-    predictive_layer:   { label: 'Predictive',        color: '#a673f5', neurons: 100000 },
-    cerebellum:         { label: 'Cerebellum',        color: '#f2d933', neurons: 50000 },
-    working_memory:     { label: 'Working Memory',    color: '#f573b5', neurons: 20000 },
-    concept_layer:      { label: 'Concept Layer',     color: '#f5ba26', neurons: 5000 },
-    meta_controller:    { label: 'Meta Control',      color: '#e6e6f0', neurons: 3000 },
-    motor_cortex:       { label: 'Motor Cortex',      color: '#38d97a', neurons: 100000 },
+    sensory_cortex:     { label: 'Sensory Cortex',   color: '#22d3ee', neurons: 232500 },
+    brainstem:          { label: 'Brainstem',         color: '#ff4d4d', neurons: 18600 },
+    reflex_arc:         { label: 'Reflex Arc',        color: '#ff9933', neurons: 11600 },
+    feature_layer:      { label: 'Feature Layer',     color: '#22c7c0', neurons: 93000 },
+    association_cortex: { label: 'Association',        color: '#5ea4f5', neurons: 232500 },
+    predictive_layer:   { label: 'Predictive',        color: '#a673f5', neurons: 116200 },
+    cerebellum:         { label: 'Cerebellum',        color: '#f2d933', neurons: 116200 },
+    working_memory:     { label: 'Working Memory',    color: '#f573b5', neurons: 27900 },
+    concept_layer:      { label: 'Concept Layer',     color: '#f5ba26', neurons: 23200 },
+    meta_controller:    { label: 'Meta Control',      color: '#e6e6f0', neurons: 13900 },
+    motor_cortex:       { label: 'Motor Cortex',      color: '#38d97a', neurons: 116200 },
 };
 
 // ── Simulated cascade profiles (used when NOT in live mode) ──────
@@ -2278,6 +2218,8 @@ function runSimulatedCascade(profileKey) {
     cascadeTimeouts = [];
     logScroll.innerHTML = '';
     summaryEl.classList.remove('active');
+    // Offline fallback: scripted cascade. Label it so nobody mistakes it for the brain.
+    addLiveLogEntry(0, 'ILLUSTRATIVE', 'Illustrative mock-up, not live brain data (brain not connected).', '#fbbf24');
 
     processingEl.classList.add('active');
     processingText.textContent = 'Encoding sensory input...';
@@ -2295,7 +2237,7 @@ function runSimulatedCascade(profileKey) {
 
     cascadeTimeouts.push(setTimeout(() => {
         clearInterval(barInterval);
-        processingText.textContent = 'Processing: ' + profile.name;
+        processingText.textContent = 'Illustrative mock-up: ' + profile.name;
 
         const cumulativeRates = {};
         const activatedRegions = [];
@@ -2693,7 +2635,7 @@ function showSimSummary(profile, activated) {
         </div>
         <div class="section">
             <div class="section-label">Patent Claim 6</div>
-            <div class="caption">Eligibility traces + homeostatic scaling preserve learned weights across task switches without batch retraining.</div>
+            <div class="caption">Eligibility traces + homeostatic scaling are designed to preserve learned weights across task switches without batch retraining.</div>
         </div>
     `;
 

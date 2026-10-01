@@ -8,6 +8,7 @@ import Nav from "../../components/Nav.astro";
 import PitchNav from "../../components/PitchNav.astro";
 import TeamCards from "../../components/TeamCards.astro";
 import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
+import { SYNAPSES_DISPLAY } from "../../data/brain";
 ---
 
 <Base title="Team | OSCEN Investor Pitch" description="Confidential investor materials. Shared by link only." noindex={true}>
@@ -35,7 +36,7 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">
         What's been built
       </h2>
-      <p class="reveal text-sm text-text-muted mb-12">5 years of planning. 7 months of focused build. Bootstrapped.</p>
+      <p class="reveal text-sm text-text-muted mb-12">Nearly a decade of research. 5 years of architecture design. Bootstrapped.</p>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         {[
@@ -43,9 +44,9 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
           { value: KEY_STATS.synapses, label: "Synapses", color: "text-accent-cyan" },
           { value: String(KEY_STATS.synapseGroups), label: "Synapse groups", color: "text-accent-green" },
           { value: String(KEY_STATS.brainRegions), label: "Brain regions", color: "text-accent-amber" },
-          { value: "6", label: "Learning rules (patented)", color: "text-accent-purple" },
+          { value: "6", label: "Learning rules (patent pending)", color: "text-accent-purple" },
           { value: "5", label: "Developmental phases", color: "text-accent-pink" },
-          { value: "660+", label: "Automated tests", color: "text-accent-blue" },
+          { value: "5,000+", label: "Automated tests", color: "text-accent-blue" },
           { value: "24/7", label: "Continuous training", color: "text-accent-green" },
         ].map((s) => (
           <div class="reveal glass rounded-xl p-4 text-center">
@@ -64,12 +65,12 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
             "5-phase developmental lifecycle",
             "Sensory gateway (camera, mic, video, serial sensors)",
             "Motor cortex with 6 sub-ranges",
-            "Cognitive action channel (emergent LLM queries)",
-            "Speech motor system (256-token vocabulary)",
+            "Cognitive action channel (LLM query path, patent Claim 3)",
+            "Speech motor system (22-articulator vocal tract)",
             "Motor feedback loop (R-STDP proprioception)",
             "Auditory short-term memory module",
             "CNN visual preprocessor (ONNX, shared singleton)",
-            "Hybrid SQLite + .npy persistence (1.31B synapses)",
+            `Hybrid SQLite + .npy persistence (${SYNAPSES_DISPLAY} synapses)`,
             "Fork-based background save (zero training pause)",
             "NATS event bus (observation aggregation, 99.7% reduction)",
             "Video curation pipeline (Gemini API classification)",
@@ -106,8 +107,8 @@ import { KEY_STATS, HIRING_PLAN } from "../../data/pitch";
             <div class="text-[9px] text-text-muted mt-1">Concept to 1M neurons</div>
           </div>
           <div>
-            <div class="text-xl font-tech font-bold text-accent-purple">660+</div>
-            <div class="text-[9px] text-text-muted mt-1">Tests (zero skipped)</div>
+            <div class="text-xl font-tech font-bold text-accent-purple">5,000+</div>
+            <div class="text-[9px] text-text-muted mt-1">Automated tests</div>
           </div>
         </div>
       </div>

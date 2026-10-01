@@ -913,7 +913,7 @@ body.body-drawer-open #ghost-panel {
             <div class="section">
                 <div class="section-label">Active Brain</div>
                 <div id="bd-active-brain" style="font-size:14px;color:#fff;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">1M Production</div>
-                <div style="font-size:9px;color:#6a6a6a;letter-spacing:1px;margin-top:4px;" id="bd-brain-sub">Generalist — walker_4dof body</div>
+                <div style="font-size:9px;color:#6a6a6a;letter-spacing:1px;margin-top:4px;" id="bd-brain-sub">Generalist, humanoid body</div>
             </div>
             <div class="section">
                 <div class="section-label">Switch To</div>
@@ -940,8 +940,6 @@ body.body-drawer-open #ghost-panel {
         outline: none;
     ">
         <option value="1m">1M Production</option>
-        <option value="100k">100K Locomotion</option>
-        <option value="balance">100K Balance/Recovery</option>
         <option value="audio">100K Speech/Audio</option>
         <option value="humanoid-stand">100K Humanoid Stand-Step</option>
         <option value="humanoid-locomotion">100K Humanoid Locomotion</option>
@@ -1064,8 +1062,6 @@ body.body-drawer-open #ghost-panel {
             border:1px solid rgba(34,211,238,0.2); border-radius:3px;
             padding:4px; margin-top:2px; font-size:11px;">
             <option value="1m">1M (main)</option>
-            <option value="100k">100K locomotion</option>
-            <option value="balance">100K balance</option>
             <option value="humanoid-stand">100K humanoid stand-step</option>
             <option value="humanoid-locomotion">100K humanoid locomotion</option>
         </select>
@@ -2504,12 +2500,10 @@ brainSelect.addEventListener('change', async () => {
     const activeBrainEl  = document.getElementById('bd-active-brain');
     const brainSubEl     = document.getElementById('bd-brain-sub');
     const BRAIN_META = {
-        '1m':      { label: '1M Production',   sub: 'Generalist — walker_4dof' },
-        '100k':    { label: '100K Locomotion', sub: 'Gait specialist — walker_4dof' },
-        'balance': { label: '100K Balance',    sub: 'Stability + recovery — walker_4dof' },
+        '1m':      { label: '1M Production',   sub: 'Generalist, humanoid_29dof' },
         'audio':   { label: '100K Speech',     sub: 'Audio brain — speech_only' },
         'humanoid-stand':      { label: '100K Humanoid Stand-Step', sub: 'Stand→step→stand — humanoid_29dof' },
-        'humanoid-locomotion': { label: '100K Humanoid Locomotion', sub: 'Humanoid gait donor — humanoid_29dof' },
+        'humanoid-locomotion': { label: '100K Humanoid Locomotion', sub: 'Humanoid locomotion specialist, humanoid_29dof' },
     };
     function refreshBrainModule() {
         const v = brainSelectEl ? brainSelectEl.value : '1m';

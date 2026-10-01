@@ -19,6 +19,7 @@ import Footer from "../components/Footer.astro";
 import Turnstile from "../components/Turnstile.astro";
 import TeamCards from "../components/TeamCards.astro";
 import { SEGMENTS } from "../lib/forms";
+import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
 ---
 
 <Base title="Invest | OSCEN" description="Back a brain-inspired AI for robots. Patent pending. Submit interest and we'll send the brief.">
@@ -33,7 +34,7 @@ import { SEGMENTS } from "../lib/forms";
         <span class="italic gradient-text">We're building the brain.</span>
       </h1>
       <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
-        A spiking neural network that learns continuously, never forgets, and is designed to run on a fraction of the power of today's AI. The brain is real and training right now. The body is what we build next, with you.
+        A spiking neural network that learns continuously, with mechanisms designed to protect old skills while learning new ones, and is designed to run on a fraction of the power of today's AI. The brain is real and training right now. The body is what we build next, with you.
       </p>
     </section>
 
@@ -43,8 +44,8 @@ import { SEGMENTS } from "../lib/forms";
         {[
           { value: "$1.4T", label: "Robotics market by 2030", sub: "Goldman Sachs", color: "text-accent-blue" },
           { value: "$200M+", label: "Brain-inspired AI VC in 2025", sub: "3× from 2024", color: "text-accent-blue" },
-          { value: "1.15M", label: "Neurons training live", sub: "Today, not pitched", color: "text-accent-green" },
-          { value: "0", label: "SNN robotics competitors", sub: "Commercial deployment", color: "text-accent-blue" },
+          { value: `${(BRAIN_STATS.totalNeurons / 1_000_000).toFixed(2)}M`, label: "Neurons training live", sub: "Today, not pitched", color: "text-accent-green" },
+          { value: "Few", label: "SNN players building robot brains", sub: "Most sell chips, not brains", color: "text-accent-blue" },
         ].map((stat) => (
           <div class="reveal glass-bright rounded-xl p-4 text-center">
             <div class={`text-xl md:text-2xl font-tech font-bold ${stat.color}`}>{stat.value}</div>
@@ -79,7 +80,7 @@ import { SEGMENTS } from "../lib/forms";
           </div>
         </div>
         <div class="divider my-4"></div>
-        <p class="text-xs text-text-secondary leading-relaxed">AMI and Prometheus both still train on GPU clusters, still deploy frozen models, still can't learn on-device, and still have no answer for catastrophic forgetting. <span class="text-accent-blue">OSCEN solves all four.</span></p>
+        <p class="text-xs text-text-secondary leading-relaxed">AMI and Prometheus both still train on GPU clusters, still deploy frozen models, still can't learn on-device, and still have no answer for catastrophic forgetting. <span class="text-accent-blue">OSCEN is designed to answer all four.</span></p>
       </div>
 
       <div class="reveal glass rounded-xl p-5">
@@ -107,7 +108,7 @@ import { SEGMENTS } from "../lib/forms";
           <div>
             <div class="text-sm font-tech text-accent-blue font-medium">OSCEN</div>
             <div class="text-[10px] text-text-secondary mt-1">Spiking Neural Net</div>
-            <div class="text-[10px] text-accent-green mt-0.5">Continual, &lt;5W</div>
+            <div class="text-[10px] text-accent-green mt-0.5">Continual, &lt;5W target</div>
           </div>
         </div>
       </div>
@@ -126,7 +127,7 @@ import { SEGMENTS } from "../lib/forms";
             { label: "GPT-4o", value: "~1,080 joules per query", source: "Epoch AI, 2025", bar: 100, color: "accent-red" },
             { label: "Gemini", value: "~864 joules per prompt", source: "Google official", bar: 80, color: "accent-amber" },
             { label: "GPU Robot Brain", value: "50-200 joules per second", source: "Industry standard", bar: 90, color: "accent-red" },
-            { label: "OSCEN (event-driven)", value: "<5 joules per second", source: "Spiking-network benchmarks", bar: 5, color: "accent-green" },
+            { label: "OSCEN on neuromorphic silicon", value: "<5 joules per second (projected)", source: "Estimate from published SNN benchmarks, not measured", bar: 5, color: "accent-green" },
           ].map((item) => (
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -166,7 +167,7 @@ import { SEGMENTS } from "../lib/forms";
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { claim: "1", title: "Integrated Multi-Mechanism Learning", desc: "6 learning rules operating simultaneously every step across all synapse groups" },
+            { claim: "1", title: "Integrated Multi-Mechanism Learning", desc: "6 learning rules operating simultaneously across the network" },
             { claim: "2", title: "Developmental Critical Periods", desc: "5 phases with experience-dependent adolescent entry: pruning, myelination, identity" },
             { claim: "3", title: "Hybrid SNN-LLM Architecture", desc: "Brain learns when to query external knowledge through emergent STDP, not hardcoded rules" },
             { claim: "4", title: "Cross-Modal Binding", desc: "Arbitrary sensor modalities bind through spike-timing coincidence with multiplicative instinctual gain" },
@@ -207,11 +208,11 @@ import { SEGMENTS } from "../lib/forms";
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         {[
-          { stat: "1,156,800", label: "Spiking neurons", desc: "15 brain regions. 66 synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning." },
-          { stat: "~850M plastic", label: "Synapses", desc: "Sparse CSR matrices. Eligibility traces on every group. BCM, neuromodulation, and synaptic scaling active system-wide." },
-          { stat: "~10 years", label: "Research to deployment", desc: "Nearly a decade of neuroscience research and architectural design. 7 months of focused implementation, bootstrapped with considerable personal investment." },
+          { stat: BRAIN_STATS.totalNeurons.toLocaleString("en-US"), label: "Spiking neurons", desc: `${BRAIN_STATS.brainRegions} brain regions. ${BRAIN_STATS.synapseGroups} synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning.` },
+          { stat: SYNAPSES_DISPLAY, label: "Synapses", desc: "Sparse CSR matrices. Eligibility traces on every plastic group. BCM, neuromodulation, and synaptic scaling active system-wide." },
+          { stat: "~10 years", label: "Research and design", desc: "Nearly a decade of neuroscience research and architectural design. 7 months of focused implementation, bootstrapped with considerable personal investment." },
           { stat: "24/7", label: "Continuous training", desc: "Enterprise-grade dedicated server. Processing a multimodal video and audio curriculum around the clock. Currently in the adolescent developmental phase." },
-          { stat: "6", label: "Learning rules", desc: "All running simultaneously every simulation step. STDP, eligibility traces, BCM, neuromodulation, homeostatic scaling, R-STDP." },
+          { stat: "6", label: "Learning rules", desc: "All running together, continuously. STDP, eligibility traces, BCM, neuromodulation, homeostatic scaling, R-STDP." },
           { stat: "5", label: "Developmental phases", desc: "Infant → Toddler → Juvenile → Adolescent → Mature. Phase transitions are experience-dependent, not hardcoded." },
         ].map((item, i) => (
           <div class="expand-card reveal glass rounded-xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
@@ -233,7 +234,7 @@ import { SEGMENTS } from "../lib/forms";
         <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-border-bright">
           <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
           <span class="text-[10px] font-tech text-text-secondary tracking-wider">
-            Training live &middot; Juvenile phase &middot; 403-video curriculum
+            Training live &middot; Adolescent phase
           </span>
         </div>
       </div>
@@ -275,9 +276,9 @@ import { SEGMENTS } from "../lib/forms";
 
       <div class="space-y-2">
         {[
-          { priority: "01", item: "Low-power edge deployment", desc: "Move from CPU simulation to purpose-built edge compute. Up to 100× energy reduction via sparse, event-driven activation." },
+          { priority: "01", item: "Low-power edge deployment", desc: "Move from CPU simulation to purpose-built edge compute. Target: up to 100x lower energy, based on published neuromorphic results." },
           { priority: "02", item: "Robotics integration", desc: "Physical robot body. Camera, servos, touch sensors. Close the full sensorimotor loop with real-world feedback." },
-          { priority: "03", item: "Team expansion", desc: "Computational neuroscientist, robotics engineer, hardware specialist. Three hires transform timeline from solo to production." },
+          { priority: "03", item: "Team expansion", desc: "Computational neuroscientist, robotics engineer, hardware specialist. Three hires take the build from a four-person core to a full build team." },
           { priority: "04", item: "Patent portfolio", desc: "Non-provisional filing by Feb 2027. 20 continuation patents covering hardware mapping, fleet learning, safety architecture." },
           { priority: "05", item: "Benchmarks & papers", desc: "Formal evaluation on standard robotics tasks. Published results for academic credibility and partnership conversations." },
         ].map((item, i) => (
