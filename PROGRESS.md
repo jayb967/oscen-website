@@ -12,6 +12,90 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-09-30 SITE-WIDE ACCURACY AUDIT + CHANGE PLAN (every page checked against the live brain)
+
+**Why now.** The 2026-09-28/29 honesty sweep corrected three premises across the code repo, and
+`BRAIN-OVERHAUL-PLAN.md` 4.5 has no row for THIS repo, so oscen.ai was never swept. Commit `05710e5`
+caught two of them by hand (the specialist-teaching claim, the 8-specialist fleet count). This is the
+full pass: every numeric and capability claim on all 17 pages, checked against the running 1M brain
+and the canonical repo sources, not against other marketing copy.
+
+**How each number was verified.** Live `GET /api/neuromorphic` on demo.oscen.ai and
+`neuromorphic/profiles/size/1m.toml`, both read 2026-09-30. Where the site and a doc disagreed, the
+running brain wins.
+
+### What is WRONG (12 findings, 3 tiers)
+
+**TIER 1, wrong numbers. These are checkable by anyone with the demo page open.**
+
+| # | Where | Site says | Truth | Size of error |
+|---|---|---|---|---|
+| A1 | `src/data/brain.ts:171` `totalSynapses` | 1,500,000,000, renders as "1.50B synapses" on /architecture | **818,962,332** | **83% overstatement** of a headline number |
+| A2 | `src/data/brain.ts:172` `synapseGroups` | 64 | **65** | off by one |
+| A3 | `src/pages/invest.astro:210` | "66 synapse groups" | **65** | off by one, and disagrees with A2 |
+| A4 | `src/data/sections.ts:125` | "66 synapse groups" | **65** | third different value on the same site |
+| A5 | `src/pages/invest.astro:211` | "~850M plastic" synapses | **819M total, and only 49 of 65 groups are plastic** | count wrong AND "plastic" wrong |
+| A6 | `src/pages/architecture.astro:239-244` | Sensory 200K, Feature 20K, Association 500K, Concept 5K, Predictive 100K, Meta 3K | **232,500 / 93,000 / 232,500 / 23,200 / 116,200 / 13,900** | **all six wrong.** Feature, Concept and Meta understated ~4.6x; Association **overstated 2.15x** |
+| A7 | `src/data/how-it-works.ts:34` | "Half a million neurons connect the dots" (association cortex) | **232,500** | same 500K error as A6, second location |
+
+**TIER 2, claims we cannot support if asked.**
+
+| # | Where | Claim | Problem |
+|---|---|---|---|
+| B1 | `src/pages/invest.astro:130` | "OSCEN (event-driven) <5 joules per second", sourced to "Spiking-network benchmarks" | **No measured power or energy figure exists anywhere in the record.** Grepped `PROGRESS.md`, `TUNING-LOG.md`, all SBIR volumes and `RESEARCH-PAPER.md`: nothing. `NV027-SUBMISSION-LOG.md` states it plainly: energy is "a derived, labeled estimate, never measured (no power telemetry at eval tier)". The named source cannot be produced. |
+| B2 | `src/pages/research.astro:100` | "OSCEN (CPU sim) ~45 J/s" | Same. Presented as if measured on our own hardware. It was not. |
+| B3 | `src/data/how-it-works.ts:41` | "Signals fire out to the body. **Walk. Grab. Speak.**" | Measured 2026-09-29: 28 consecutive 1M episodes all ended `reason=fallen`, 0 successes, and the historical `walk` successes were knee-shuffles banked by a displacement-only gate. Speech: the phone recognizer hears /i/ and "ba" only, word bank 0 of 16. "Grab": the manipulation bed was retired 2026-09-28. **All three named capabilities are unsupported on the flagship.** |
+
+**TIER 3, drift and hygiene.**
+
+| # | Where | Issue |
+|---|---|---|
+| C1 | `src/data/sections.ts:133`, `src/data/pitch.ts:465` | "7 months training continuously" is a hardcoded string that silently ages. Patent filed 2026-02-20, so it is already drifting toward 8. "Continuously" is also strained given restarts. |
+| C2 | repo-wide | Three separate hardcoded copies of the synapse-group count and two of the synapse count. There is a `BRAIN_STATS` single source of truth in `src/data/brain.ts` and two pages bypass it. That is what let A2, A3 and A4 diverge. |
+
+### What is RIGHT (checked, no action needed)
+
+- Neuron count **1,156,800**, consistent everywhere and matches the live brain.
+- Brain regions **15**, consistent and matches live `firing_rates`.
+- Patent **US 63/986,737**, filed 2026-02-20, 6 claims. Verified.
+- "258 prior art patents searched, zero overlap" verified against `oscen/docs/PROVISIONAL-PATENT.md:1309` (USPTO ODP, `inventionTitle:"spiking neural"`, 258 hits, none combining 2+ learning mechanisms).
+- 6 learning rules, 5 developmental phases, 4 dendritic compartments. All match the patent claims.
+- Fleet "1M + 3 specialists" and the specialist-teaching copy, both already corrected in `05710e5`.
+- LLM energy comparators (GPT-4o ~1,080 J/query Epoch AI, Gemini ~864 J/prompt) are externally sourced and attributed. Only OUR OWN two numbers are the problem.
+
+### The change plan
+
+**Wave 1, the wrong numbers. Do this first, it is mechanical and it is the reputational risk.**
+
+- [ ] **W1.1** `src/data/brain.ts`: `totalSynapses` 1_500_000_000 -> **818_962_332**; `synapseGroups` 64 -> **65**. Add a comment naming the source and the date, and add `plasticSynapseGroups: 49`.
+- [ ] **W1.2** `src/pages/architecture.astro:239-244`: replace all six per-layer neuron counts with the profile values (232,500 / 93,000 / 232,500 / 23,200 / 116,200 / 13,900). Read them from a new exported `REGION_POPULATIONS` in `brain.ts` rather than retyping them inline.
+- [ ] **W1.3** `src/pages/invest.astro:210-211`: use `BRAIN_STATS` instead of the hardcoded "66" and "~850M plastic". New copy: "15 brain regions. 65 synapse groups, 49 of them plastic." and stat "818,962,332".
+- [ ] **W1.4** `src/data/sections.ts:125`: same, drive from `BRAIN_STATS`.
+- [ ] **W1.5** `src/data/how-it-works.ts:34`: "Half a million neurons" -> "A quarter of a million neurons" (232,500).
+
+**Wave 2, the claims we cannot support. Founder decision on each.**
+
+- [ ] **W2.1** Energy. Three options, pick one: **(a)** delete both OSCEN rows and keep the section as "why event-driven compute matters" with only the externally sourced LLM/GPU comparators; **(b)** relabel both as explicit projections, for example "OSCEN, projected on neuromorphic silicon: <5 J/s (estimate, not measured)"; **(c)** actually measure the CPU draw on the Hetzner box and publish a real number. **Recommendation: (b) now, (c) later.** (a) loses a real differentiator; (c) is the only thing that makes the claim durable, and the box has the instrumentation story already.
+- [ ] **W2.2** "Walk. Grab. Speak." Rewrite to what the brain demonstrably does: it emits motor commands to a body every step, in real time, with no round trip to a data centre. That claim is true, it is the architectural point the step is making, and it does not name three capabilities we cannot show. Suggested: "Signals fire out to the body, every step, in real time. No round trip to a data centre."
+- [ ] **W2.3** Sweep for any other verb-level capability claim on /index, /research and /invest that implies the humanoid walks or talks today.
+
+**Wave 3, stop it happening again.**
+
+- [ ] **W3.1** Make `BRAIN_STATS` the only place any brain number lives. Grep for hardcoded duplicates and replace every one with the import. `sections.ts`, `pitch.ts` and `invest.astro` are the known offenders.
+- [ ] **W3.2** Replace the hardcoded "7 months" with a value computed from a `TRAINING_START` date constant so it cannot go stale.
+- [ ] **W3.3** Add a `BRAIN-OVERHAUL-PLAN.md` 4.5 row for this repo, so the next honesty sweep includes oscen.ai by default. This omission is the root cause of the whole audit.
+- [ ] **W3.4** Add a short `docs/NUMBERS.md` in this repo: each public number, its canonical source, and the command that re-verifies it.
+
+### Gate before deploy
+
+`npm run build` green with 17 pages, then grep the built output in `dist/` to confirm zero occurrences of `1.50B`, `1,500,000,000`, `66 synapse`, `64 synapse`, `850M`, `Half a million neurons`, `Walk. Grab. Speak.`, and confirm `818,962,332`, `65 synapse groups` and `232,500` are present. Verify locally BEFORE pushing, and do not poll oscen.ai afterwards.
+
+### Note on severity
+
+A1 and A6 are the two that matter most. A1 nearly doubles a headline number, and A6 is wrong in the direction that flatters us on the single largest region. Both are on pages an investor reads before a diligence call, and both are contradicted by our own live demo, which is linked from the same site. The pitch deck locked these numbers for exactly this reason; the website never got the memo.
+
+---
+
 ## 2026-08-21 SPAM KILL SWITCH (inquiry forms OFF) + CAPTCHA plan
 
 A spam bot is flooding the public forms: same `Name: RobertJaf`, `Company: google`,
