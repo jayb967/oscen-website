@@ -197,11 +197,11 @@ export const ENERGY_DATA: EnergyComparison[] = [
 
 // Current round, DECIDED 2026-08-06 (oscen-internal DE-RISKING-ROADMAP-TRACKER.md
 // Risk 8; fundraising/PRESEED-2026-TERM-SHEET.md): $2M pre-seed, YC post-money
-// SAFE, $10M post-money cap, cap-only, MFN, $10K accredited minimum.
+// SAFE, $10M post-money cap, cap-only, MFN, $100K accredited minimum (raised from $10K 2026-10-06).
 export const RAISE_AMOUNT = "$2M";
 export const RAISE_INSTRUMENT = "Post-money SAFE";
 export const VALUATION_CAP = "$10M";
-export const MIN_CHECK = "$10K";
+export const MIN_CHECK = "$100K";
 export const FOUNDER_OWNERSHIP_POST = "~64%"; // fully diluted, illustrative (term sheet)
 // The earlier $10M plan at $30M pre-money is deferred to the NEXT round, to be
 // priced on the evidence the pre-seed produces. It is not part of this offering.
