@@ -13,6 +13,7 @@ interface Props {
 }
 const { tier, featured = false, wide = featured } = Astro.props;
 const a = ACCENT[tier.accent];
+import LineBadge from "./support/LineBadge.astro";
 ---
 
 <a
@@ -33,6 +34,8 @@ const a = ACCENT[tier.accent];
     </div>
   </div>
 
+  {tier.line && <div class="mb-4"><LineBadge text={tier.line} size={featured ? "md" : "sm"} /></div>}
+
   <div class:list={[wide && "md:grid md:grid-cols-2 md:gap-10"]}>
     <p class:list={["text-text-secondary leading-relaxed mb-5", featured ? "text-base" : "text-sm"]}>{tier.blurb}</p>
 
@@ -47,12 +50,6 @@ const a = ACCENT[tier.accent];
   </div>
 
   <div class="mt-auto space-y-1.5">
-    {tier.line && (
-      <p class="flex items-center gap-2 text-[11px] font-tech text-accent-green/90">
-        <span class="w-1.5 h-1.5 rounded-full bg-accent-green shrink-0" aria-hidden="true"></span>
-        <span>{tier.line}</span>
-      </p>
-    )}
     {tier.scarcity && <p data-scarcity class="text-[11px] font-tech text-accent-amber/90">{tier.scarcity}</p>}
     {tier.ships && <p class="text-[10px] font-tech text-text-muted">{tier.ships}</p>}
     <div class={`pt-3 text-[11px] font-tech ${a.ctaIdle} ${a.ctaHover} transition-colors`}>

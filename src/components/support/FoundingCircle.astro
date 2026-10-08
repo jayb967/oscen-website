@@ -44,6 +44,7 @@ const COMPARE: { label: string; circle: Cell; inner: Cell }[] = [
   { label: "Quarterly live build session with the founder", circle: false, inner: true },
   { label: "OSCEN-branded crewneck with your first month", circle: false, inner: true },
 ];
+import LineBadge from "./LineBadge.astro";
 ---
 
 {PLANS.length > 0 && (
@@ -66,6 +67,7 @@ const COMPARE: { label: string; circle: Cell; inner: Cell }[] = [
             <span class:list={["font-tech text-5xl font-bold tracking-tight", p.priceColor]}>{p.tier.price}</span>
             <span class="text-sm font-tech text-text-muted">/month</span>
           </p>
+          {p.tier.line && <div class="mt-4"><LineBadge text={p.tier.line} size="md" /></div>}
           <p class="mt-4 text-sm text-text-secondary leading-relaxed">{p.tier.blurb}</p>
           <ul class="mt-6 mb-8 space-y-3">
             {p.perks.map((perk) => (
