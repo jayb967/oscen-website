@@ -2,8 +2,10 @@
 /**
  * CookieConsent.astro
  *
- * GDPR/CCPA consent banner. Site defaults to deny-all tracking;
- * pixel and GTM only load after the user clicks Accept.
+ * GDPR/CCPA consent banner. Outside the US nothing loads until Accept and
+ * the banner shows on first visit. In the US tracking is opt-out (see
+ * scripts/consent.ts): no banner on first visit, opt out from the footer
+ * "Do not sell or share" link or by reopening this banner.
  *
  * Mounted once globally in Base.astro. No props.
  * Region copy (US soft vs. INTL strict) is selected at runtime,
@@ -28,10 +30,11 @@
       <!-- US copy (soft) -->
       <div data-consent-copy="us" class="hidden">
         <h2 class="text-sm font-medium text-text-primary mb-1">
-          We use cookies to understand what's working.
+          Your cookie choices
         </h2>
         <p class="text-xs text-text-secondary leading-relaxed">
-          Privacy-safe analytics plus optional ad measurement for our investor outreach. You can opt out anytime in the footer.
+          We use cookies for analytics and to measure our ads on Meta, TikTok, and Reddit. That can count as "sharing" under US privacy laws. Opt out anytime. See our
+          <a href="/privacy" class="underline decoration-white/20 hover:decoration-text-primary hover:text-text-primary transition-colors">Privacy Policy</a>.
         </p>
       </div>
 
@@ -53,7 +56,7 @@
         data-consent-decline
         class="order-2 sm:order-1 px-5 py-2 text-[12px] font-medium rounded-full border border-white/15 text-text-primary/90 hover:text-text-primary hover:border-white/30 hover:-translate-y-px transition-all duration-300 font-tech tracking-wide"
       >
-        <span data-consent-label="decline-us">Decline</span>
+        <span data-consent-label="decline-us">Opt out</span>
         <span data-consent-label="decline-intl" class="hidden">Reject all</span>
       </button>
       <button
@@ -61,7 +64,7 @@
         data-consent-accept
         class="order-1 sm:order-2 px-5 py-2 text-[12px] font-medium rounded-full border border-accent-amber/30 bg-accent-amber/10 text-accent-amber hover:bg-accent-amber/20 hover:border-accent-amber/50 transition-all duration-300 font-tech tracking-wide"
       >
-        <span data-consent-label="accept-us">Accept</span>
+        <span data-consent-label="accept-us">Allow</span>
         <span data-consent-label="accept-intl" class="hidden">Accept all</span>
       </button>
     </div>
@@ -76,6 +79,7 @@
 
   interface OscenConsent {
     state: () => ConsentState;
+    decided: () => boolean;
     region: () => ConsentRegion;
     grant: () => void;
     deny: () => void;
@@ -150,10 +154,23 @@
       });
     });
 
-    // Initial mount: only show if the user has not decided.
+    // "Do not sell or share my personal information": one-click opt-out.
+    document.querySelectorAll<HTMLElement>("[data-consent-optout]").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.oscenConsent?.deny?.();
+        hideBanner();
+        el.textContent = "You've opted out";
+        el.setAttribute("aria-live", "polite");
+      });
+    });
+
+    // Initial mount: only opt-in regions see the banner unprompted, and only
+    // until they choose. US visitors are opt-out (no banner on first visit).
     const init = () => {
-      const state = window.oscenConsent?.state?.() ?? "unknown";
-      if (state === "unknown") showBanner();
+      const c = window.oscenConsent;
+      if (!c) return;
+      if (c.region() !== "us" && !c.decided()) showBanner();
     };
 
     if (window.oscenConsent) {

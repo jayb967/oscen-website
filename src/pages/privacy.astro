@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 
-const lastUpdated = "2026-06-27";
+const lastUpdated = "2026-10-08";
 ---
 
 <Base title="Privacy Policy | OSCEN" description="How OSCEN collects, uses, and protects your information across oscen.ai.">
@@ -37,7 +37,12 @@ const lastUpdated = "2026-06-27";
             <ul class="list-disc pl-5 mt-2 space-y-2">
               <li><strong class="text-text-primary">Essential (always on):</strong> a small consent cookie that remembers your choice, and a session-scoped attribution cookie that captures the UTM tags from links you arrive on.</li>
               <li><strong class="text-text-primary">Analytics (always on, privacy-safe):</strong> Plausible Analytics. It does not use cookies and does not identify you personally.</li>
-              <li><strong class="text-text-primary">Advertising (consent required):</strong> Meta Pixel and Google Tag Manager. These set cookies that let Meta and Google's tag partners measure ad performance and let us show relevant ads on Instagram, Facebook, and other Meta properties.</li>
+              <li><strong class="text-text-primary">Advertising:</strong> the Meta, TikTok, and Reddit pixels and Google Tag Manager, plus server-side copies of the same conversion events (for example, that a form was submitted or a purchase completed, with your email address hashed). These let those platforms measure our ads and show relevant ads. Under some US state laws this counts as "sharing" personal information for targeted advertising.
+                <ul class="list-[circle] pl-5 mt-1 space-y-1">
+                  <li><strong class="text-text-primary">In the US:</strong> on by default. Opt out anytime with the <button data-consent-optout class="text-accent-blue hover:underline">Do not sell or share my personal information</button> link in the footer, or through Cookie preferences. We also treat a Global Privacy Control signal from your browser as an opt-out.</li>
+                  <li><strong class="text-text-primary">Outside the US:</strong> off until you choose Accept in the cookie banner.</li>
+                </ul>
+              </li>
             </ul>
           </li>
           <li><strong class="text-text-primary">When you fill out a form:</strong> name, email, and whatever else the form asks. Contact, investor, and collaborator forms submit to our own OSCEN CRM; newsletter signups go through Buttondown. Investor inquiries also ask about accreditation status and check size.</li>
@@ -75,7 +80,7 @@ const lastUpdated = "2026-06-27";
       <div class="reveal glass rounded-2xl p-6">
         <h2 class="text-xl font-display text-text-primary mb-3">Your rights</h2>
         <ul class="text-text-secondary leading-relaxed space-y-2 list-disc pl-5">
-          <li>Withdraw consent at any time. Use the <button data-consent-reopen class="text-accent-blue hover:underline">Cookie preferences</button> link to reopen the banner.</li>
+          <li>Withdraw consent or opt out at any time. Use the <button data-consent-reopen class="text-accent-blue hover:underline">Cookie preferences</button> link to reopen the banner, or the "Do not sell or share my personal information" link in the footer.</li>
           <li>Request a copy of your data.</li>
           <li>Request deletion.</li>
           <li>Object to processing.</li>

@@ -1,14 +1,20 @@
 /**
  * Consent state machine.
  *
- * Default state is DENIED everywhere, regardless of region. Tags only load
- * after the user grants consent through the CookieConsent banner.
+ * Two models, by region (founder decision 2026-10-08):
+ *   - US: OPT-OUT. With no saved choice, ad tags load ("implied" consent)
+ *     unless the browser sends Global Privacy Control, which counts as an
+ *     opt-out (CCPA/CPRA). Visitors opt out through the footer "Do not sell or
+ *     share my personal information" link or the cookie preferences banner.
+ *   - Everywhere else: OPT-IN. Nothing loads until the visitor clicks Accept.
  *
- * Region detection is timezone-based (no IP lookup, no third-party calls).
- * US/Canada -> "soft" banner copy. Everywhere else -> "strict" banner.
+ * Region detection is timezone-based (no IP lookup, no third-party calls)
+ * and deliberately narrow: only US timezones count as "us". Canada, Latin
+ * America and everyone else get the opt-in model.
  *
  * Public API (window.oscenConsent):
- *   .state()                      -> "granted" | "denied" | "unknown"
+ *   .state()                      -> "granted" | "denied" | "unknown" (effective)
+ *   .decided()                    -> true once the visitor saved a choice
  *   .region()                     -> "us" | "intl"
  *   .grant()                      -> persists granted, dispatches consent:granted
  *   .deny()                       -> persists denied, dispatches consent:denied
@@ -48,35 +54,47 @@ function clearCookie() {
   document.cookie = `${COOKIE_NAME}=; max-age=0; path=/; SameSite=Lax`;
 }
 
+/** IANA zones used in the 50 states + DC (incl. legacy US/* aliases). */
+const US_ZONES = new Set([
+  "America/New_York", "America/Detroit", "America/Chicago", "America/Denver",
+  "America/Phoenix", "America/Los_Angeles", "America/Anchorage", "America/Juneau",
+  "America/Sitka", "America/Metlakatla", "America/Yakutat", "America/Nome",
+  "America/Adak", "America/Boise", "America/Menominee", "America/Fort_Wayne",
+  "America/Indianapolis", "America/Louisville", "Pacific/Honolulu",
+]);
+const US_ZONE_PREFIXES = ["America/Indiana/", "America/Kentucky/", "America/North_Dakota/", "US/"];
+
 function detectRegion(): ConsentRegion {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-    if (tz.startsWith("America/")) {
-      // America/* covers US + Canada + Latin America. We classify Canada
-      // as "us" for banner purposes (CCPA-like opt-out posture works for
-      // both); rest of Americas get the strict banner.
-      if (
-        tz.startsWith("America/Toronto") ||
-        tz.startsWith("America/Vancouver") ||
-        tz.startsWith("America/Edmonton") ||
-        tz.startsWith("America/Winnipeg") ||
-        tz.startsWith("America/Halifax") ||
-        tz.startsWith("America/St_Johns") ||
-        tz === "America/Argentina/Buenos_Aires"
-      ) {
-        return tz === "America/Argentina/Buenos_Aires" ? "intl" : "us";
-      }
-      return "us";
-    }
+    if (US_ZONES.has(tz) || US_ZONE_PREFIXES.some((p) => tz.startsWith(p))) return "us";
     return "intl";
   } catch {
     return "intl";
   }
 }
 
+/** Global Privacy Control: a legally binding opt-out signal in California. */
+function gpcOptOut(): boolean {
+  try {
+    return (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
+  } catch {
+    return false;
+  }
+}
+
+/** Effective state when the visitor has not saved a choice. */
+function impliedState(region: ConsentRegion): ConsentState {
+  if (region !== "us") return "unknown";
+  return gpcOptOut() ? "denied" : "granted";
+}
+
+const saved = readCookie();
+const region = detectRegion();
 const state = {
-  current: readCookie(),
-  region: detectRegion(),
+  current: saved === "unknown" ? impliedState(region) : saved,
+  decided: saved !== "unknown",
+  region,
 };
 
 function dispatch(name: "consent:granted" | "consent:denied") {
@@ -85,22 +103,28 @@ function dispatch(name: "consent:granted" | "consent:denied") {
 }
 
 function grant() {
-  if (state.current === "granted") return;
+  const changed = state.current !== "granted";
   state.current = "granted";
+  state.decided = true;
   writeCookie("granted");
-  dispatch("consent:granted");
+  if (changed) dispatch("consent:granted");
 }
 
 function deny() {
-  if (state.current === "denied") return;
+  const changed = state.current !== "denied";
   state.current = "denied";
+  state.decided = true;
   writeCookie("denied");
-  dispatch("consent:denied");
+  // Tags that already loaded stay in memory until the next page load; the
+  // saved "denied" stops them from loading again on every later page.
+  if (changed) dispatch("consent:denied");
 }
 
+/** Forget the saved choice (reopens the banner). Falls back to the region default. */
 function clear() {
-  state.current = "unknown";
   clearCookie();
+  state.decided = false;
+  state.current = impliedState(state.region);
 }
 
 function onChange(handler: (s: ConsentState) => void) {
@@ -117,6 +141,7 @@ function onChange(handler: (s: ConsentState) => void) {
 
 const api = {
   state: () => state.current,
+  decided: () => state.decided,
   region: () => state.region,
   grant,
   deny,
@@ -132,8 +157,8 @@ declare global {
 
 if (typeof window !== "undefined") {
   window.oscenConsent = api;
-  // Returning user: emit the granted/denied event on next tick so scripts that
-  // loaded after consent.ts (meta-pixel, gtm) can still hear the initial state.
+  // Saved or implied state: emit the granted/denied event on next tick so
+  // scripts that loaded after consent.ts (pixels, gtm) hear the initial state.
   if (state.current === "granted") {
     queueMicrotask(() => dispatch("consent:granted"));
   } else if (state.current === "denied") {
