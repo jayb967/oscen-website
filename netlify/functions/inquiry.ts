@@ -19,20 +19,24 @@
  */
 
 import { verifyTurnstile } from "../lib/turnstile";
+import {
+  clientIp,
+  corsHeaders,
+  isAllowedOrigin,
+  json,
+  rateLimited,
+  type HandlerEvent as RelayEvent,
+  type HandlerResponse,
+} from "../lib/ad-relay";
 
-type HandlerEvent = {
-  path: string;
-  httpMethod: string;
-  body: string | null;
-  isBase64Encoded?: boolean;
-  headers: Record<string, string | undefined>;
-};
+type HandlerEvent = RelayEvent & { isBase64Encoded?: boolean };
 
-type HandlerResponse = {
-  statusCode: number;
-  headers?: Record<string, string>;
-  body: string;
-};
+/** Whole-body cap. Real submissions are a few KB; this leaves room for a long message. */
+const MAX_INQUIRY_BYTES = 32 * 1024;
+/** Per-field caps: free-text fields get room, everything else is short. */
+const LONG_FIELDS = new Set<string>(["message", "why"]);
+const LONG_FIELD_MAX = 10_000;
+const FIELD_MAX = 1024;
 
 /** Sub-path -> authoritative CRM classification. Client input is ignored. */
 const ROUTE_TO_INQUIRY: Record<string, { kind: string; source: string }> = {
@@ -40,11 +44,6 @@ const ROUTE_TO_INQUIRY: Record<string, { kind: string; source: string }> = {
   invest: { kind: "INVESTOR", source: "Website - Investor" },
   build: { kind: "PARTNER", source: "Website - Collaborator" },
 };
-
-const ALLOWED_ORIGINS = [
-  "https://oscen.ai",
-  "https://www.oscen.ai",
-];
 
 // KILL SWITCH: emergency off-switch for inquiry forwarding. Enabled by DEFAULT
 // now that Cloudflare Turnstile guards the forms (see verifyTurnstile). To
@@ -123,56 +122,6 @@ function scoreSpam(fields: Record<string, unknown>): { score: number; signals: s
   }
 
   return { score, signals };
-}
-
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 100;
-const ipHits = new Map<string, number[]>();
-
-function isAllowedOrigin(origin: string | undefined): boolean {
-  if (!origin) return false;
-  if (ALLOWED_ORIGINS.includes(origin)) return true;
-  if (/^https:\/\/[a-z0-9-]+\.netlify\.app$/i.test(origin)) return true;
-  return false;
-}
-
-function corsHeaders(origin: string | undefined): Record<string, string> {
-  const allow = isAllowedOrigin(origin) ? origin! : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allow,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "content-type",
-    "Access-Control-Max-Age": "86400",
-    Vary: "Origin",
-  };
-}
-
-function json(status: number, body: unknown, origin: string | undefined): HandlerResponse {
-  return {
-    statusCode: status,
-    headers: { "content-type": "application/json", ...corsHeaders(origin) },
-    body: JSON.stringify(body),
-  };
-}
-
-function clientIp(headers: Record<string, string | undefined>): string | undefined {
-  // Prefer the Netlify-set client IP: it is the real TCP source and cannot be spoofed by the
-  // caller. Fall back to X-Forwarded-For only if it is absent (client-controlled, so last resort).
-  const nf = headers["x-nf-client-connection-ip"];
-  if (nf) return nf;
-  const xff = headers["x-forwarded-for"];
-  const first = xff?.split(",")[0]?.trim();
-  return first || undefined;
-}
-
-function rateLimit(ip: string | undefined): boolean {
-  if (!ip) return true;
-  const now = Date.now();
-  const cutoff = now - RATE_LIMIT_WINDOW_MS;
-  const hits = (ipHits.get(ip) || []).filter((t) => t > cutoff);
-  hits.push(now);
-  ipHits.set(ip, hits);
-  return hits.length <= RATE_LIMIT_MAX;
 }
 
 function routeOf(path: string): string | null {
@@ -256,6 +205,10 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
   if (event.httpMethod !== "POST") {
     return json(405, { error: "method_not_allowed" }, origin);
   }
+  // Same allowlist as the other relays (oscen.ai, www, this site's own Netlify
+  // URLs). The forms always POST via fetch, which always sends Origin. Origin is
+  // forgeable outside a browser, so this bounds abuse; Turnstile authenticates.
+  if (!isAllowedOrigin(origin)) return json(403, { error: "forbidden" }, origin);
 
   // Kill switch: while inquiries are disabled, accept and silently drop every
   // submission (same 200 {ok:true} shape as the honeypot) instead of forwarding
@@ -268,13 +221,18 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
   const endpoint = process.env.CRM_ENDPOINT;
   const secret = process.env.INQUIRY_SECRET;
   if (!endpoint || !secret) {
-    return json(500, { error: "inquiry_not_configured" }, origin);
+    // Generic on purpose: never tell a visitor which config is missing.
+    console.error("[inquiry] CRM_ENDPOINT or INQUIRY_SECRET unset");
+    return json(503, { error: "unavailable" }, origin);
   }
 
   const ip = clientIp(event.headers);
-  if (!rateLimit(ip)) {
+  if (rateLimited(ip)) {
     return json(429, { error: "rate_limited" }, origin);
   }
+
+  const rawLen = Buffer.byteLength(event.body || "", event.isBase64Encoded ? "base64" : "utf8");
+  if (rawLen > MAX_INQUIRY_BYTES) return json(413, { error: "too_large" }, origin);
 
   const route = routeOf(event.path || "");
   const mapping = route ? ROUTE_TO_INQUIRY[route] : undefined;
@@ -304,8 +262,14 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
   const payload: Record<string, unknown> = { kind: mapping.kind, source: mapping.source };
   const dropped: string[] = [];
   for (const [key, value] of Object.entries(fields)) {
-    if (ALLOWED_FIELDS.has(key)) payload[key] = value;
-    else if (!INTERNAL_FIELDS.has(key)) dropped.push(key);
+    if (ALLOWED_FIELDS.has(key)) {
+      // Strings (and plain booleans/numbers, e.g. a JSON consent flag) only, length
+      // bounded. Objects/arrays are dropped so nothing nested reaches the CRM.
+      const max = LONG_FIELDS.has(key) ? LONG_FIELD_MAX : FIELD_MAX;
+      if (typeof value === "string") payload[key] = value.slice(0, max);
+      else if (typeof value === "boolean" || (typeof value === "number" && Number.isFinite(value))) payload[key] = value;
+      else dropped.push(key);
+    } else if (!INTERNAL_FIELDS.has(key)) dropped.push(key.slice(0, 40));
   }
   // Log only the KEY NAMES (never values -> no PII / spam content in logs) so
   // field-probing is visible without leaking submission contents.

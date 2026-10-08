@@ -66,7 +66,7 @@ export function isAllowedOrigin(origin: string | undefined): boolean {
   return false;
 }
 
-function corsHeaders(origin: string | undefined): Record<string, string> {
+export function corsHeaders(origin: string | undefined): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": isAllowedOrigin(origin) ? origin! : ALLOWED_ORIGINS[0],
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -79,7 +79,12 @@ function corsHeaders(origin: string | undefined): Record<string, string> {
 export function json(status: number, body: unknown, origin: string | undefined): HandlerResponse {
   return {
     statusCode: status,
-    headers: { "content-type": "application/json", ...corsHeaders(origin) },
+    headers: {
+      "content-type": "application/json",
+      "x-content-type-options": "nosniff",
+      "cache-control": "no-store",
+      ...corsHeaders(origin),
+    },
     body: JSON.stringify(body),
   };
 }
