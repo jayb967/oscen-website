@@ -1,0 +1,23 @@
+---
+/**
+ * SectionHead. The homepage header rhythm for /invest body sections:
+ * tech eyebrow, two-tone serif headline, optional lede. The second
+ * headline line is the italic gradient accent (pass it via `accent`).
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  accent?: string;
+  lede?: string;
+}
+const { eyebrow, title, accent, lede } = Astro.props;
+---
+
+<div class="text-center mb-12 md:mb-16">
+  <p class="reveal inv-eyebrow text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">{eyebrow}</p>
+  <h2 class="reveal font-display text-[clamp(2rem,5vw,3.5rem)] text-text-primary leading-tight">
+    {title}
+    {accent && (<><br /><span class="italic gradient-text">{accent}</span></>)}
+  </h2>
+  {lede && <p class="reveal text-sm md:text-base text-text-secondary mt-6 max-w-2xl mx-auto leading-relaxed">{lede}</p>}
+</div>

@@ -1,0 +1,120 @@
+---
+/**
+ * /invest sections 5-6: patent protection, what's built.
+ * Premium treatment: glass-ticks cards, CSS node accents, oversized
+ * font-tech numbers with count-ups (final values live in the HTML).
+ * Patent copy is "patent pending", never "patented".
+ */
+import SectionHead from "./SectionHead.astro";
+import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../../data/brain";
+
+const CLAIMS = [
+  { claim: "1", title: "Integrated Multi-Mechanism Learning", desc: "6 learning rules operating simultaneously across the network" },
+  { claim: "2", title: "Developmental Critical Periods", desc: "5 phases with experience-dependent adolescent entry: pruning, myelination, identity" },
+  { claim: "3", title: "Hybrid SNN-LLM Architecture", desc: "Brain learns when to query external knowledge through emergent STDP, not hardcoded rules" },
+  { claim: "4", title: "Cross-Modal Binding", desc: "Arbitrary sensor modalities bind through spike-timing coincidence with multiplicative instinctual gain" },
+  { claim: "5", title: "Multi-Compartment Dendrites", desc: "4 compartments per neuron with independent dynamics and supralinear dendritic spikes" },
+  { claim: "6", title: "Neuromodulatory Continual Learning", desc: "Eligibility traces + homeostatic scaling + myelination enable learning without forgetting" },
+];
+
+const PATENT_STATS = [
+  { value: "258", label: "Prior art patents searched", color: "text-accent-blue" },
+  { value: "0", label: "Overlapping claims found", color: "text-accent-green" },
+  { value: "20", label: "Continuation patents planned", color: "text-accent-blue" },
+];
+
+const BUILT = [
+  { stat: BRAIN_STATS.totalNeurons.toLocaleString("en-US"), count: true, label: "Spiking neurons", desc: `${BRAIN_STATS.brainRegions} brain regions. ${BRAIN_STATS.synapseGroups} synapse groups. Sensory, motor, association, prediction, working memory, all connected and learning.` },
+  { stat: SYNAPSES_DISPLAY, count: true, label: "Synapses", desc: "Sparse CSR matrices. Eligibility traces on every plastic group. BCM, neuromodulation, and synaptic scaling active system-wide." },
+  { stat: "~10 years", count: true, label: "Research and design", desc: "Nearly a decade of neuroscience research and architectural design. 7 months of focused implementation, bootstrapped with considerable personal investment." },
+  { stat: "24/7", count: false, label: "Continuous training", desc: "Enterprise-grade dedicated server. Processing a multimodal video and audio curriculum around the clock. Currently in the adolescent developmental phase." },
+  { stat: "6", count: true, label: "Learning rules", desc: "All running together, continuously. STDP, eligibility traces, BCM, neuromodulation, homeostatic scaling, R-STDP." },
+  { stat: "5", count: true, label: "Developmental phases", desc: "Infant → Toddler → Juvenile → Adolescent → Mature. Phase transitions are experience-dependent, not hardcoded." },
+];
+---
+
+<!-- 5. Patent protection -->
+<section class="inv-section inv-glow max-w-5xl mx-auto px-6">
+  <SectionHead
+    eyebrow="Patent protection"
+    title="The architecture is protected."
+    accent="The IP moat is real."
+  />
+
+  <div class="reveal glass-bright glass-ticks inv-topline rounded-2xl p-6 md:p-10 mb-4">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+      <div>
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/30 text-accent-blue text-[10px] font-tech uppercase tracking-wider">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse" aria-hidden="true"></span>
+          Patent Pending
+        </span>
+        <p class="text-2xl md:text-4xl text-text-primary font-tech font-bold tracking-tight mt-4">US 63/986,737</p>
+      </div>
+      <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.2em]">Filed February 20, 2026</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {CLAIMS.map((c) => (
+        <div class="reveal glass glass-ticks rounded-xl p-5 flex gap-4">
+          <span class="inv-node mt-0.5" aria-hidden="true"></span>
+          <div>
+            <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.2em]">Claim {c.claim}</p>
+            <p class="text-sm md:text-base text-text-primary mt-1">{c.title}</p>
+            <p class="text-xs text-text-secondary leading-relaxed mt-2">{c.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3">
+    {PATENT_STATS.map((s) => (
+      <div class="reveal glass glass-ticks rounded-xl px-2 py-5 md:p-6 text-center">
+        <div class={`text-3xl md:text-5xl font-tech font-bold tracking-tight ${s.color}`}>
+          <span class="inv-count" data-countup>{s.value}</span>
+        </div>
+        <div class="text-[10px] text-text-secondary mt-2 leading-tight">{s.label}</div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<!-- 6. What's built -->
+<section class="inv-section inv-glow inv-glow-green max-w-5xl mx-auto px-6">
+  <SectionHead
+    eyebrow="What's built"
+    title="This is not a pitch deck."
+    accent="The brain is running."
+  />
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    {BUILT.map((item, i) => (
+      <div class="expand-card reveal glass-bright glass-ticks rounded-2xl p-6 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="text-3xl md:text-4xl font-tech font-bold tracking-tight text-accent-blue">
+              {item.count ? <span class="inv-count" data-countup>{item.stat}</span> : item.stat}
+            </div>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="w-1 h-1 rounded-full bg-accent-blue/60" aria-hidden="true"></span>
+              <span class="text-[10px] font-tech text-text-secondary uppercase tracking-[0.2em]">{item.label}</span>
+            </div>
+          </div>
+          <span class="expand-indicator text-accent-blue/40 text-lg">+</span>
+        </div>
+        <div class="expand-body mt-4">
+          <p class="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="reveal text-center mt-10">
+    <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-border-bright">
+      <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
+      <span class="text-[10px] font-tech text-text-secondary tracking-wider">
+        Training live &middot; Adolescent phase
+      </span>
+    </div>
+  </div>
+</section>
