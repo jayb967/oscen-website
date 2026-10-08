@@ -15,7 +15,7 @@
  *   PUBLIC_STRIPE_SUPPORT_CUSTOM    pay-what-you-want ($1 min, $25 preset)
  *   PUBLIC_STRIPE_SUPPORT_FOUNDING  one-time $100      numbered crewneck (cap 100)
  *   PUBLIC_STRIPE_SUPPORT_HOLIDAY   one-time $175      gift box (order-by date below)
- *   PUBLIC_STRIPE_SUPPORT_OFFICE    one-time $250      1:1 call (8 a month)
+ *   PUBLIC_STRIPE_SUPPORT_OFFICE    one-time $250      seat at the monthly Office Hours session (8 seats a month)
  *   PUBLIC_STRIPE_SUPPORT_REGION    one-time $500      region sponsor (one per region)
  *   PUBLIC_STRIPE_SUPPORT_LABDAY    one-time $2,500    lab day (4 a year)
  *   PUBLIC_STRIPE_SUPPORT_COMPANY   one-time $5,000    company sponsor
@@ -204,14 +204,14 @@ const ALL_TIERS: SupportTier[] = [
     name: "Office Hours",
     price: "$250",
     cadence: "one-time",
-    blurb: "Thirty minutes, one on one, with the person building the brain. Ask anything.",
+    blurb: "A seat at the founder's monthly live session. Bring your questions about the brain.",
     stack: [
-      "A 30-minute video call with the founder",
+      "A seat at Office Hours, the founder's monthly live session",
       "OSCEN-branded crewneck",
       "Milestone Witness Pass ($50)",
     ],
-    scarcity: "8 Office Hours spots a month.",
-    ships: `Call held within 30 days. Crewneck ships in 4 to 6 weeks. ${US_ONLY}`,
+    scarcity: "8 seats a month.",
+    ships: `Your seat is in the next monthly session. Crewneck ships in 4 to 6 weeks. ${US_ONLY}`,
     line: LINE.top,
     href: env.PUBLIC_STRIPE_SUPPORT_OFFICE ?? "",
     accent: "purple",
@@ -224,12 +224,12 @@ const ALL_TIERS: SupportTier[] = [
     blurb: `Sponsor one of the brain's ${BRAIN_STATS.brainRegions} regions. Your name on a part of the mind.`,
     stack: [
       "Honorary sponsor of one brain region, named on the contributor wall",
-      "Office Hours ($250): a 30-minute call with the founder",
+      "Office Hours ($250): a seat at the founder's monthly live session",
       "OSCEN-branded crewneck",
       "Milestone Witness Pass ($50)",
     ],
     scarcity: `${BRAIN_STATS.brainRegions} regions. One sponsor each.`,
-    ships: `Call held within 30 days. Crewneck ships in 4 to 6 weeks. ${US_ONLY}`,
+    ships: `Your Office Hours seat is in the next monthly session. Crewneck ships in 4 to 6 weeks. ${US_ONLY}`,
     line: LINE.top,
     href: env.PUBLIC_STRIPE_SUPPORT_REGION ?? "",
     accent: "purple",
