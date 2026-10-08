@@ -57,9 +57,18 @@ export function leaveForSupport(origin?: HTMLElement | null, onStay?: () => void
   // Everything behind the overlay goes inert so focus can't wander under it.
   const behind = [...document.body.children].filter((el) => el !== p.root) as HTMLElement[];
 
+  let dismissed = false;
+  let left = false;
+  const onKey = (e: KeyboardEvent) => {
+    // A modal dialog closes on Escape, same as "Stay here".
+    if (e.key === "Escape" && !left) dismiss();
+  };
   const dismiss = () => {
+    if (dismissed) return;
+    dismissed = true;
     tl?.kill();
     window.clearTimeout(timer);
+    document.removeEventListener("keydown", onKey);
     p.root.classList.add("hidden");
     document.documentElement.style.overflow = "";
     behind.forEach((el) => el.removeAttribute("inert"));
@@ -67,10 +76,10 @@ export function leaveForSupport(origin?: HTMLElement | null, onStay?: () => void
   };
   window.addEventListener("pageshow", (e) => e.persisted && dismiss(), { once: true });
   p.stay?.addEventListener("click", dismiss, { once: true });
+  document.addEventListener("keydown", onKey);
 
-  let left = false;
   const go = () => {
-    if (left) return;
+    if (left || dismissed) return;
     left = true;
     window.location.assign(SUPPORT_URL);
   };

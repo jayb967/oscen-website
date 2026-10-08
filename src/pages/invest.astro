@@ -181,7 +181,7 @@ import { SEGMENTS } from "../lib/forms";
       <!-- Accredited only: Calendly intro-call picker, prefilled from the form
            (src/scripts/calendly-booking.ts). Calendly loads only when shown. -->
       <div id="investor-calendly" class="hidden mt-6">
-        <div class="glass rounded-2xl overflow-hidden">
+        <div data-calendly-box class="glass rounded-2xl overflow-hidden">
           <div class="px-6 pt-6 pb-2 text-center">
             <p class="text-[10px] font-tech text-accent-blue uppercase tracking-[0.3em] mb-2">Book your intro call</p>
             <p class="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
@@ -296,7 +296,12 @@ import { SEGMENTS } from "../lib/forms";
     successCard.classList.remove("hidden");
     successCard.focus({ preventScroll: true });
     // Accredited only: the intro-call picker, prefilled so nothing is typed twice.
-    if (answer === "yes" && calendlyRoot && person?.email) void showCalendly(calendlyRoot, person);
+    if (answer === "yes" && calendlyRoot && person?.email) {
+      void showCalendly(calendlyRoot, person, () => {
+        if (successTitle) successTitle.textContent = "Thanks. You're booked.";
+        if (successDetail) successDetail.textContent = "Your calendar invite is on its way. Our NDA and deck follow before the call.";
+      });
+    }
   }
 
   // Already submitted in this tab: don't hand people an empty form to resend.

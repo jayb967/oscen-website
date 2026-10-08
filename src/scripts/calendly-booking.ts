@@ -58,6 +58,16 @@ function calendlyUrl(person: Person, a: Attribution): string {
   return `${BASE_URL}?${query}`;
 }
 
+/** Set once Calendly reports a booking in this tab. */
+const BOOKED_KEY = "oscen_invest_booked";
+function wasBooked(): boolean {
+  try {
+    return sessionStorage.getItem(BOOKED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 let scriptPromise: Promise<CalendlyApi> | null = null;
 function loadWidget(): Promise<CalendlyApi> {
   const existing = (window as unknown as { Calendly?: CalendlyApi }).Calendly;
@@ -105,7 +115,11 @@ function listenForBooking(person: Person, a: Attribution, onBooked: () => void) 
  * Mount the picker inside `root` (expects [data-calendly-mount], [data-calendly-fallback],
  * [data-calendly-booked] children). Safe to call more than once.
  */
-export async function showCalendly(root: HTMLElement, person: Person): Promise<void> {
+export async function showCalendly(
+  root: HTMLElement,
+  person: Person,
+  onBooked?: () => void,
+): Promise<void> {
   const mount = root.querySelector<HTMLElement>("[data-calendly-mount]");
   const fallback = root.querySelector<HTMLAnchorElement>("[data-calendly-fallback]");
   const booked = root.querySelector<HTMLElement>("[data-calendly-booked]");
@@ -115,7 +129,27 @@ export async function showCalendly(root: HTMLElement, person: Person): Promise<v
   if (fallback) fallback.href = url;
   root.classList.remove("hidden");
 
-  listenForBooking(person, a, () => booked?.classList.remove("hidden"));
+  // Booked earlier in this tab (reload / Back): show the confirmation, not a
+  // second picker that invites a duplicate booking.
+  const showBooked = () => {
+    booked?.classList.remove("hidden");
+    (root.querySelector<HTMLElement>("[data-calendly-box]") ?? mount).classList.add("hidden");
+    fallback?.closest("p")?.classList.add("hidden");
+    onBooked?.();
+  };
+  if (wasBooked()) {
+    showBooked();
+    return;
+  }
+
+  listenForBooking(person, a, () => {
+    try {
+      sessionStorage.setItem(BOOKED_KEY, "1");
+    } catch {
+      // Non-fatal: a reload would just show the picker again.
+    }
+    showBooked();
+  });
 
   if (mount.dataset.mounted === "1") return;
   try {
