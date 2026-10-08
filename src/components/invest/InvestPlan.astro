@@ -1,0 +1,85 @@
+---
+/**
+ * /invest sections 7-9: built with conviction, what funding enables, team.
+ * The funding list is a numbered step rail (drawn on scroll by
+ * invest-motion.ts). TeamCards is shared with /team, so it is framed
+ * here, not restyled.
+ */
+import SectionHead from "./SectionHead.astro";
+import TeamCards from "../TeamCards.astro";
+
+const CONVICTION = [
+  { value: "3,500+ hours", count: true, label: "Dedicated R&D", color: "text-accent-blue" },
+  { value: "~10 years", count: true, label: "Research & development", color: "text-accent-blue" },
+  { value: "Live", count: false, label: "Brain training daily", color: "text-accent-green" },
+  { value: "CPU today", count: false, label: "Low-power next", color: "text-accent-blue" },
+];
+
+const FUNDING = [
+  { priority: "01", item: "Low-power edge deployment", desc: "Move from CPU simulation to purpose-built edge compute. Target: up to 100x lower energy, based on published neuromorphic results." },
+  { priority: "02", item: "Robotics integration", desc: "Physical robot body. Camera, servos, touch sensors. Close the full sensorimotor loop with real-world feedback." },
+  { priority: "03", item: "Team expansion", desc: "Computational neuroscientist, robotics engineer, hardware specialist. Three hires take the build from a four-person core to a full build team." },
+  { priority: "04", item: "Patent portfolio", desc: "Non-provisional filing by Feb 2027. 20 continuation patents covering hardware mapping, fleet learning, safety architecture." },
+  { priority: "05", item: "Benchmarks & papers", desc: "Formal evaluation on standard robotics tasks. Published results for academic credibility and partnership conversations." },
+];
+---
+
+<!-- 7. Built with conviction -->
+<section class="inv-section max-w-5xl mx-auto px-6">
+  <SectionHead eyebrow="Commitment" title="Built with" accent="conviction." />
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    {CONVICTION.map((s) => (
+      <div class="reveal glass-bright glass-ticks rounded-2xl px-3 py-6 text-center">
+        <div class={`text-xl md:text-3xl font-tech font-bold tracking-tight ${s.color}`}>
+          {s.count ? <span class="inv-count" data-countup>{s.value}</span> : s.value}
+        </div>
+        <div class="text-[10px] text-text-secondary mt-2 uppercase tracking-wider leading-tight">{s.label}</div>
+      </div>
+    ))}
+  </div>
+  <div class="reveal glass rounded-2xl p-6 md:p-8">
+    <p class="text-sm text-text-secondary text-center leading-relaxed max-w-2xl mx-auto">
+      Deep domain knowledge across computational neuroscience, distributed systems, sparse linear algebra, and real-time sensor fusion.
+      The architecture runs on CPUs today and the brain is actively training. Funding continues the build, opens partnerships with low-power compute providers, and gets us to purpose-built edge deployment.
+    </p>
+  </div>
+</section>
+
+<!-- 8. What funding enables -->
+<section class="inv-section inv-glow max-w-5xl mx-auto px-6">
+  <SectionHead eyebrow="Use of funds" title="What funding" accent="enables." />
+
+  <div class="relative max-w-3xl mx-auto" data-rail-wrap>
+    <span class="inv-rail left-[1.15rem] md:left-[1.4rem]" data-rail aria-hidden="true"></span>
+    <ol class="space-y-3">
+      {FUNDING.map((item, i) => (
+        <li class="relative pl-12 md:pl-14">
+          <span class="absolute left-0 top-4 w-[2.3rem] h-[2.3rem] md:w-[2.8rem] md:h-[2.8rem] rounded-full bg-abyss border border-accent-blue/35 flex items-center justify-center text-[10px] md:text-xs font-tech text-accent-blue shadow-[0_0_16px_rgba(94,164,245,0.18)]" aria-hidden="true">{item.priority}</span>
+          <div class="expand-card reveal glass glass-ticks rounded-2xl p-5 cursor-pointer group" tabindex="0" style={`--glow-delay: ${i * 1.5}s; --glow-color: var(--color-accent-blue);`}>
+            <div class="flex items-center gap-4">
+              <span class="sr-only">{item.priority}</span>
+              <h3 class="text-sm md:text-base font-medium text-text-primary group-hover:text-accent-blue transition-colors">{item.item}</h3>
+              <span class="expand-indicator text-accent-blue/40 text-sm ml-auto">+</span>
+            </div>
+            <div class="expand-body mt-3">
+              <p class="text-xs md:text-sm text-text-secondary leading-relaxed">{item.desc}</p>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<!-- 9. Team -->
+<section class="inv-section max-w-5xl mx-auto px-6">
+  <SectionHead
+    eyebrow="Team"
+    title="The people"
+    accent="building OSCEN."
+    lede="Deep expertise on the architecture, paired with the operational footing to scale it."
+  />
+
+  <TeamCards />
+</section>
