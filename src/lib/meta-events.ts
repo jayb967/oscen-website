@@ -11,7 +11,8 @@ export type StandardEventName =
   | "ViewContent"
   | "Lead"
   | "Subscribe"
-  | "CompleteRegistration";
+  | "CompleteRegistration"
+  | "Purchase";
 
 export type CustomEventName = "BrainVizPlay";
 

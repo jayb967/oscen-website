@@ -64,6 +64,8 @@ const ALLOWED_FIELDS = new Set<string>([
   "linkedin", "link", "consent", "_subject",
   "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
   "referrer", "landing_page",
+  // Ad click ids (first-touch, src/scripts/attribution.ts).
+  "rdt_cid", "ttclid", "fbclid", "gclid",
 ]);
 // Internal fields consumed by the relay itself (not forwarded, and not "unexpected").
 const INTERNAL_FIELDS = new Set<string>(["_gotcha", "cf-turnstile-response"]);

@@ -113,6 +113,13 @@ const metaDomainVerification =
       import "../scripts/gtm";
     </script>
 
+    <!-- Reddit + TikTok pixels. Same consent gate as Meta (pixel-gate.ts);
+         expose window.redditTrack / window.tiktokTrack. -->
+    <script>
+      import "../scripts/reddit-pixel";
+      import "../scripts/tiktok-pixel";
+    </script>
+
     <!-- GSAP ScrollTrigger animations -->
     <script>
       import "../scripts/scroll-animations";

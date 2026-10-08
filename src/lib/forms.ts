@@ -6,8 +6,9 @@
  * we never repeat fetch / disable / status logic.
  *
  * On successful submit, helpers ALSO fire Meta Pixel + Conversions API +
- * GTM dataLayer events with a shared event_id so the browser and server
- * legs dedupe. All firing is gated on the helpers seeing window.metaTrack /
+ * GTM dataLayer events, plus the Reddit + TikTok pixels and their server legs
+ * (ad-conversions.ts), all with ONE shared event_id so each platform's browser
+ * and server legs dedupe. All firing is gated on the helpers seeing window.metaTrack /
  * window.gtmPush (set by consent-gated scripts in Base.astro).
  *
  * Set in Netlify (or .env.local for dev):
@@ -24,6 +25,7 @@ import {
   LEAD_VALUE,
   type LeadType,
 } from "./meta-events";
+import { fanOutAdConversion } from "./ad-conversions";
 
 const env = import.meta.env;
 
@@ -49,24 +51,18 @@ export const SEGMENTS = {
   supporterCustom: "supporter-custom",
 } as const;
 
-export const SUPPORTER_TAG_FOR_TIER: Record<string, string> = {
-  spark:   SEGMENTS.supporterSpark,
-  synapse: SEGMENTS.supporterSynapse,
-  cortex:  SEGMENTS.supporterCortex,
-  custom:  SEGMENTS.supporterCustom,
-};
 
 // ---------- conversion tracking ----------
 
 const CAPI_BASE = "/.netlify/functions/meta-capi";
 
-type TrackEventName = "Lead" | "Subscribe" | "CompleteRegistration";
+type TrackEventName = "Lead" | "Subscribe" | "CompleteRegistration" | "Purchase";
 
 type TrackConfig = {
   /** Pixel event to fire. */
   event: TrackEventName;
-  /** CAPI route segment ("lead" | "subscribe" | "registration"). */
-  route: "lead" | "subscribe" | "registration";
+  /** CAPI route segment. Also the Reddit/TikTok conversion kind (ad-events.ts). */
+  route: "lead" | "subscribe" | "registration" | "purchase";
   /** Lead bucket for the value lookup; not used for Subscribe / CompleteRegistration. */
   leadType?: LeadType;
   /** Custom params merged into both the pixel event and the CAPI custom_data. */
@@ -124,6 +120,19 @@ export function trackingForNewsletter(form: HTMLFormElement): TrackConfig {
     route: "subscribe",
     customData: {
       tag: readFormString(form, "tag") || "follower",
+    },
+  };
+}
+
+/** Supporter checkout return (/support?ok=1&tier=X). Value is the tier price. */
+export function trackingForPurchase(tier: string, value: number | undefined): TrackConfig {
+  return {
+    event: "Purchase",
+    route: "purchase",
+    customData: {
+      tier,
+      content_name: `supporter_${tier}`,
+      ...(value !== undefined ? { value, currency: "USD" } : {}),
     },
   };
 }
@@ -187,6 +196,8 @@ function fireConversion(form: HTMLFormElement, cfg: TrackConfig): void {
   if (typeof window.gtmPush === "function") {
     window.gtmPush(cfg.event.toLowerCase(), { ...pixelParams, event_id: eventId });
   }
+  // Same event_id to Reddit + TikTok (browser + consent-gated server legs).
+  fanOutAdConversion({ kind: cfg.route, eventId, email, params: pixelParams });
   // Server-side mirror runs async; do not block the success handler.
   postCapiMirror(cfg, eventId, email, valueParams);
 }
@@ -205,11 +216,13 @@ async function withBusyButton<T>(btn: HTMLButtonElement, run: () => Promise<T>):
   const original = btn.textContent;
   btn.disabled = true;
   btn.textContent = "Sending...";
+  btn.form?.setAttribute("aria-busy", "true");
   try {
     return await run();
   } finally {
     btn.disabled = false;
     btn.textContent = original;
+    btn.form?.removeAttribute("aria-busy");
   }
 }
 
@@ -307,5 +320,6 @@ export function fireStandaloneConversion(
   if (typeof window.gtmPush === "function") {
     window.gtmPush(cfg.event.toLowerCase(), { ...pixelParams, event_id: eventId });
   }
+  fanOutAdConversion({ kind: cfg.route, eventId, email, params: pixelParams });
   postCapiMirror(cfg, eventId, email, valueParams);
 }
