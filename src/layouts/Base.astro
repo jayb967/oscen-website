@@ -115,6 +115,12 @@ const metaDomainVerification =
       import "../scripts/attribution";
     </script>
 
+    <!-- Stripe Payment Links carry a per-page-view client_reference_id; on click the
+         first-touch attribution is beaconed under it so the CRM can report revenue per campaign. -->
+    <script>
+      import "../scripts/checkout-links";
+    </script>
+
     <!-- First-party click + scroll analytics to Cloudflare (oscen.ai/e Worker,
          Analytics Engine). Anonymous and cookieless; loads after attribution. -->
     <script>
