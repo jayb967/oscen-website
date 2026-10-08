@@ -18,8 +18,6 @@ export const SYNAPSES_WORDS = `${Math.round(BRAIN_STATS.totalSynapses / 1_000_00
 
 export interface Person {
   name: string;
-  /** The name the person goes by on the public site. */
-  alternateName?: string;
   jobTitle: string;
   /** Only profiles that already exist and are linked on the site. */
   sameAs?: string[];
@@ -35,12 +33,11 @@ export const COMPANY = {
   email: "info@oscen.ai",
   address: { locality: "Denver", region: "CO", regionName: "Colorado", country: "US" },
   stage: "early-stage, pre-revenue research company",
-  patent: "Patent pending (U.S. provisional application 63/986,737, filed February 2026)",
+  patent: "Patent pending (U.S. provisional application filed February 2026)",
   programs: ["NVIDIA Inception member", "AWS Activate credit recipient"],
   founders: [
     {
-      name: "Jesus BalderasMiranda",
-      alternateName: "Rio Bold",
+      name: "Rio Bold",
       jobTitle: "Founder and CEO",
       sameAs: ["https://linkedin.com/in/rio-bold"],
     },

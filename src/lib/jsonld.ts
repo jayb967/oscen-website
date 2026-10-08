@@ -36,7 +36,6 @@ export function organizationLd() {
     founder: COMPANY.founders.map((p) => ({
       "@type": "Person",
       name: p.name,
-      ...(p.alternateName ? { alternateName: p.alternateName } : {}),
       jobTitle: p.jobTitle,
       ...(p.sameAs?.length ? { sameAs: p.sameAs } : {}),
     })),

@@ -29,7 +29,7 @@ ${COMPANY.name} is building a brain for robots, not a robot. The brain is design
 ## Key facts
 
 - Legal name: ${COMPANY.legalName} (${COMPANY.entityType}, founded ${COMPANY.foundingDate}, ${COMPANY.address.locality}, ${COMPANY.address.regionName}, USA).
-- Founder and CEO: ${founder.name} (known on the site as ${founder.alternateName}).
+- Founder and CEO: ${founder.name}.
 - Stage: ${COMPANY.stage}.
 - Technology: a spiking neural network of about ${NEURONS_WORDS} neurons and about ${SYNAPSES_WORDS} live synapses across ${BRAIN_STATS.brainRegions} brain regions.
 - Learning: learns continuously from experience, without backpropagation, training datasets or retraining runs.

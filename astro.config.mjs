@@ -5,8 +5,15 @@ import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
   site: "https://oscen.ai",
-  // /first is a campaign alias of /support (canonical), so it stays out of the sitemap.
-  integrations: [sitemap({ filter: (page) => !/\/first\/?$/.test(page) })],
+  // Kept out of the sitemap: /first (campaign alias of /support, canonical),
+  // /investor-pitch/* (confidential deck, robots-disallowed) and /dev/* (internal
+  // noindex harness pages, not linked from anywhere).
+  integrations: [
+    sitemap({
+      filter: (page) =>
+        !/\/first\/?$/.test(page) && !/\/(investor-pitch|dev)(\/|$)/.test(new URL(page).pathname),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

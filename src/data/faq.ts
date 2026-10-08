@@ -47,7 +47,7 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: "Who founded OSCEN?",
-    a: "OSCEN was founded in 2026 by Jesus BalderasMiranda, known on this site as Rio Bold, who is founder and CEO and the architect of the brain. He is a Marine Corps veteran with 13 years of professional software engineering and nearly a decade of independent research in computational neuroscience. Adam Hamersky, also a Marine Corps veteran, is cofounder and leads operations.",
+    a: "OSCEN was founded in 2026 by Rio Bold, founder and CEO and the architect of the brain. He is a Marine Corps veteran with 13 years of professional software engineering and nearly a decade of independent research in computational neuroscience. Adam Hamersky, also a Marine Corps veteran, is cofounder and leads operations.",
     links: [{ href: "/team", label: "Meet the team" }],
   },
   {
