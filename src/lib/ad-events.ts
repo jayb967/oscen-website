@@ -77,6 +77,20 @@ export const X_PAGE_EVENT_ENV: Record<XPageEvent, string> = {
 export const X_PAGE_EVENT_FOR_PATH: Record<string, XPageEvent | undefined> = {
   "/invest": "invest_view",
 };
+/**
+ * X-only conversion events: an X conversion that must NOT ride a shared kind.
+ * investor_signup fires only from the investor form (forms.ts
+ * trackingForInvestor), so the X "sign up" conversion counts investors and
+ * nothing else (founder 2026-10-08). Same relay and dedupe as the shared kinds.
+ */
+export type XConversionEvent = "investor_signup";
+export const X_CONVERSION_EVENT_ENV: Record<XConversionEvent, string> = {
+  investor_signup: "PUBLIC_X_EVENT_INVESTOR_SIGNUP",
+};
+export function isXConversionEvent(v: unknown): v is XConversionEvent {
+  return typeof v === "string" && Object.prototype.hasOwnProperty.call(X_CONVERSION_EVENT_ENV, v);
+}
+
 export function isXPageEvent(v: unknown): v is XPageEvent {
   return typeof v === "string" && Object.prototype.hasOwnProperty.call(X_PAGE_EVENT_ENV, v);
 }

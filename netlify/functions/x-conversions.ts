@@ -15,32 +15,37 @@
  *                          not_configured
  *
  * Routes: the shared conversion kinds (lead, subscribe, registration,
- * purchase) plus X-only page events (invest_view, for audiences).
+ * purchase), the X-only conversion investor_signup (investor form only), and
+ * X-only page events (invest_view, for audiences).
  *
  * conversion_id = the shared event_id, so X dedupes this against the pixel's
  * twq('event', ..., { conversion_id }) call.
  */
 
 import {
+  X_CONVERSION_EVENT_ENV,
   X_EVENT_ENV,
   X_PAGE_EVENT_ENV,
   isConversionKind,
+  isXConversionEvent,
   isXPageEvent,
   xEventId,
   type ConversionKind,
+  type XConversionEvent,
   type XPageEvent,
 } from "../../src/lib/ad-events";
 import { hashEmail, json, parseRequest, postUpstream, type HandlerEvent, type HandlerResponse } from "../lib/ad-relay";
 
 const API = "https://ads-api.x.com/12/measurement/conversions";
 
-type XRoute = ConversionKind | XPageEvent;
-const isXRoute = (k: string): k is XRoute => isConversionKind(k) || isXPageEvent(k);
+type XRoute = ConversionKind | XConversionEvent | XPageEvent;
+const isXRoute = (k: string): k is XRoute => isConversionKind(k) || isXConversionEvent(k) || isXPageEvent(k);
 
 /** The route is only known after parsing, so read its event id up front from the path. */
 function eventIdForPath(path: string): string | undefined {
   const route = path.split("/").filter(Boolean).pop();
   if (isConversionKind(route)) return xEventId(process.env[X_EVENT_ENV[route]]);
+  if (isXConversionEvent(route)) return xEventId(process.env[X_CONVERSION_EVENT_ENV[route]]);
   if (isXPageEvent(route)) return xEventId(process.env[X_PAGE_EVENT_ENV[route]]);
   return undefined;
 }

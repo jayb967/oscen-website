@@ -26,6 +26,7 @@ import {
   type LeadType,
 } from "./meta-events";
 import { fanOutAdConversion } from "./ad-conversions";
+import type { XConversionEvent } from "./ad-events";
 
 const env = import.meta.env;
 
@@ -67,6 +68,8 @@ type TrackConfig = {
   leadType?: LeadType;
   /** Custom params merged into both the pixel event and the CAPI custom_data. */
   customData?: Record<string, unknown>;
+  /** X only: fire this X-only event instead of `route` (ad-events.ts). */
+  xEvent?: XConversionEvent;
 };
 
 function readFormString(form: HTMLFormElement, name: string): string | undefined {
@@ -81,6 +84,8 @@ export function trackingForInvestor(form: HTMLFormElement): TrackConfig {
   return {
     event: "Lead",
     route: "lead",
+    // The X ad's "sign up" conversion counts investor sign-ups only.
+    xEvent: "investor_signup",
     leadType,
     customData: {
       lead_type: leadType,
@@ -197,7 +202,7 @@ function fireConversion(form: HTMLFormElement, cfg: TrackConfig): void {
     window.gtmPush(cfg.event.toLowerCase(), { ...pixelParams, event_id: eventId });
   }
   // Same event_id to Reddit + TikTok (browser + consent-gated server legs).
-  fanOutAdConversion({ kind: cfg.route, eventId, email, params: pixelParams });
+  fanOutAdConversion({ kind: cfg.route, xEvent: cfg.xEvent, eventId, email, params: pixelParams });
   // Server-side mirror runs async; do not block the success handler.
   postCapiMirror(cfg, eventId, email, valueParams);
 }
@@ -320,6 +325,6 @@ export function fireStandaloneConversion(
   if (typeof window.gtmPush === "function") {
     window.gtmPush(cfg.event.toLowerCase(), { ...pixelParams, event_id: eventId });
   }
-  fanOutAdConversion({ kind: cfg.route, eventId, email, params: pixelParams });
+  fanOutAdConversion({ kind: cfg.route, xEvent: cfg.xEvent, eventId, email, params: pixelParams });
   postCapiMirror(cfg, eventId, email, valueParams);
 }

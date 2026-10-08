@@ -12,7 +12,7 @@
  * skipped.
  */
 
-import { X_PAGE_EVENT_FOR_PATH, xEventId, type ConversionKind, type XPageEvent } from "../lib/ad-events";
+import { X_PAGE_EVENT_FOR_PATH, xEventId, type ConversionKind, type XConversionEvent, type XPageEvent } from "../lib/ad-events";
 import { consentGatedTracker } from "./pixel-gate";
 
 type Twq = ((...args: unknown[]) => void) & {
@@ -27,11 +27,12 @@ const SDK_URL = "https://static.ads-twitter.com/uwt.js";
 
 /** Build-time map kind -> X event id. Literal env reads so Vite inlines them;
  *  the names match X_EVENT_ENV in ad-events.ts (the server side reads those). */
-const EVENT_IDS: Record<ConversionKind, string | undefined> = {
+const EVENT_IDS: Record<ConversionKind | XConversionEvent, string | undefined> = {
   lead: xEventId(import.meta.env.PUBLIC_X_EVENT_LEAD),
   subscribe: xEventId(import.meta.env.PUBLIC_X_EVENT_SUBSCRIBE),
   registration: xEventId(import.meta.env.PUBLIC_X_EVENT_REGISTRATION),
   purchase: xEventId(import.meta.env.PUBLIC_X_EVENT_PURCHASE),
+  investor_signup: xEventId(import.meta.env.PUBLIC_X_EVENT_INVESTOR_SIGNUP),
 };
 
 /** Page-visit events for audiences (names match X_PAGE_EVENT_ENV). */
@@ -110,7 +111,7 @@ const track = consentGatedTracker<Call>({
   fire,
 });
 
-function xTrack(kind: ConversionKind, params: Record<string, unknown>, conversionId: string) {
+function xTrack(kind: ConversionKind | XConversionEvent, params: Record<string, unknown>, conversionId: string) {
   const eventId = EVENT_IDS[kind];
   if (!eventId) return;
   track({ eventId, params: { ...params, conversion_id: conversionId } });

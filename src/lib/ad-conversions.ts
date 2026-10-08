@@ -13,10 +13,12 @@
  * Meta CAPI mirror: no granted consent = no email leaves the page.
  */
 
-import { REDDIT_EVENT, TIKTOK_EVENT, type ConversionKind } from "./ad-events";
+import { REDDIT_EVENT, TIKTOK_EVENT, type ConversionKind, type XConversionEvent } from "./ad-events";
 
 type FanOut = {
   kind: ConversionKind;
+  /** X only: send this X event instead of `kind` (e.g. investor_signup). */
+  xEvent?: XConversionEvent;
   eventId: string;
   email?: string;
   /** Pixel params; value + currency are the only ones forwarded server-side. */
@@ -40,8 +42,9 @@ function post(path: string, body: Record<string, unknown>) {
   }
 }
 
-export function fanOutAdConversion({ kind, eventId, email, params }: FanOut): void {
+export function fanOutAdConversion({ kind, xEvent, eventId, email, params }: FanOut): void {
   if (typeof window === "undefined") return;
+  const xRoute = xEvent ?? kind;
 
   if (typeof window.redditTrack === "function") {
     window.redditTrack(REDDIT_EVENT[kind], params, eventId);
@@ -50,7 +53,7 @@ export function fanOutAdConversion({ kind, eventId, email, params }: FanOut): vo
     window.tiktokTrack(TIKTOK_EVENT[kind], params, eventId);
   }
   if (typeof window.xTrack === "function") {
-    window.xTrack(kind, params, eventId);
+    window.xTrack(xRoute, params, eventId);
   }
 
   if (window.oscenConsent?.state() !== "granted") return;
@@ -80,6 +83,6 @@ export function fanOutAdConversion({ kind, eventId, email, params }: FanOut): vo
     });
   }
   if (import.meta.env.PUBLIC_X_PIXEL_ENABLED === "true") {
-    post(`/.netlify/functions/x-conversions/${kind}`, { ...shared, click_id: clickIds.twclid });
+    post(`/.netlify/functions/x-conversions/${xRoute}`, { ...shared, click_id: clickIds.twclid });
   }
 }
