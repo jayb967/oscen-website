@@ -2,9 +2,10 @@
  * First-party click and scroll analytics, stored in Cloudflare.
  *
  * Every click on a link, button or [data-cta] element, and scroll depth
- * milestones (25/50/75/100%), are sent with navigator.sendBeacon to
- * oscen.ai/e, a Cloudflare Worker (oscen-events) that writes them to the
- * Cloudflare Analytics Engine dataset "oscen_clicks".
+ * milestones (25/50/75/100%), are sent via analytics-core.ts to oscen.ai/e,
+ * a Cloudflare Worker (oscen-events) that writes them to the Cloudflare
+ * Analytics Engine dataset "oscen_clicks". Time on page and per section is
+ * engagement.ts.
  *
  * Anonymous and cookieless: no identifiers, no form values, no emails. Only
  * what was clicked (data-cta / id / short visible label / link target), the
@@ -13,49 +14,7 @@
  * Cloudflare Web Analytics, which is enabled on the zone.
  */
 
-const ENDPOINT = "/e";
-
-type Attribution = { utm_source?: string; utm_campaign?: string; referrer?: string };
-
-function attribution(): Attribution {
-  try {
-    return JSON.parse(sessionStorage.getItem("oscen_attribution") || "{}") as Attribution;
-  } catch {
-    return {};
-  }
-}
-
-function device(): string {
-  const w = window.innerWidth;
-  return w < 640 ? "phone" : w < 1024 ? "tablet" : "desktop";
-}
-
-function send(event: Record<string, unknown>) {
-  const a = attribution();
-  const body = JSON.stringify({
-    ...event,
-    path: location.pathname,
-    utm_source: a.utm_source,
-    utm_campaign: a.utm_campaign,
-    ref: a.referrer ? safeHost(a.referrer) : undefined,
-    device: device(),
-    vw: window.innerWidth,
-  });
-  try {
-    if (navigator.sendBeacon?.(ENDPOINT, new Blob([body], { type: "application/json" }))) return;
-    void fetch(ENDPOINT, { method: "POST", body, keepalive: true, headers: { "content-type": "application/json" } }).catch(() => {});
-  } catch {
-    // Analytics must never break the page.
-  }
-}
-
-function safeHost(u: string): string | undefined {
-  try {
-    return new URL(u).host;
-  } catch {
-    return undefined;
-  }
-}
+import { analyticsEnabled, send } from "./analytics-core";
 
 /** Short, non-sensitive label for an element: its visible text, trimmed. */
 function label(el: HTMLElement): string {
@@ -121,7 +80,7 @@ function trackScrollDepth() {
   );
 }
 
-if (typeof window !== "undefined" && !location.pathname.startsWith("/investor-pitch")) {
+if (analyticsEnabled) {
   document.addEventListener("click", onClick, { capture: true, passive: true });
   trackScrollDepth();
 }
