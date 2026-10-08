@@ -33,8 +33,8 @@ export type HandlerResponse = {
 };
 
 /** Validated, normalized input shared by both platforms. */
-export type AdConversion = {
-  kind: ConversionKind;
+export type AdConversion<K extends string = ConversionKind> = {
+  kind: K;
   eventId: string;
   sourceUrl?: string;
   referrer?: string;
@@ -137,11 +137,13 @@ const TOKEN = /^[A-Za-z0-9._~-]+$/;
  * Runs every shared check. Returns either a finished response (reject /
  * not configured) or the validated conversion for the platform sender.
  */
-export function parseRequest(
+export function parseRequest<K extends string = ConversionKind>(
   event: HandlerEvent,
   fnName: string,
   configured: boolean,
-): { response: HandlerResponse } | { conversion: AdConversion; origin: string; body: Record<string, unknown> } {
+  /** Route allowlist; defaults to the shared conversion kinds. */
+  isKind: (k: string) => k is K = isConversionKind as unknown as (k: string) => k is K,
+): { response: HandlerResponse } | { conversion: AdConversion<K>; origin: string; body: Record<string, unknown> } {
   const origin = event.headers["origin"] || event.headers["Origin"];
 
   if (event.httpMethod === "OPTIONS") {
@@ -155,7 +157,7 @@ export function parseRequest(
   if (rateLimited(ip)) return { response: json(429, { ok: false }, origin) };
 
   const kind = routeOf(event.path || "", fnName);
-  if (!isConversionKind(kind)) return { response: json(404, { ok: false }, origin) };
+  if (!isKind(kind)) return { response: json(404, { ok: false }, origin) };
 
   const raw = event.body || "";
   if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) {

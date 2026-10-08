@@ -10,29 +10,46 @@
  *                          setup > Generate access token (secret)
  *   PUBLIC_X_PIXEL_ID      pixel id, e.g. "rgr3c"
  *   PUBLIC_X_EVENT_*       per-kind event ids "tw-<pixel>-<code>" (see
- *                          X_EVENT_ENV in src/lib/ad-events.ts); a kind with
- *                          no id answers not_configured
+ *                          X_EVENT_ENV and X_PAGE_EVENT_ENV in
+ *                          src/lib/ad-events.ts); a route with no id answers
+ *                          not_configured
+ *
+ * Routes: the shared conversion kinds (lead, subscribe, registration,
+ * purchase) plus X-only page events (invest_view, for audiences).
  *
  * conversion_id = the shared event_id, so X dedupes this against the pixel's
  * twq('event', ..., { conversion_id }) call.
  */
 
-import { X_EVENT_ENV, isConversionKind, xEventId } from "../../src/lib/ad-events";
+import {
+  X_EVENT_ENV,
+  X_PAGE_EVENT_ENV,
+  isConversionKind,
+  isXPageEvent,
+  xEventId,
+  type ConversionKind,
+  type XPageEvent,
+} from "../../src/lib/ad-events";
 import { hashEmail, json, parseRequest, postUpstream, type HandlerEvent, type HandlerResponse } from "../lib/ad-relay";
 
 const API = "https://ads-api.x.com/12/measurement/conversions";
 
-/** The kind is only known after parsing, so read its event id up front from the path. */
+type XRoute = ConversionKind | XPageEvent;
+const isXRoute = (k: string): k is XRoute => isConversionKind(k) || isXPageEvent(k);
+
+/** The route is only known after parsing, so read its event id up front from the path. */
 function eventIdForPath(path: string): string | undefined {
-  const kind = path.split("/").filter(Boolean).pop();
-  return isConversionKind(kind) ? xEventId(process.env[X_EVENT_ENV[kind]]) : undefined;
+  const route = path.split("/").filter(Boolean).pop();
+  if (isConversionKind(route)) return xEventId(process.env[X_EVENT_ENV[route]]);
+  if (isXPageEvent(route)) return xEventId(process.env[X_PAGE_EVENT_ENV[route]]);
+  return undefined;
 }
 
 export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => {
   const token = process.env.X_PIXEL_TOKEN;
   const pixelId = process.env.PUBLIC_X_PIXEL_ID;
   const eventId = eventIdForPath(event.path || "");
-  const parsed = parseRequest(event, "x-conversions", !!token && !!pixelId && !!eventId);
+  const parsed = parseRequest<XRoute>(event, "x-conversions", !!token && !!pixelId && !!eventId, isXRoute);
   if ("response" in parsed) return parsed.response;
   const { conversion: c, origin } = parsed;
 

@@ -64,6 +64,23 @@ export const X_EVENT_ENV: Record<ConversionKind, string> = {
   purchase: "PUBLIC_X_EVENT_PURCHASE",
 };
 
+/**
+ * X page-visit events (audience building), fired once per visit to a page by
+ * the X pixel and mirrored to the Conversion API with the same conversion_id.
+ * Route segment on x-conversions -> env var holding the "tw-..." event id.
+ */
+export type XPageEvent = "invest_view";
+export const X_PAGE_EVENT_ENV: Record<XPageEvent, string> = {
+  invest_view: "PUBLIC_X_EVENT_INVEST_VIEW",
+};
+/** Which page fires which X page event (pathname without trailing slash). */
+export const X_PAGE_EVENT_FOR_PATH: Record<string, XPageEvent | undefined> = {
+  "/invest": "invest_view",
+};
+export function isXPageEvent(v: unknown): v is XPageEvent {
+  return typeof v === "string" && Object.prototype.hasOwnProperty.call(X_PAGE_EVENT_ENV, v);
+}
+
 /** "tw-rgr3c-abc12" style id, or undefined if unset/malformed. */
 export function xEventId(raw: unknown): string | undefined {
   return typeof raw === "string" && /^tw-[a-z0-9]+-[a-z0-9]+$/i.test(raw.trim()) ? raw.trim() : undefined;

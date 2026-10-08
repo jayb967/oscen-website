@@ -12,7 +12,7 @@
  * skipped.
  */
 
-import { xEventId, type ConversionKind } from "../lib/ad-events";
+import { X_PAGE_EVENT_FOR_PATH, xEventId, type ConversionKind, type XPageEvent } from "../lib/ad-events";
 import { consentGatedTracker } from "./pixel-gate";
 
 type Twq = ((...args: unknown[]) => void) & {
@@ -32,6 +32,11 @@ const EVENT_IDS: Record<ConversionKind, string | undefined> = {
   subscribe: xEventId(import.meta.env.PUBLIC_X_EVENT_SUBSCRIBE),
   registration: xEventId(import.meta.env.PUBLIC_X_EVENT_REGISTRATION),
   purchase: xEventId(import.meta.env.PUBLIC_X_EVENT_PURCHASE),
+};
+
+/** Page-visit events for audiences (names match X_PAGE_EVENT_ENV). */
+const PAGE_EVENT_IDS: Record<XPageEvent, string | undefined> = {
+  invest_view: xEventId(import.meta.env.PUBLIC_X_EVENT_INVEST_VIEW),
 };
 
 function injectBase(pixelId: string) {
@@ -63,10 +68,45 @@ function fire(call: Call) {
   twq("event", call.eventId, props);
 }
 
+function newConversionId(): string {
+  return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `x_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
+/**
+ * Page-visit event for this path (e.g. /invest -> audience event), fired once
+ * per page load from the pixel and mirrored server-side with the same
+ * conversion_id. Runs inside boot, so consent is already granted.
+ */
+function firePageEvent() {
+  const path = window.location.pathname.replace(/\/$/, "") || "/";
+  const route = X_PAGE_EVENT_FOR_PATH[path];
+  const eventId = route ? PAGE_EVENT_IDS[route] : undefined;
+  if (!route || !eventId) return;
+  const conversionId = newConversionId();
+  fire({ eventId, params: { conversion_id: conversionId } });
+  try {
+    void fetch(`/.netlify/functions/x-conversions/${route}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        event_id: conversionId,
+        event_source_url: window.location.href,
+        click_id: window.oscenClickIds?.().twclid,
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // Best-effort; the pixel already fired.
+  }
+}
+
 const track = consentGatedTracker<Call>({
   enabled: import.meta.env.PUBLIC_X_PIXEL_ENABLED === "true",
   pixelId: import.meta.env.PUBLIC_X_PIXEL_ID as string | undefined,
-  boot: injectBase,
+  boot: (pixelId) => {
+    injectBase(pixelId);
+    firePageEvent();
+  },
   fire,
 });
 
