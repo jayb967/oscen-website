@@ -288,29 +288,67 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
   // Run after DOMContentLoaded: this component's module executes before the
   // consent + pixel modules at the end of Base.astro, so firing now would find
   // no window.oscenConsent / redditTrack / tiktokTrack / metaTrack yet.
-  function firePurchaseOnce() {
-    const url = new URL(window.location.href);
-    const tier = (url.searchParams.get("tier") || "").toLowerCase();
-    if (url.searchParams.get("ok") === "1" && tier in TIER_NAMES) {
-      // When the Payment Link redirect carries {CHECKOUT_SESSION_ID}, it is the
-      // event id: every platform then dedupes reloads, other tabs and shared
-      // links to the one real checkout. Without it, fall back to one Purchase
-      // per tier per tab session.
-      const sessionId = url.searchParams.get("session_id") || "";
-      // The relays cap event ids at 64 chars; the session id's tail is unique on its own.
-      const stableId = /^cs_(live|test)_[A-Za-z0-9]{10,200}$/.test(sessionId) ? `cs_${sessionId.slice(-56)}` : undefined;
-      const key = `oscen_purchase_fired_${stableId ?? tier}`;
-      let already = false;
-      try {
-        already = sessionStorage.getItem(key) === "1";
-        if (!already) sessionStorage.setItem(key, "1");
-      } catch {
-        // Storage blocked (rare): fire anyway; a reload could then count twice.
-      }
-      if (!already) {
-        fireStandaloneConversion(trackingForPurchase(tier, TIER_PRICE_USD[tier as TierId]), undefined, {}, stableId);
-      }
+  //
+  // A Purchase is only reported for a checkout the CRM confirms was paid
+  // (/.netlify/functions/checkout-verify asks our record or Stripe), with the
+  // real tier and amount. A typed or shared ?ok=1 URL, or a return without a
+  // session id, shows the thank-you copy but counts nothing.
+  const SESSION_ID = /^cs_(live|test)_[A-Za-z0-9]{10,200}$/;
+
+  function firedKey(sessionId: string) {
+    return `oscen_purchase_fired_${sessionId.slice(-56)}`;
+  }
+  function alreadyFired(key: string): boolean {
+    try {
+      return localStorage.getItem(key) === "1" || sessionStorage.getItem(key) === "1";
+    } catch {
+      return false;
     }
+  }
+  function markFired(key: string) {
+    try { localStorage.setItem(key, "1"); } catch { /* storage blocked */ }
+    try { sessionStorage.setItem(key, "1"); } catch { /* storage blocked */ }
+  }
+
+  type Verified = { ok?: boolean; paid?: boolean; tier?: string | null; value?: number };
+
+  async function verify(sessionId: string): Promise<Verified | null> {
+    // The webhook or Stripe can lag the redirect by a moment; try a few times.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await fetch("/.netlify/functions/checkout-verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId }),
+        });
+        if (res.ok) {
+          const data = (await res.json()) as Verified;
+          if (data.ok && data.paid) return data;
+          if (data.ok && !data.paid && attempt === 2) return data;
+        }
+      } catch {
+        // network blip: retry
+      }
+      await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+    }
+    return null;
+  }
+
+  async function firePurchaseOnce() {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("ok") !== "1") return;
+    const sessionId = url.searchParams.get("session_id") || "";
+    if (!SESSION_ID.test(sessionId)) return;
+    const key = firedKey(sessionId);
+    if (alreadyFired(key)) return;
+    const result = await verify(sessionId);
+    if (!result?.paid || alreadyFired(key)) return;
+    const urlTier = (url.searchParams.get("tier") || "").toLowerCase();
+    const tier = result.tier && result.tier in TIER_NAMES ? result.tier : urlTier in TIER_NAMES ? urlTier : "custom";
+    const value = typeof result.value === "number" && result.value > 0 ? result.value : TIER_PRICE_USD[tier as TierId];
+    markFired(key);
+    // The relays cap event ids at 64 chars; the session id's tail is unique on its own.
+    fireStandaloneConversion(trackingForPurchase(tier, value), undefined, {}, `cs_${sessionId.slice(-56)}`);
   }
 
   // Module scripts run while readyState is already "interactive" but before
@@ -319,7 +357,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
   const runOnce = () => {
     if (purchaseHandled) return;
     purchaseHandled = true;
-    firePurchaseOnce();
+    void firePurchaseOnce();
   };
   if (document.readyState === "complete") {
     runOnce();
