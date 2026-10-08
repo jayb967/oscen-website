@@ -1,11 +1,12 @@
 /**
- * Reddit + TikTok legs of the conversion fan-out.
+ * Reddit, TikTok and X legs of the conversion fan-out.
  *
  * forms.ts calls fanOutAdConversion() right next to window.metaTrack with the
  * SAME event_id, so one conversion reaches Meta, Reddit and TikTok in the
  * browser and each platform can dedupe its browser + server pair:
  *   Reddit: pixel conversionId  == CAPI event_metadata.conversion_id
  *   TikTok: pixel event_id      == Events API event_id
+ *   X:      pixel conversion_id == Conversion API conversion_id
  *
  * Server legs POST to /.netlify/functions/reddit-capi/<kind> and
  * /.netlify/functions/tiktok-events/<kind>, consent-gated exactly like the
@@ -48,6 +49,9 @@ export function fanOutAdConversion({ kind, eventId, email, params }: FanOut): vo
   if (typeof window.tiktokTrack === "function") {
     window.tiktokTrack(TIKTOK_EVENT[kind], params, eventId);
   }
+  if (typeof window.xTrack === "function") {
+    window.xTrack(kind, params, eventId);
+  }
 
   if (window.oscenConsent?.state() !== "granted") return;
 
@@ -74,5 +78,8 @@ export function fanOutAdConversion({ kind, eventId, email, params }: FanOut): vo
       click_id: clickIds.ttclid,
       browser_id: window.tiktokGetTtp?.(),
     });
+  }
+  if (import.meta.env.PUBLIC_X_PIXEL_ENABLED === "true") {
+    post(`/.netlify/functions/x-conversions/${kind}`, { ...shared, click_id: clickIds.twclid });
   }
 }

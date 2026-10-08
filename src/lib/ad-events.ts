@@ -51,8 +51,26 @@ export type TikTokEventName =
   | "CompleteRegistration"
   | "Purchase";
 
+/**
+ * X (Twitter) uses per-pixel event ids ("tw-<pixel>-<code>") created in X
+ * Events Manager, not fixed names. One public env var per conversion kind;
+ * a kind with no id is simply not sent to X. Read on both sides: the pixel
+ * (import.meta.env) and the x-conversions function (process.env).
+ */
+export const X_EVENT_ENV: Record<ConversionKind, string> = {
+  lead: "PUBLIC_X_EVENT_LEAD",
+  subscribe: "PUBLIC_X_EVENT_SUBSCRIBE",
+  registration: "PUBLIC_X_EVENT_REGISTRATION",
+  purchase: "PUBLIC_X_EVENT_PURCHASE",
+};
+
+/** "tw-rgr3c-abc12" style id, or undefined if unset/malformed. */
+export function xEventId(raw: unknown): string | undefined {
+  return typeof raw === "string" && /^tw-[a-z0-9]+-[a-z0-9]+$/i.test(raw.trim()) ? raw.trim() : undefined;
+}
+
 /** Click ids captured first-touch by attribution.ts and forwarded server-side. */
-export const CLICK_ID_KEYS = ["rdt_cid", "ttclid", "fbclid", "gclid"] as const;
+export const CLICK_ID_KEYS = ["rdt_cid", "ttclid", "twclid", "fbclid", "gclid"] as const;
 export type ClickIdKey = (typeof CLICK_ID_KEYS)[number];
 
 export function isConversionKind(v: unknown): v is ConversionKind {

@@ -5,7 +5,7 @@
  * landing referrer into sessionStorage so they survive multi-page browsing
  * before a user submits a form. First-touch wins. we never overwrite once set.
  *
- * Also captures ad click ids (rdt_cid, ttclid, fbclid, gclid) into the same
+ * Also captures ad click ids (rdt_cid, ttclid, twclid, fbclid, gclid) into the same
  * store so forms and the conversion server legs can forward them.
  *
  * Exposes window.injectAttribution(form) for form submit handlers and
@@ -22,9 +22,10 @@ type Attribution = {
   utm_campaign?: string;
   utm_content?: string;
   utm_term?: string;
-  // Ad platform click ids (Reddit, TikTok, Meta, Google). First value wins.
+  // Ad platform click ids (Reddit, TikTok, X, Meta, Google). First value wins.
   rdt_cid?: string;
   ttclid?: string;
+  twclid?: string;
   fbclid?: string;
   gclid?: string;
   referrer?: string;
