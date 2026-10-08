@@ -68,7 +68,7 @@ const dots = [
     <!-- Media (above the copy on phones) -->
     <figure class="order-1 lg:order-2 m-0">
       <div class="line-frame relative rounded-[1.75rem] p-1.5 glass-bright">
-        <div data-line-media class="relative overflow-hidden rounded-[1.4rem] bg-abyss aspect-square sm:aspect-[16/10] lg:aspect-[4/5]">
+        <div data-line-media class="relative overflow-hidden rounded-[1.4rem] bg-abyss aspect-[4/5] sm:aspect-[16/10] lg:aspect-[4/5]">
           <!-- Fallback panel: always underneath, visible until real media paints. -->
           <div class="line-fallback absolute inset-0" aria-hidden="true">
             {dots.map((p) => (
@@ -81,7 +81,7 @@ const dots = [
           <video
             data-line-video
             data-poster={`${MEDIA}.jpg`}
-            class="absolute inset-0 w-full h-full object-cover object-[50%_12%] opacity-0 transition-opacity duration-700"
+            class="absolute inset-0 w-full h-full object-cover object-[50%_55%] sm:object-[50%_12%] lg:object-[50%_55%] opacity-0 transition-opacity duration-700"
             muted
             loop
             playsinline
