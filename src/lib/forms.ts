@@ -296,9 +296,13 @@ export async function submitInquiry(
         if (tracking) fireConversion(form, tracking);
         onSuccess();
       } else {
+        // Turnstile tokens are single-use: get a fresh one so "try again" works
+        // without a page reload.
+        (window as Window & { turnstile?: { reset: () => void } }).turnstile?.reset();
         showStatus(status, "Something went wrong. Please try again.", "error");
       }
     } catch {
+      (window as Window & { turnstile?: { reset: () => void } }).turnstile?.reset();
       showStatus(status, "Network error. Please try again.", "error");
     }
   });
