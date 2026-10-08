@@ -10,7 +10,8 @@
  *
  *   PUBLIC_STRIPE_SUPPORT_SPARK     one-time $20       Name a Neuron
  *   PUBLIC_STRIPE_SUPPORT_SYNAPSE   one-time $50       Milestone Witness Pass
- *   PUBLIC_STRIPE_SUPPORT_CORTEX    recurring $100/mo  Cortex Circle
+ *   PUBLIC_STRIPE_SUPPORT_CIRCLE    recurring $29/mo   Circle (Founding Circle entry plan)
+ *   PUBLIC_STRIPE_SUPPORT_CORTEX    recurring $100/mo  Inner Circle (id stays "cortex")
  *   PUBLIC_STRIPE_SUPPORT_CUSTOM    pay-what-you-want ($1 min, $25 preset)
  *   PUBLIC_STRIPE_SUPPORT_FOUNDING  one-time $100      numbered crewneck (cap 100)
  *   PUBLIC_STRIPE_SUPPORT_HOLIDAY   one-time $175      gift box (order-by date below)
@@ -55,9 +56,32 @@ export const HOLIDAY_ORDER_BY = "2026-12-11T07:59:59Z";
 /** Physical perks ship to US addresses only (the CRM's SHIPPING_COUNTRIES). */
 const US_ONLY = "US addresses only.";
 
+/**
+ * Line priority, in queue order. A place in line is a promise of first
+ * access when reservations open, never of a robot, a price, or a date.
+ */
+export const LINE = {
+  founding: "Holds one of the first 100 places in line for good",
+  top: "Top of the line, behind the Founding 100",
+  innerCircle: "Ahead of all Circle members in line",
+  circle: "Ahead of all free sign-ups in line",
+  aheadOfFree: "Ahead of all free sign-ups",
+} as const;
+
+/** Circle perks, best first. The Inner Circle gets all of these too. */
+export const CIRCLE_PERKS = [
+  "A monthly \"here's what it learned\" clip",
+  "Vote on what it learns next",
+  "Vote on the humanoid's name",
+  "The members-only build log: the wins and the misses",
+  "Your place in line ahead of all free sign-ups",
+  "24 hours early access when reservations open",
+  "A neuron named for you, with a certificate",
+];
+
 export type SupportTier = {
   id:
-    | "spark" | "synapse" | "cortex" | "custom"
+    | "spark" | "synapse" | "cortex" | "circle" | "custom"
     | "founding" | "holiday" | "office" | "region" | "labday" | "company";
   name: string;
   price: string;
@@ -72,6 +96,8 @@ export type SupportTier = {
   ships?: string;
   /** ISO time after which the card hides itself (real deadlines only). */
   expires?: string;
+  /** Where this backer stands in the First in Line queue (a promise of first access only). */
+  line?: string;
   href: string;
   accent: "blue" | "cyan" | "amber" | "purple";
 };
@@ -90,6 +116,7 @@ const ALL_TIERS: SupportTier[] = [
       "Name a Neuron ($20): your name on one neuron in the brain, with a certificate",
     ],
     scarcity: "100 made. When they're gone, this tier closes.",
+    line: LINE.founding,
     ships: `Unisex crewneck, XS to 3XL. Ships in 4 to 6 weeks, or full refund. ${US_ONLY}`,
     href: env.PUBLIC_STRIPE_SUPPORT_FOUNDING ?? "",
     accent: "amber",
@@ -104,6 +131,7 @@ const ALL_TIERS: SupportTier[] = [
       "Your name on one numbered neuron in the brain, with the region it lives in",
       "A certificate for your neuron, by email within 7 days",
     ],
+    line: LINE.aheadOfFree,
     href: env.PUBLIC_STRIPE_SUPPORT_SPARK ?? LINKS.spark,
     accent: "cyan",
   },
@@ -118,21 +146,36 @@ const ALL_TIERS: SupportTier[] = [
       "Your name on the witness list and the contributor wall",
       "Name a Neuron ($20)",
     ],
+    line: LINE.aheadOfFree,
     href: env.PUBLIC_STRIPE_SUPPORT_SYNAPSE ?? LINKS.synapse,
     accent: "blue",
   },
   {
+    id: "circle",
+    name: "Circle",
+    price: "$29",
+    cadence: "monthly",
+    blurb: "Raise the brain with us, month by month. See what it learned and help decide what it learns next.",
+    stack: CIRCLE_PERKS,
+    line: LINE.circle,
+    ships: "Billed monthly, cancel anytime.",
+    href: env.PUBLIC_STRIPE_SUPPORT_CIRCLE ?? "",
+    accent: "blue",
+  },
+  {
     id: "cortex",
-    name: "Cortex Circle",
+    name: "Inner Circle",
     price: "$100",
     cadence: "monthly",
-    blurb: "Watch it learn, month by month, from the inside. Keeps a specialist brain running.",
+    blurb: "Everything in the Circle, plus a seat at the build itself. Keeps a specialist brain running.",
     stack: [
+      "Everything in the Circle",
+      "A quarterly live build session with the founder",
       "OSCEN-branded crewneck with your first month",
-      "The Lab Log: a private monthly note and video from the founder, the wins and the misses",
-      "A seat on the quarterly live Q&A with the founder",
-      "Milestone Witness Pass ($50)",
+      "Your place in line ahead of all Circle members",
+      "72 hours early access when reservations open",
     ],
+    line: LINE.innerCircle,
     ships: `Billed monthly, cancel anytime. Crewneck ships in 4 to 6 weeks. ${US_ONLY}`,
     href: env.PUBLIC_STRIPE_SUPPORT_CORTEX ?? LINKS.cortex,
     accent: "amber",
@@ -151,6 +194,7 @@ const ALL_TIERS: SupportTier[] = [
     scarcity: "Order by December 10 for delivery before the holidays.",
     ships: `Pick their size at checkout. Ships by December 20, or full refund. ${US_ONLY}`,
     expires: HOLIDAY_ORDER_BY,
+    line: LINE.aheadOfFree,
     href: env.PUBLIC_STRIPE_SUPPORT_HOLIDAY ?? "",
     accent: "cyan",
   },
@@ -167,6 +211,7 @@ const ALL_TIERS: SupportTier[] = [
     ],
     scarcity: "8 Office Hours spots a month.",
     ships: `Call held within 30 days. Crewneck ships in 4 to 6 weeks. ${US_ONLY}`,
+    line: LINE.top,
     href: env.PUBLIC_STRIPE_SUPPORT_OFFICE ?? "",
     accent: "purple",
   },
@@ -184,6 +229,7 @@ const ALL_TIERS: SupportTier[] = [
     ],
     scarcity: `${BRAIN_STATS.brainRegions} regions. One sponsor each.`,
     ships: `Call held within 30 days. Crewneck ships in 4 to 6 weeks. ${US_ONLY}`,
+    line: LINE.top,
     href: env.PUBLIC_STRIPE_SUPPORT_REGION ?? "",
     accent: "purple",
   },
@@ -200,6 +246,7 @@ const ALL_TIERS: SupportTier[] = [
     ],
     scarcity: "4 a year.",
     ships: `Session held within 60 days. Crewnecks ship in 4 to 6 weeks. ${US_ONLY}`,
+    line: LINE.top,
     href: env.PUBLIC_STRIPE_SUPPORT_LABDAY ?? "",
     accent: "purple",
   },
@@ -215,6 +262,7 @@ const ALL_TIERS: SupportTier[] = [
       "Ten OSCEN-branded crewnecks for your team",
     ],
     ships: `Talk held within 60 days. Crewnecks ship in 4 to 6 weeks. ${US_ONLY}`,
+    line: LINE.top,
     href: env.PUBLIC_STRIPE_SUPPORT_COMPANY ?? "",
     accent: "blue",
   },
@@ -252,7 +300,10 @@ const byId = (ids: SupportTier["id"][]) =>
 /** Page layout groups. A group with no live tiers renders nothing. */
 export const FEATURED_TIER = byId(["founding"])[0];
 export const SEASONAL_TIER = byId(["holiday"])[0];
-export const CORE_TIERS = byId(["spark", "synapse", "cortex"]);
+/** The Founding Circle monthly plans, entry plan first. */
+export const CIRCLE_TIERS = byId(["circle", "cortex"]);
+/** Small one-time add-ons ("Small ways to back the brain"). */
+export const ADDON_TIERS = byId(["spark", "synapse"]);
 export const PREMIUM_TIERS = byId(["office", "region", "labday"]);
 export const COMPANY_TIER = byId(["company"])[0];
 export const CUSTOM_TIER = byId(["custom"])[0];

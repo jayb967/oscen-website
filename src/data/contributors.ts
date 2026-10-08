@@ -11,7 +11,7 @@
  */
 
 export type ContributorTier =
-  | "spark" | "synapse" | "cortex" | "custom"
+  | "spark" | "synapse" | "cortex" | "circle" | "custom"
   | "founding" | "holiday" | "office" | "region" | "labday" | "company";
 export type ContributorWallEntry = {
   displayName: string;
@@ -23,6 +23,7 @@ export const TIER_DOT: Record<ContributorTier, string> = {
   spark:   "bg-accent-cyan",
   synapse: "bg-accent-blue",
   cortex:  "bg-accent-amber",
+  circle:  "bg-accent-blue",
   custom:  "bg-accent-purple",
   founding: "bg-accent-amber",
   holiday:  "bg-accent-cyan",

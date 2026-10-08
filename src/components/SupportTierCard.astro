@@ -1,7 +1,7 @@
 ---
 /**
  * One /support offer card: name, price, hook, value stack, real scarcity,
- * ship window. The whole card is the Stripe link. `wide` lays the stack out
+ * ship window, place in line. The whole card is the Stripe link. `wide` lays the stack out
  * beside the hook (featured and full-width cards).
  */
 import { ACCENT, type SupportTier } from "../lib/support";
@@ -47,6 +47,12 @@ const a = ACCENT[tier.accent];
   </div>
 
   <div class="mt-auto space-y-1.5">
+    {tier.line && (
+      <p class="flex items-center gap-2 text-[11px] font-tech text-accent-green/90">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-green shrink-0" aria-hidden="true"></span>
+        <span>{tier.line}</span>
+      </p>
+    )}
     {tier.scarcity && <p data-scarcity class="text-[11px] font-tech text-accent-amber/90">{tier.scarcity}</p>}
     {tier.ships && <p class="text-[10px] font-tech text-text-muted">{tier.ships}</p>}
     <div class={`pt-3 text-[11px] font-tech ${a.ctaIdle} ${a.ctaHover} transition-colors`}>

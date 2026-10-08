@@ -1,0 +1,93 @@
+---
+/**
+ * "Go further": the one-time tiers, each with its place-in-line note, then
+ * the small add-ons and the choose-your-own-amount link. Tiers without a
+ * live Stripe link are filtered out in lib/support.ts. Live caps and
+ * sell-outs are applied client-side by src/scripts/support-status.ts via
+ * the data-tier / data-scarcity hooks on SupportTierCard.
+ */
+import SectionHead from "../invest/SectionHead.astro";
+import SupportTierCard from "../SupportTierCard.astro";
+import {
+  ACCENT, ADDON_TIERS, COMPANY_TIER, CUSTOM_TIER, FEATURED_TIER, PREMIUM_TIERS, SEASONAL_TIER,
+} from "../../lib/support";
+---
+
+<section id="go-further" class="inv-section max-w-5xl mx-auto px-6 scroll-mt-24">
+  <SectionHead
+    eyebrow="Go further"
+    title="Back the build once,"
+    accent="and move up the line."
+    lede="One-time ways to back the brain. Every one of them puts you ahead of all free sign-ups."
+  />
+
+  {FEATURED_TIER && (
+    <div class="mb-4">
+      <SupportTierCard tier={FEATURED_TIER} featured />
+    </div>
+  )}
+
+  {SEASONAL_TIER && (
+    <div class="mb-4" data-tier-wrap>
+      <SupportTierCard tier={SEASONAL_TIER} wide />
+    </div>
+  )}
+
+  {PREMIUM_TIERS.length > 0 && (
+    <>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mt-12 mb-5">Closer to the work</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        {PREMIUM_TIERS.map((tier) => <SupportTierCard tier={tier} />)}
+      </div>
+    </>
+  )}
+
+  {COMPANY_TIER && (
+    <>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mt-12 mb-5">For companies</p>
+      <div class="mb-4">
+        <SupportTierCard tier={COMPANY_TIER} wide />
+      </div>
+    </>
+  )}
+
+  {ADDON_TIERS.length > 0 && (
+    <>
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mt-12 mb-5">Small ways to back the brain</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {ADDON_TIERS.map((tier) => {
+          const a = ACCENT[tier.accent];
+          return (
+            <a
+              href={tier.href}
+              data-tier={tier.id}
+              class:list={["reveal glass rounded-xl p-5 flex flex-col gap-2 group transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60", a.borderHover]}
+            >
+              <div class="flex items-baseline justify-between gap-3">
+                <h3 class:list={["font-display text-xl", a.textBold]}>{tier.name}</h3>
+                <span class:list={["font-tech text-lg text-text-primary transition-colors", a.priceHover]}>{tier.price}</span>
+              </div>
+              <p class="text-xs text-text-secondary leading-relaxed">{tier.blurb}</p>
+              <div class="mt-auto pt-2 flex flex-wrap items-center justify-between gap-2">
+                <span class="flex items-center gap-2 text-[11px] font-tech text-accent-green/90">
+                  <span class="w-1.5 h-1.5 rounded-full bg-accent-green" aria-hidden="true"></span>{tier.line}
+                </span>
+                <span class:list={["text-[11px] font-tech transition-colors", a.ctaIdle, a.ctaHover]}>Continue on Stripe →</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </>
+  )}
+
+  {CUSTOM_TIER && (
+    <a
+      href={CUSTOM_TIER.href}
+      class="reveal mt-4 glass rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 group hover:border-accent-purple/30 transition-all duration-300"
+    >
+      <span class="text-sm text-text-secondary"><span class="text-accent-purple font-medium">Choose your own amount.</span> {CUSTOM_TIER.stack[0]}</span>
+      <span class="text-[11px] font-tech text-accent-purple/70 group-hover:text-accent-purple transition-colors shrink-0">Continue on Stripe →</span>
+    </a>
+  )}
+</section>

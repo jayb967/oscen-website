@@ -74,7 +74,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
     const url = new URL(window.location.href);
     const ok = url.searchParams.get("ok") === "1";
     const rawTier = (url.searchParams.get("tier") || "").toLowerCase();
-    const tier = ["spark", "synapse", "cortex", "custom", "founding", "holiday", "office", "region", "labday", "company"].includes(rawTier) ? rawTier : "";
+    const tier = ["spark", "synapse", "cortex", "circle", "custom", "founding", "holiday", "office", "region", "labday", "company"].includes(rawTier) ? rawTier : "";
 
     if (ok) {
       section.classList.remove("hidden");
@@ -100,10 +100,15 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
           headline: "You'll be there when it happens.",
           body: `${INBOX} It has your neuron certificate, and the clips of its first steps and first word will come to the same address the day each happens. ${WALL}`,
         },
-        cortex: {
-          eyebrow: "Cortex Circle",
+        circle: {
+          eyebrow: "Circle",
           headline: "Welcome to the Circle.",
-          body: `${INBOX} It has your certificate, a link to manage or cancel your membership, and when to expect the first Lab Log. Your crewneck ships in 4 to 6 weeks. ${WALL}`,
+          body: `${INBOX} Your first "here's what it learned" clip arrives on the 1st of next month, and your votes on what it learns next come by email. The welcome email also has your neuron certificate and a link to manage or cancel your membership. ${WALL}`,
+        },
+        cortex: {
+          eyebrow: "Inner Circle",
+          headline: "Welcome to the Inner Circle.",
+          body: `${INBOX} Your first "here's what it learned" clip arrives on the 1st of next month, and your votes and the invite to the next live build session come by email. The welcome email also has your neuron certificate and a link to manage or cancel your membership. Your crewneck ships in 4 to 6 weeks. ${WALL}`,
         },
         founding: {
           eyebrow: "Founding 100",
@@ -165,6 +170,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
       spark: "supporter-spark",
       synapse: "supporter-synapse",
       cortex: "supporter-cortex",
+      circle: "supporter-circle",
       custom: "supporter-custom",
       founding: "supporter-founding",
       holiday: "supporter-holiday",
@@ -188,7 +194,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
 
     // Tier prices in USD for conversion values (custom is unknown here).
     const TIER_VALUE = {
-      spark: 20, synapse: 50, cortex: 100, founding: 100, holiday: 175,
+      spark: 20, synapse: 50, circle: 29, cortex: 100, founding: 100, holiday: 175,
       office: 250, region: 500, labday: 2500, company: 5000,
     };
 

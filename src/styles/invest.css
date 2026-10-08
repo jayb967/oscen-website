@@ -1,5 +1,6 @@
 /*
- * /invest body styles. Loaded only by the invest section components, so
+ * Section styles for the long-read pages (/invest and /support). Imported
+ * by the invest section components and components/support/SupportPage, so
  * nothing here ships to other pages. Pure CSS: no canvases, no blur, no
  * backdrop-filter (same perf rule as .glass in global.css).
  */

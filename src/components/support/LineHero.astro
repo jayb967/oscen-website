@@ -1,0 +1,135 @@
+---
+/**
+ * /support hero: the First in Line hook beside a looping concept clip of the
+ * OSCEN humanoid. The copy is plain HTML (the LCP); the clip never blocks it.
+ *
+ * Media rules (src/scripts/line-hero-video.ts): preload="none", playback
+ * starts only while the frame is on screen and pauses when it leaves;
+ * reduced motion or Save-Data shows the poster only; if the poster or the
+ * clip 404s, the styled glow panel underneath simply stays visible.
+ * The caption is always on: this is a concept, not a built robot.
+ */
+import { BRAIN_STATS } from "../../data/brain";
+
+const neurons = BRAIN_STATS.totalNeurons.toLocaleString("en-US");
+const MEDIA = "/media/oscen-humanoid-walk";
+
+// Fallback panel "neurons" (percent positions, px size, color, delay s).
+const dots = [
+  { x: 30, y: 30, s: 5, c: "#5ea4f5", d: 0 },
+  { x: 62, y: 24, s: 4, c: "#22d3ee", d: 1.2 },
+  { x: 48, y: 44, s: 7, c: "#e2e8f4", d: 2.1 },
+  { x: 70, y: 58, s: 5, c: "#a78bfa", d: 0.6 },
+  { x: 36, y: 64, s: 4, c: "#38d97a", d: 1.7 },
+  { x: 54, y: 76, s: 4, c: "#5ea4f5", d: 2.8 },
+];
+---
+
+<section id="line-hero" class="relative max-w-6xl mx-auto px-6 mb-8 md:mb-12" aria-labelledby="line-hero-title">
+  <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-14 items-center">
+    <!-- Copy (below the media on phones) -->
+    <div class="order-2 lg:order-1">
+      <p class="hud-label !tracking-[0.3em] mb-5">First in Line</p>
+      <h1 id="line-hero-title" class="font-display text-[clamp(2.5rem,5.6vw,4.5rem)] text-text-primary leading-[0.95] tracking-tight text-balance">
+        Be first in line for the <span class="italic gradient-text pr-1">OSCEN humanoid.</span>
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-text-primary/90 leading-snug">
+        Back the brain now, and you move to the front.
+      </p>
+      <p class="mt-4 text-base text-text-secondary leading-relaxed max-w-xl">
+        A {neurons}-neuron brain is learning right now on ordinary CPUs, with no training data.
+        One day it runs a body. Join the line free, or back the build and jump ahead.
+      </p>
+
+      <div class="mt-8 flex flex-col sm:flex-row gap-3">
+        <a
+          href="#join"
+          data-line-cta="join"
+          class="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-accent-blue text-void font-medium text-sm tracking-wide hover:bg-accent-cyan transition-colors duration-300 shadow-[0_0_32px_rgba(94,164,245,0.35)]"
+        >
+          Get my place in line, free
+        </a>
+        <a
+          href="#circle"
+          data-line-cta="circle"
+          class="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-border-bright bg-void/40 text-text-primary text-sm tracking-wide hover:border-accent-blue/50 hover:text-accent-blue transition-colors duration-300"
+        >
+          Back the brain
+        </a>
+      </div>
+
+      <p class="mt-7 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-tech tracking-[0.16em] uppercase text-text-muted">
+        <span class="whitespace-nowrap text-accent-green">{neurons} neurons</span>
+        <span class="whitespace-nowrap">0 GPUs</span>
+        <span class="whitespace-nowrap">Patent pending</span>
+      </p>
+    </div>
+
+    <!-- Media (above the copy on phones) -->
+    <figure class="order-1 lg:order-2 m-0">
+      <div class="line-frame relative rounded-[1.75rem] p-1.5 glass-bright">
+        <div data-line-media class="relative overflow-hidden rounded-[1.4rem] bg-abyss aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/5]">
+          <!-- Fallback panel: always underneath, visible until real media paints. -->
+          <div class="line-fallback absolute inset-0" aria-hidden="true">
+            {dots.map((p) => (
+              <span
+                class="line-dot absolute rounded-full"
+                style={`left:${p.x}%;top:${p.y}%;width:${p.s}px;height:${p.s}px;background:${p.c};box-shadow:0 0 ${p.s * 3}px ${p.c};animation-delay:${p.d}s;`}
+              ></span>
+            ))}
+          </div>
+          <video
+            data-line-video
+            data-poster={`${MEDIA}.jpg`}
+            class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700"
+            muted
+            loop
+            playsinline
+            preload="none"
+            disablepictureinpicture
+            aria-label="Concept animation of the OSCEN humanoid walking"
+          >
+            <source src={`${MEDIA}.webm`} type="video/webm" />
+            <source src={`${MEDIA}.mp4`} type="video/mp4" />
+          </video>
+          <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-void/80 to-transparent pointer-events-none" aria-hidden="true"></div>
+          <figcaption class="absolute left-3 bottom-3 right-3 sm:left-4 sm:bottom-4 text-[10px] sm:text-[11px] font-tech tracking-wider text-text-primary/85">
+            <span class="inline-block px-2.5 py-1 rounded-full bg-void/70 border border-border-bright">Concept visualization. Design not final.</span>
+          </figcaption>
+        </div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .line-frame {
+    box-shadow:
+      0 0 0 1px rgba(94, 164, 245, 0.08),
+      0 30px 80px -20px rgba(94, 164, 245, 0.28),
+      0 0 120px -30px rgba(167, 139, 250, 0.35);
+  }
+  .line-fallback {
+    background:
+      radial-gradient(ellipse 45% 55% at 50% 45%, rgba(94, 164, 245, 0.24), transparent 70%),
+      radial-gradient(ellipse 35% 30% at 64% 66%, rgba(167, 139, 250, 0.2), transparent 70%),
+      radial-gradient(ellipse 30% 26% at 36% 32%, rgba(34, 211, 238, 0.14), transparent 70%),
+      linear-gradient(180deg, #0c1222, #070b16);
+  }
+  .line-dot {
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+    animation: line-fire 4s ease-in-out infinite;
+  }
+  @keyframes line-fire {
+    0%, 100% { opacity: 0.25; }
+    45% { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line-dot { animation: none; opacity: 0.7; }
+  }
+</style>
+
+<script>
+  import "../../scripts/line-hero-video";
+</script>

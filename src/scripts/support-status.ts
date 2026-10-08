@@ -6,6 +6,7 @@
  *    vanishing, so the sell-out itself is visible and true.
  *  - The recent-backers ticker shows only once there are MIN_PROOF real
  *    backers. Small numbers never headline; invented ones never exist.
+ *  - The First in Line confirmed total shows only from MIN_LINE people up.
  *
  * Every number here comes from real purchases. If the fetch fails, the page
  * keeps its static copy, which is also true ("100 made", "8 calls a month").
@@ -17,6 +18,8 @@ const STATUS_URL =
 
 /** Below this many real backers, lead with the cap instead of the count. */
 const MIN_PROOF = 5;
+/** First in Line: the confirmed total shows only from this many people up. */
+const MIN_LINE = 25;
 
 type Capped = { cap: number; sold: number; remaining: number; open: boolean; period?: string; taken?: string[] };
 type Status = {
@@ -30,6 +33,8 @@ type Status = {
   /** displayName is null for anonymous or not-yet-approved buyers. */
   recent: { displayName: string | null; tier: string; foundingNumber?: number; at: string }[];
   backers: number;
+  /** First in Line: confirmed places only. */
+  line?: { total?: number };
 };
 
 function card(id: string) {
@@ -85,7 +90,8 @@ function applyTiers(t: Status["tiers"]) {
     else setScarcity("labday", `${l.remaining} of ${l.cap} left for ${l.period ?? "this year"}.`);
   }
 
-  if (t.holiday && !t.holiday.open) card("holiday")?.closest("section")?.remove();
+  const holiday = card("holiday");
+  if (t.holiday && !t.holiday.open && holiday) (holiday.closest("[data-tier-wrap]") ?? holiday).remove();
 }
 
 function timeAgo(iso: string) {
@@ -127,6 +133,14 @@ function renderTicker(s: Status) {
   root.classList.remove("hidden");
 }
 
+function renderLineTotal(line: Status["line"]) {
+  const el = document.getElementById("line-total");
+  const total = Number(line?.total);
+  if (!el || !Number.isInteger(total) || total < MIN_LINE) return;
+  el.textContent = `${total.toLocaleString("en-US")} people have confirmed their place in line.`;
+  el.classList.remove("hidden");
+}
+
 export async function loadSupportStatus() {
   try {
     const res = await fetch(STATUS_URL, { headers: { Accept: "application/json" } });
@@ -136,6 +150,7 @@ export async function loadSupportStatus() {
     const backers = Number(s.backers) || 0;
     applyTiers(s.tiers);
     renderTicker({ ...s, backers });
+    renderLineTotal(s.line);
   } catch {
     // Static copy stays; it is true on its own.
   }

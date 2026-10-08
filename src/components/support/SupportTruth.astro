@@ -1,0 +1,78 @@
+---
+/**
+ * "What's real, and what isn't yet" plus the FAQ. Plain, checkable claims
+ * only: the brain is real and patent pending; the robot, its price and its
+ * date are not. Neuron count comes from src/data/brain.ts.
+ */
+import SectionHead from "../invest/SectionHead.astro";
+import { BRAIN_STATS } from "../../data/brain";
+
+const neurons = `${(BRAIN_STATS.totalNeurons / 1_000_000).toFixed(2)}M`;
+
+const REAL = [
+  `A ${neurons}-neuron brain, learning continuously on CPUs`,
+  "Patent pending",
+  "A simulated humanoid body it trains in",
+];
+const NOT_YET = ["A physical robot design", "A price", "A delivery date"];
+
+const FAQ: { q: string; a: string; link?: string; after?: string }[] = [
+  { q: "Will I have to buy the robot?", a: "No. Your place in line is first access only, never an obligation to buy." },
+  { q: "When will it ship?", a: "We don't know yet, and we won't guess. You'll hear the day there is a real date." },
+  { q: "Can I cancel the Circle?", a: "Anytime, from the manage link in your welcome email or by writing to info@oscen.ai. It stops at the end of your month." },
+  { q: "Is this an investment?", a: "No. Backing the brain gives no equity, ownership, or financial return. If you want to own part of OSCEN, accredited investors can start at ", link: "/invest", after: ". That's the only place a security would ever be offered." },
+];
+---
+
+<section id="whats-real" class="inv-section inv-glow-green inv-glow max-w-5xl mx-auto px-6">
+  <SectionHead eyebrow="Straight answers" title="What's real," accent="and what isn't yet." />
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="reveal glass-bright glass-ticks rounded-2xl p-7">
+      <p class="text-[10px] font-tech text-accent-green uppercase tracking-[0.3em] mb-4">Real today</p>
+      <ul class="space-y-3">
+        {REAL.map((item) => (
+          <li class="flex gap-3 text-sm text-text-primary leading-relaxed">
+            <span class="text-accent-green shrink-0" aria-hidden="true">✓</span><span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="reveal glass rounded-2xl p-7">
+      <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-4">Not yet</p>
+      <ul class="space-y-3">
+        {NOT_YET.map((item) => (
+          <li class="flex gap-3 text-sm text-text-secondary leading-relaxed">
+            <span class="text-text-muted shrink-0" aria-hidden="true">○</span><span>{item}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="mt-5 text-xs text-text-muted leading-relaxed">We'll share each one when it's real.</p>
+    </div>
+  </div>
+
+  <div class="reveal mt-4 glass rounded-2xl p-6 md:p-7 grid grid-cols-1 md:grid-cols-[auto_1fr] gap-3 md:gap-8 items-start">
+    <p class="text-[10px] font-tech text-accent-blue uppercase tracking-[0.3em] md:pt-1">What your money does</p>
+    <div class="text-sm text-text-secondary leading-relaxed space-y-2">
+      <p>Compute, sensors and runway for the brain.</p>
+      <p class="text-text-primary">Backing is not a pre-order, a deposit, or an investment. Your place in line is a promise of first access, not of a robot.</p>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="inv-section max-w-3xl mx-auto px-6">
+  <SectionHead eyebrow="FAQ" title="Fair questions." />
+  <div class="space-y-3">
+    {FAQ.map((item) => (
+      <details class="reveal glass rounded-xl group">
+        <summary class="flex items-center justify-between gap-4 p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden text-sm md:text-base text-text-primary">
+          {item.q}
+          <span class="text-accent-blue font-tech transition-transform duration-300 group-open:rotate-45 shrink-0" aria-hidden="true">+</span>
+        </summary>
+        <p class="px-5 pb-5 -mt-1 text-sm text-text-secondary leading-relaxed">
+          {item.a}{item.link && <a href={item.link} class="text-accent-blue underline underline-offset-4">{item.link}</a>}{item.after}
+        </p>
+      </details>
+    ))}
+  </div>
+</section>
