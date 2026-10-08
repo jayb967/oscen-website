@@ -70,7 +70,8 @@ export const LINE = {
 
 /** Circle perks, best first. The Inner Circle gets all of these too. */
 export const CIRCLE_PERKS = [
-  "A monthly \"here's what it learned\" clip",
+  "A monthly \"here's what it learned\" clip, by the 10th of each month",
+  "The milestone clips: first steps and first word, the day each happens",
   "Vote on what it learns next",
   "Vote on the humanoid's name",
   "The members-only build log: the wins and the misses",
