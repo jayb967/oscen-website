@@ -19,6 +19,7 @@ import Footer from "../components/Footer.astro";
 import Turnstile from "../components/Turnstile.astro";
 import TeamCards from "../components/TeamCards.astro";
 import HandoffOverlay from "../components/HandoffOverlay.astro";
+import InvestBrainHero from "../components/InvestBrainHero.astro";
 import { SEGMENTS } from "../lib/forms";
 import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
 ---
@@ -26,18 +27,9 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
 <Base title="Invest | OSCEN" description="Back a brain-inspired AI for robots. Patent pending. Submit interest and we'll send the brief.">
   <Nav />
 
-  <main class="pt-32 pb-24">
-    <!-- 1. Hook -->
-    <section class="max-w-5xl mx-auto px-6 mb-24">
-      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">Path A · Investors</p>
-      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
-        Everyone is building the body.<br />
-        <span class="italic gradient-text">We're building the brain.</span>
-      </h1>
-      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
-        A spiking neural network that learns continuously, with mechanisms designed to protect old skills while learning new ones, and is designed to run on a fraction of the power of today's AI. The brain is real and training right now. The body is what we build next, with you.
-      </p>
-    </section>
+  <main class="pb-24">
+    <!-- 1. Hook: cinematic hero with the simulated brain -->
+    <InvestBrainHero />
 
     <!-- 2. Market signals (public-safe) -->
     <section class="max-w-5xl mx-auto px-6 mb-24">
@@ -203,7 +195,7 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
     </section>
 
     <!-- 6. What's built -->
-    <section class="max-w-5xl mx-auto px-6 mb-24">
+    <section id="whats-built" class="max-w-5xl mx-auto px-6 mb-24 scroll-mt-24">
       <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-3">What's built</h2>
       <p class="reveal text-sm text-text-secondary mb-6 max-w-xl">This is not a pitch deck. The brain is running.</p>
 

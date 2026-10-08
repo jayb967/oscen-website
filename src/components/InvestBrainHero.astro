@@ -1,0 +1,217 @@
+---
+/**
+ * /invest hero. Static copy + CTAs are the LCP and render in plain HTML.
+ * The simulated brain (BrainStage, mode "sim", no network) mounts behind
+ * the copy only after the page is idle AND the hero is on screen; see
+ * src/scripts/invest-brain.ts. Until then, and permanently on
+ * reduced-motion / save-data / low-memory / no-WebGL devices, a static
+ * CSS composition holds the same spot so the hero never looks empty.
+ */
+import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
+
+const neurons = `${(BRAIN_STATS.totalNeurons / 1_000_000).toFixed(2)}M`;
+
+// Fallback "neurons": fixed positions inside the brain's footprint so the
+// static composition reads as a cluster, not noise. Percentages of the
+// fallback box; d = animation delay (s).
+const dots = [
+  { x: 28, y: 38, s: 5, c: "#5ea4f5", d: 0 },
+  { x: 41, y: 27, s: 4, c: "#22d3ee", d: 1.1 },
+  { x: 55, y: 31, s: 6, c: "#a78bfa", d: 2.3 },
+  { x: 67, y: 40, s: 4, c: "#5ea4f5", d: 0.6 },
+  { x: 72, y: 54, s: 5, c: "#38d97a", d: 1.8 },
+  { x: 60, y: 63, s: 4, c: "#22d3ee", d: 2.9 },
+  { x: 46, y: 58, s: 6, c: "#5ea4f5", d: 0.3 },
+  { x: 34, y: 55, s: 4, c: "#f472b6", d: 1.5 },
+  { x: 49, y: 44, s: 7, c: "#e2e8f4", d: 2.1 },
+  { x: 38, y: 46, s: 3, c: "#a78bfa", d: 3.2 },
+  { x: 62, y: 49, s: 3, c: "#22d3ee", d: 0.9 },
+  { x: 52, y: 70, s: 4, c: "#f5a623", d: 2.6 },
+];
+---
+
+<!-- Pre-paint: hide the GSAP-animated copy only when motion is allowed.
+     Failsafe: if the module never runs, everything shows after 2.5s. -->
+<script is:inline>
+  (function () {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var d = document.documentElement;
+    d.classList.add("inv-intro");
+    setTimeout(function () { d.classList.remove("inv-intro"); }, 2500);
+  })();
+</script>
+
+<section
+  id="invest-hero"
+  class="relative w-full min-h-[90svh] flex items-center overflow-hidden pt-28 pb-24 md:pt-32 mb-12"
+  aria-labelledby="invest-hero-title"
+>
+  <!-- Brain layer. Fixed to the hero box from first paint (no layout shift). -->
+  <div id="invest-brain" class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+    <div id="invest-brain-fallback" class="inv-fallback absolute inset-0">
+      <div class="inv-fallback-box absolute">
+        <div class="inv-glow absolute inset-0 rounded-full"></div>
+        {dots.map((p) => (
+          <span
+            class="inv-dot absolute rounded-full"
+            style={`left:${p.x}%;top:${p.y}%;width:${p.s}px;height:${p.s}px;background:${p.c};box-shadow:0 0 ${p.s * 3}px ${p.c};animation-delay:${p.d}s;`}
+          ></span>
+        ))}
+      </div>
+    </div>
+    <div id="invest-brain-canvas" class="absolute inset-0 opacity-0"></div>
+    <div class="inv-scrim absolute inset-0"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-40 inv-bottom-fade"></div>
+  </div>
+
+  <div class="relative z-10 w-full max-w-6xl mx-auto px-6">
+    <div class="max-w-2xl">
+      <p data-inv-intro class="hud-label !tracking-[0.3em] mb-6 text-scrim">
+        Path A · Investors
+      </p>
+      <h1
+        id="invest-hero-title"
+        class="font-display text-[clamp(2.75rem,6.2vw,4.75rem)] text-text-primary leading-[0.9] tracking-tight text-balance text-scrim"
+      >
+        <span class="inv-line block">Everyone is building the body.</span>
+        <span class="inv-line inv-line-2 block italic gradient-text pb-[0.12em] mt-1 [text-shadow:none] drop-shadow-[0_2px_20px_rgba(94,164,245,0.3)]">We're building the brain.</span>
+      </h1>
+      <p class="inv-line inv-line-3 mt-7 text-text-secondary text-base md:text-lg leading-relaxed max-w-xl text-scrim">
+        A spiking neural network that learns continuously, with mechanisms designed to protect old skills while learning new ones, and is designed to run on a fraction of the power of today's AI. The brain is real and training right now. The body is what we build next, with you.
+      </p>
+
+      <div data-inv-intro class="mt-9 flex flex-col sm:flex-row gap-3">
+        <a
+          href="#investor-form"
+          data-inv-cta="form"
+          class="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-accent-blue text-void font-medium text-sm tracking-wide hover:bg-accent-cyan transition-colors duration-300 shadow-[0_0_32px_rgba(94,164,245,0.35)]"
+        >
+          Start the conversation
+        </a>
+        <a
+          href="#whats-built"
+          data-inv-cta="built"
+          class="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-border-bright bg-void/40 backdrop-blur-sm text-text-primary text-sm tracking-wide hover:border-accent-blue/50 hover:text-accent-blue transition-colors duration-300"
+        >
+          See what's built
+        </a>
+      </div>
+
+      <p data-inv-intro class="mt-8 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-tech tracking-[0.16em] uppercase text-text-muted text-scrim">
+        <span class="whitespace-nowrap text-accent-green">{neurons} neurons</span>
+        <span class="whitespace-nowrap">{SYNAPSES_DISPLAY} synapses</span>
+        <span class="whitespace-nowrap">Patent pending</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Scroll cue -->
+  <div id="invest-hero-cue" data-inv-intro class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2" aria-hidden="true">
+    <span class="text-[9px] font-tech tracking-[0.3em] uppercase text-text-muted">Scroll</span>
+    <span class="inv-cue-line block w-px h-9"></span>
+  </div>
+</section>
+
+<style>
+  /* Copy intro. Headline + sub rise in pure CSS from first paint (no JS on
+     the LCP path); eyebrow, CTAs, stats and cue are a GSAP timeline in
+     invest-brain.ts. */
+  :global(html.inv-intro) [data-inv-intro] {
+    opacity: 0;
+  }
+  :global(html.inv-intro) .inv-line {
+    animation: inv-rise 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  :global(html.inv-intro) .inv-line-2 {
+    animation-delay: 0.14s;
+  }
+  /* The sub is the largest text block on phones, so it is the LCP there.
+     Chrome only reports a candidate under an opacity animation once that
+     animation ends, so the sub moves without fading. */
+  :global(html.inv-intro) .inv-line-3 {
+    animation-name: inv-settle;
+    animation-delay: 0.1s;
+  }
+  @keyframes inv-rise {
+    from { opacity: 0.2; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes inv-settle {
+    from { transform: translateY(14px); }
+    to { transform: none; }
+  }
+
+  /* Legibility scrim: dark behind the copy column, open on the brain side. */
+  .inv-scrim {
+    background:
+      linear-gradient(to bottom, rgba(3, 6, 12, 0.2), rgba(3, 6, 12, 0.5) 45%, rgba(3, 6, 12, 0.3)),
+      radial-gradient(ellipse 90% 70% at 30% 55%, rgba(3, 6, 12, 0.6) 0%, transparent 85%);
+  }
+  .inv-bottom-fade {
+    background: linear-gradient(to top, var(--color-abyss), transparent);
+  }
+
+  /* Static fallback composition: where the brain sits (right on desktop,
+     upper-center behind the copy on phones). */
+  .inv-fallback-box {
+    width: min(92vw, 560px);
+    aspect-ratio: 1.15;
+    left: 50%;
+    top: 18%;
+    transform: translateX(-50%);
+    opacity: 0.85;
+  }
+  @media (min-width: 1024px) {
+    .inv-fallback-box {
+      width: min(48vw, 640px);
+      left: auto;
+      right: 3%;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 1;
+    }
+    .inv-scrim {
+      background:
+        radial-gradient(ellipse 55% 75% at 20% 50%, rgba(3, 6, 12, 0.8) 0%, rgba(3, 6, 12, 0.35) 55%, transparent 85%);
+    }
+  }
+  .inv-glow {
+    background:
+      radial-gradient(ellipse 50% 42% at 50% 48%, rgba(94, 164, 245, 0.22), transparent 70%),
+      radial-gradient(ellipse 34% 30% at 62% 56%, rgba(167, 139, 250, 0.18), transparent 70%),
+      radial-gradient(ellipse 30% 26% at 38% 40%, rgba(34, 211, 238, 0.14), transparent 70%);
+    filter: blur(6px);
+  }
+  .inv-fallback {
+    transition: opacity 1.2s ease;
+  }
+  .inv-dot {
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+    animation: inv-fire 4s ease-in-out infinite;
+  }
+  @keyframes inv-fire {
+    0%, 100% { opacity: 0.25; }
+    45% { opacity: 1; }
+  }
+
+  .inv-cue-line {
+    background: linear-gradient(to bottom, transparent, rgba(139, 149, 171, 0.5));
+    animation: inv-cue 2.2s ease-in-out infinite;
+    transform-origin: top;
+  }
+  @keyframes inv-cue {
+    0% { transform: scaleY(0); opacity: 0; }
+    40% { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .inv-dot, .inv-cue-line { animation: none; }
+    .inv-dot { opacity: 0.7; }
+  }
+</style>
+
+<script>
+  import "../scripts/invest-brain";
+</script>

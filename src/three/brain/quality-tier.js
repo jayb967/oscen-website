@@ -54,6 +54,17 @@ export function detectQualityTier(renderer) {
     return clamp(PROFILES.low);
 }
 
+const RANK = { low: 0, med: 1, high: 2 };
+
+/**
+ * Cap a detected profile at a page-chosen ceiling (e.g. phones on the
+ * /invest hero ask for 'low'). A null/unknown ceiling returns it unchanged.
+ */
+export function capQualityTier(profile, maxTier) {
+    if (!maxTier || !(maxTier in RANK) || RANK[profile.tier] <= RANK[maxTier]) return profile;
+    return clamp(PROFILES[maxTier]);
+}
+
 function clamp(profile) {
     // Never request a pixel ratio above the device's, and never below 1.
     const dpr = window.devicePixelRatio || 1;
