@@ -1,5 +1,6 @@
 ---
 import CookieConsent from "../components/CookieConsent.astro";
+import { organizationLd, websiteLd, ldJson } from "../lib/jsonld";
 
 interface Props {
   title: string;
@@ -8,6 +9,8 @@ interface Props {
   noindex?: boolean;
   /** Canonical path when a page is served at more than one URL (e.g. /first -> /support). */
   canonicalPath?: string;
+  /** Extra page-level JSON-LD blocks (e.g. FAQPage), rendered after the site-wide Organization + WebSite. */
+  jsonLd?: object[];
 }
 
 const {
@@ -16,7 +19,12 @@ const {
   ogImage = "/og-default.png",
   noindex = false,
   canonicalPath,
+  jsonLd = [],
 } = Astro.props;
+
+// Site-wide structured data for search and AI answer engines. Values come
+// from src/data/company.ts via src/lib/jsonld.ts.
+const ldBlocks = [organizationLd(), websiteLd(), ...jsonLd];
 
 const canonicalURL = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
@@ -71,6 +79,10 @@ const metaDomainVerification =
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+
+    {ldBlocks.map((block) => (
+      <script type="application/ld+json" set:html={ldJson(block)} />
+    ))}
 
     {plausibleEnabled && (
       <script defer data-domain={plausibleDomain} src="https://plausible.io/js/script.outbound-links.js"></script>

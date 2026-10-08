@@ -1,0 +1,76 @@
+---
+/**
+ * /faq. Plain answers for investors, researchers and AI answer engines.
+ * The page and its FAQPage JSON-LD render from ONE array (src/data/faq.ts).
+ * Answers stay visible (not collapsed) so every reader, human or crawler,
+ * gets the full text.
+ */
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { FAQ } from "../data/faq";
+import { faqPageLd } from "../lib/jsonld";
+---
+
+<Base
+  title="FAQ | OSCEN"
+  description="Plain answers about OSCEN: what the brain-inspired AI is, how it differs from GPU-based AI, the company's stage, team, patent status and how to get in touch."
+  jsonLd={[faqPageLd(FAQ)]}
+>
+  <Nav />
+
+  <main class="pt-32 pb-24">
+    <!-- Header -->
+    <section class="max-w-4xl mx-auto px-6 mb-20">
+      <p class="reveal text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-6">FAQ</p>
+      <h1 class="reveal font-display text-[clamp(2.5rem,6vw,4.5rem)] text-text-primary leading-[0.9]">
+        Questions,<br />
+        <span class="italic gradient-text">answered plainly.</span>
+      </h1>
+      <p class="reveal text-text-secondary mt-8 max-w-2xl text-lg leading-relaxed">
+        What OSCEN is, where it stands today, and how to reach us. For investors, researchers and anyone curious about the brain.
+      </p>
+    </section>
+
+    <!-- Questions -->
+    <section class="max-w-4xl mx-auto px-6 mb-24">
+      <div class="space-y-3">
+        {FAQ.map((item) => (
+          <article class="reveal glass rounded-xl p-6">
+            <h2 class="text-base font-medium text-text-primary">{item.q}</h2>
+            <p class="text-sm text-text-secondary leading-relaxed mt-3">{item.a}</p>
+            {item.links && (
+              <div class="flex flex-wrap gap-x-5 gap-y-2 mt-4">
+                {item.links.map((l) => (
+                  <a href={l.href} class="text-[11px] font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">
+                    {l.label} →
+                  </a>
+                ))}
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-4xl mx-auto px-6 mb-16">
+      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/contact"
+          class="px-8 py-3 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue font-medium hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-all duration-300"
+        >
+          Get in touch
+        </a>
+        <a
+          href="/research"
+          class="px-8 py-3 rounded-full border border-border text-text-muted hover:text-text-primary hover:border-border-bright transition-all duration-300"
+        >
+          Read the research
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
