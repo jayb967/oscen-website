@@ -189,6 +189,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
       const clean = new URL(window.location.href);
       clean.searchParams.delete("ok");
       clean.searchParams.delete("tier");
+      clean.searchParams.delete("session_id");
       window.history.replaceState({}, "", clean.toString());
     }
 
@@ -291,9 +292,14 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
     const url = new URL(window.location.href);
     const tier = (url.searchParams.get("tier") || "").toLowerCase();
     if (url.searchParams.get("ok") === "1" && tier in TIER_NAMES) {
-      // ?ok=1 survives a reload until the visitor finishes or skips the form,
-      // so guard with sessionStorage: one Purchase per tier per session.
-      const key = `oscen_purchase_fired_${tier}`;
+      // When the Payment Link redirect carries {CHECKOUT_SESSION_ID}, it is the
+      // event id: every platform then dedupes reloads, other tabs and shared
+      // links to the one real checkout. Without it, fall back to one Purchase
+      // per tier per tab session.
+      const sessionId = url.searchParams.get("session_id") || "";
+      // The relays cap event ids at 64 chars; the session id's tail is unique on its own.
+      const stableId = /^cs_(live|test)_[A-Za-z0-9]{10,200}$/.test(sessionId) ? `cs_${sessionId.slice(-56)}` : undefined;
+      const key = `oscen_purchase_fired_${stableId ?? tier}`;
       let already = false;
       try {
         already = sessionStorage.getItem(key) === "1";
@@ -302,7 +308,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
         // Storage blocked (rare): fire anyway; a reload could then count twice.
       }
       if (!already) {
-        fireStandaloneConversion(trackingForPurchase(tier, TIER_PRICE_USD[tier as TierId]));
+        fireStandaloneConversion(trackingForPurchase(tier, TIER_PRICE_USD[tier as TierId]), undefined, {}, stableId);
       }
     }
   }

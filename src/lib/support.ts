@@ -71,7 +71,7 @@ export const LINE = {
 /** Circle perks, best first. The Inner Circle gets all of these too. */
 export const CIRCLE_PERKS = [
   "A monthly \"here's what it learned\" clip, by the 10th of each month",
-  "The milestone clips: first steps and first word, the day each happens",
+  "The milestone clips: its first steps and its first word, sent the day each happens",
   "Vote on what it learns next",
   "Vote on the humanoid's name",
   "The members-only build log: the wins and the misses",
@@ -274,6 +274,7 @@ const ALL_TIERS: SupportTier[] = [
     cadence: "you choose",
     blurb: "Whatever fits. Every dollar goes to compute, sensors, and runway.",
     stack: ["Give $20 or more for a named neuron. $50 or more adds the Milestone Witness Pass."],
+    line: LINE.aheadOfFree,
     href: env.PUBLIC_STRIPE_SUPPORT_CUSTOM ?? LINKS.custom,
     accent: "purple",
   },

@@ -9,7 +9,7 @@
 import SectionHead from "../invest/SectionHead.astro";
 import SupportTierCard from "../SupportTierCard.astro";
 import {
-  ACCENT, ADDON_TIERS, COMPANY_TIER, CUSTOM_TIER, FEATURED_TIER, LINE, PREMIUM_TIERS, SEASONAL_TIER,
+  ACCENT, ADDON_TIERS, COMPANY_TIER, CUSTOM_TIER, FEATURED_TIER, PREMIUM_TIERS, SEASONAL_TIER,
 } from "../../lib/support";
 import LineBadge from "./LineBadge.astro";
 ---
@@ -83,11 +83,12 @@ import LineBadge from "./LineBadge.astro";
   {CUSTOM_TIER && (
     <a
       href={CUSTOM_TIER.href}
+      data-tier={CUSTOM_TIER.id}
       class="reveal mt-4 glass rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 group hover:border-accent-purple/30 transition-all duration-300"
     >
       <span class="flex flex-col gap-2">
         <span class="text-sm text-text-secondary"><span class="text-accent-purple font-medium">Choose your own amount.</span> {CUSTOM_TIER.stack[0]}</span>
-        <LineBadge text={LINE.aheadOfFree} />
+        {CUSTOM_TIER.line && <LineBadge text={CUSTOM_TIER.line} />}
       </span>
       <span class="text-[11px] font-tech text-accent-purple/70 group-hover:text-accent-purple transition-colors shrink-0">Continue on Stripe →</span>
     </a>

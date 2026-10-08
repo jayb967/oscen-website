@@ -314,8 +314,10 @@ export function fireStandaloneConversion(
   cfg: TrackConfig,
   email?: string,
   extraCustom: Record<string, unknown> = {},
+  /** A stable id (e.g. the Stripe checkout session) so platforms dedupe repeats. */
+  stableEventId?: string,
 ): void {
-  const eventId = generateEventId();
+  const eventId = stableEventId || generateEventId();
   const valueParams: Record<string, unknown> = {};
   if (cfg.leadType && LEAD_VALUE[cfg.leadType] !== undefined) {
     valueParams.value = LEAD_VALUE[cfg.leadType];

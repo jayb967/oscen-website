@@ -52,7 +52,7 @@ import LineBadge from "./support/LineBadge.astro";
   <div class="mt-auto space-y-1.5">
     {tier.scarcity && <p data-scarcity class="text-[11px] font-tech text-accent-amber/90">{tier.scarcity}</p>}
     {tier.ships && <p class="text-[10px] font-tech text-text-muted">{tier.ships}</p>}
-    <div class={`pt-3 text-[11px] font-tech ${a.ctaIdle} ${a.ctaHover} transition-colors`}>
+    <div data-tier-cta class={`pt-3 text-[11px] font-tech ${a.ctaIdle} ${a.ctaHover} transition-colors`}>
       Continue on Stripe →
     </div>
   </div>

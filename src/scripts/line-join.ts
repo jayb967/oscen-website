@@ -51,6 +51,14 @@ function store(kind: "local" | "session", key: string, value?: string | null): s
 const validCode = (v: string | null | undefined): v is string => !!v && CODE.test(v);
 const fmt = (n: number) => n.toLocaleString("en-US");
 
+/** Turnstile tokens are single-use: get a fresh one before the next submit. */
+function resetCaptcha() {
+  (window as Window & { turnstile?: { reset: () => void } }).turnstile?.reset();
+}
+
+/** Set once the visitor submits, so a slower returning-visitor lookup can't overwrite the result. */
+let joined = false;
+
 const form = $<HTMLFormElement>("line-form");
 const submit = $<HTMLButtonElement>("line-submit");
 const status = $<HTMLElement>("line-status");
@@ -169,8 +177,14 @@ async function init() {
   if (!validCode(code) || lineError) return;
 
   const place = await lookup(code);
+  if (joined) return;
   if (place === "gone") {
     store("local", CODE_KEY, null);
+    return;
+  }
+  if (!place && justConfirmed) {
+    // The confirmation itself succeeded server-side; only the live lookup failed.
+    say(notice, "Confirmed. Your place in line is saved.", "ok");
     return;
   }
   if (place) {
@@ -195,6 +209,7 @@ async function join(e: SubmitEvent) {
   });
 
   status?.classList.add("hidden");
+  joined = true;
   const label = submit.textContent;
   submit.disabled = true;
   submit.textContent = "Saving your place...";
@@ -205,12 +220,14 @@ async function join(e: SubmitEvent) {
       body: JSON.stringify(body),
     });
     if (!res.ok) {
+      const err = ((await res.json().catch(() => ({}))) as { error?: string }).error;
       const msg =
         res.status === 429 ? "Too many tries. Give it a minute, then try again."
+        : err === "captcha_failed" ? "The spam check didn't go through. Please try again."
         : res.status === 400 ? "We couldn't save that. Check your email address and try again."
         : "Something went wrong on our side. Please try again, or write to info@oscen.ai.";
       say(status, msg, "error");
-      (window as Window & { turnstile?: { reset: () => void } }).turnstile?.reset();
+      resetCaptcha();
       return;
     }
     const place = (await res.json().catch(() => ({}))) as Place;
@@ -227,6 +244,7 @@ async function join(e: SubmitEvent) {
     success?.focus({ preventScroll: true });
   } catch {
     say(status, "Network error. Please try again.", "error");
+    resetCaptcha();
   } finally {
     submit.disabled = false;
     submit.textContent = label;
@@ -238,6 +256,8 @@ form?.addEventListener("submit", join);
 $("line-reset")?.addEventListener("click", () => {
   store("local", CODE_KEY, null);
   notice?.classList.add("hidden");
+  // The first join spent the Turnstile token; a second email needs a new one.
+  resetCaptcha();
   showForm();
   $<HTMLInputElement>("line-email")?.focus();
 });

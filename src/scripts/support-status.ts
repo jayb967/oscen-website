@@ -54,7 +54,7 @@ function markClaimed(id: string, text: string, cta = "Claimed") {
   el.setAttribute("aria-disabled", "true");
   el.classList.add("opacity-60", "pointer-events-none");
   setScarcity(id, text);
-  const ctaEl = el.lastElementChild?.lastElementChild;
+  const ctaEl = el.querySelector<HTMLElement>("[data-tier-cta]");
   if (ctaEl) ctaEl.textContent = cta;
 }
 
