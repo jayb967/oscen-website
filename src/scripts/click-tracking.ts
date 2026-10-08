@@ -84,7 +84,8 @@ function onClick(e: MouseEvent) {
   const section = el.closest<HTMLElement>("section[id], [data-section]");
   send({
     type: "click",
-    target: el.dataset.cta || el.id || el.tagName.toLowerCase(),
+    // Named CTAs first, then support tier buttons (data-tier), then id, then tag.
+    target: el.dataset.cta || (el.dataset.tier ? `tier-${el.dataset.tier}` : "") || el.id || el.tagName.toLowerCase(),
     label: label(el),
     href: target(el),
     section: section?.dataset.section || section?.id || undefined,
