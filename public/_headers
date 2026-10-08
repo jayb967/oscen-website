@@ -1,16 +1,31 @@
 # Baseline security headers for every page (Netlify serves this from the publish dir).
-# Added 2026-08-21 from the security scan (M2). Intentionally conservative:
-#  - X-Frame-Options DENY: the marketing site is never framed by us; blocks
-#    clickjacking. (This governs OTHERS framing us; it does NOT stop us embedding
-#    the Cloudflare Turnstile iframe, which is us->them.)
+# Added 2026-08-21 from the security scan (M2); tightened 2026-10-08 (sec/site-hardening).
+#  - X-Frame-Options SAMEORIGIN + CSP frame-ancestors 'self': blocks clickjacking by
+#    other sites. NOT DENY: /investor-pitch/demo frames our own /brain-viz/index.html,
+#    and DENY blocked that same-origin iframe. (This governs OTHERS framing us; it does
+#    NOT stop us embedding Turnstile / Calendly / GTM iframes, which is us->them.)
 #  - HSTS has NO includeSubDomains / preload on purpose: oscen.ai has live
-#    subdomains (crm/demo/dashboard) and preload is hard to undo. Apex/www only.
-#  - No Content-Security-Policy yet: the site loads Meta Pixel / GTM / Plausible /
-#    Google Fonts / three.js, so a CSP needs a Report-Only rollout first (tracked
-#    in PROGRESS.md, M2 follow-up). These headers do not touch script loading.
+#    subdomains (crm/demo/dashboard/links) and preload is hard to undo. Apex/www only.
+#  - Enforced CSP is limited to directives that cannot break third-party scripts
+#    (frame-ancestors, object-src, base-uri). The full source allowlist ships as
+#    Content-Security-Policy-Report-Only: watch the browser console on every page
+#    (pixels firing, Turnstile, Calendly, brain-viz, fonts) before promoting it.
+#    GTM can inject arbitrary tags, so any new GTM tag may need a host added here.
+#  - Permissions-Policy denies powerful features the site never uses. Clipboard and
+#    Web Share stay allowed (the /support referral button uses them).
 /*
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), midi=(), magnetometer=(), gyroscope=(), accelerometer=(), browsing-topics=()
   Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Content-Security-Policy: frame-ancestors 'self'; object-src 'none'; base-uri 'self'
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://*.googletagmanager.com https://*.google-analytics.com https://connect.facebook.net https://analytics.tiktok.com https://static.ads-twitter.com https://www.redditstatic.com https://challenges.cloudflare.com https://assets.calendly.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://assets.calendly.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' https://crm.oscen.ai https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.facebook.com https://connect.facebook.net https://*.tiktok.com https://*.tiktokw.us https://*.reddit.com https://www.redditstatic.com https://*.twitter.com https://*.x.com https://static.ads-twitter.com https://plausible.io https://buttondown.com https://challenges.cloudflare.com https://calendly.com https://*.calendly.com; frame-src 'self' https://challenges.cloudflare.com https://calendly.com https://*.calendly.com https://www.googletagmanager.com https://*.facebook.com https://demo.oscen.ai; worker-src 'self' blob:; form-action 'self' https://buttondown.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'
+
+# Internal / unlisted pages: keep them out of search even if a URL leaks.
+# (robots.txt Disallow alone does not deindex a linked URL; this header does.)
+/dev/*
+  X-Robots-Tag: noindex, nofollow
+/investor-pitch/*
+  X-Robots-Tag: noindex, nofollow
