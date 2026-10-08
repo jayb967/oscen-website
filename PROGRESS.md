@@ -307,7 +307,7 @@ hand-edited list. Paired with the CRM-side program (see `oscencrm/progress.md`
 
 ## 2026-07-24 FEEDBACK ROUND 2 -- PERF + REVEAL FIXES (latest, post-swap)
 
-Jesus's testing round surfaced: HIW step lag/freezes, reveal jumping +
+Rio's testing round surfaced: HIW step lag/freezes, reveal jumping +
 flashes + "brain too low", general site lag. All root-caused and fixed,
 3 commits (perf / reveal / public-copy sync):
 
@@ -350,14 +350,14 @@ brain-shell.js stays site-divergent (DRACO + depthTest additions).
 ## 2026-07-24 CINEMATIC BRAIN SWAP -- EXECUTED (late night session)
 
 Both phases of the plan below are DONE, verified in Playwright, committed
-on `redesign-v2` (NOT pushed -- Jesus still reviewing locally). 8 commits:
+on `redesign-v2` (NOT pushed -- Rio still reviewing locally). 8 commits:
 Phase 1 (demo swap), module copies, draco GLB, regions/pulses re-sync,
 BrainModule integration, BrainStage integration + bloom re-tune, pulses
 setDim fix, reveal-fit + HIW pose fixes.
 
 **What shipped:**
 - Investor demo iframe -> canonical cinematic copy at
-  `/brain-viz/index.html?mode=sim` (HUD VISIBLE per Jesus -- no embed=true).
+  `/brain-viz/index.html?mode=sim` (HUD VISIBLE per Rio -- no embed=true).
 - Hero native port: shell GLB draco-compressed 4.49 MB -> 431 KB at
   `public/models/brain.glb` (decoder at public/draco/, BrainShell.load
   gained an optional dracoDecoderPath -- SITE-ONLY divergence, canonical's
@@ -389,7 +389,7 @@ anchors, reveal brain fits the skull, outro portrait), demo iframe boots
 cinematic with HUD + zero console errors, npm run build green, dev server
 restarted. Screenshots from the session at workspace root (phase1/phase2-*.png).
 
-**Still owed:** Jesus eyeballs everything (esp. HIW step framing + reveal
+**Still owed:** Rio eyeballs everything (esp. HIW step framing + reveal
 brightness inside the skull -- tuned by eye, taste calls are his); real
 push + Netlify preview per the v2 handoff; commit the two synced fixes in
 the oscen repo.
@@ -410,7 +410,7 @@ one shared scene/camera/bloom chain. An iframe brain is a separate WebGL
 context, so the reveal (plus setLateralOffset / mood tweens / HIW
 region-flare choreography, all direct API calls) would die. Hero = native
 port (Phase 2 below). Investor demo = wholesale folder copy (Phase 1).
-Jesus signed off 2026-07-24; scroll perf must not degrade noticeably.
+Rio signed off 2026-07-24; scroll perf must not degrade noticeably.
 
 ### Canonical source facts (verified)
 
@@ -453,7 +453,7 @@ Jesus signed off 2026-07-24; scroll perf must not degrade noticeably.
    all .js + index.html). 5.8 MB static, served as-is by Astro.
 2. `src/pages/investor-pitch/demo.astro` line ~37: iframe src
    `/brain-viz/` -> `/brain-viz/index.html?embed=true&mode=sim`.
-   (Jesus was asked about HUD-on vs off in the pitch iframe; default is
+   (Rio was asked about HUD-on vs off in the pitch iframe; default is
    embed=true = hidden. Drop the param if he wants the HUD.)
 3. Verify in Playwright: cinematic boots in the iframe (glass shell,
    volumetric cloud, bilateral pulses), no console errors. Check whether
@@ -504,7 +504,7 @@ Integration -- `brain-stage.js`:
   under cap-0.34 they all clamp flat. Scale them into the new range
   (~0.34/0.16/0.30 starting points) and tune by eye per scene.
 
-Scroll-perf guardrails (Jesus's hard requirement):
+Scroll-perf guardrails (Rio's hard requirement):
 - Progressive boot: classic look renders first (cinematic already does
   this pre-GLB); kick the shell GLB fetch AFTER first hero paint
   (idle callback), keeping the no-GLB-in-critical-path LCP rule.
@@ -534,7 +534,7 @@ Scroll-perf guardrails (Jesus's hard requirement):
 
 ## 2026-07-24 FEEDBACK ROUND 1 -- APPLIED (read this, then the v2 handoff below)
 
-Jesus's first screenshot round is implemented, 5 commits on `redesign-v2`
+Rio's first screenshot round is implemented, 5 commits on `redesign-v2`
 (still NOT pushed). What changed:
 
 1. **Brain glides aside for copy sections** -- `BrainStage.setLateralOffset`
@@ -564,12 +564,12 @@ re-optimized on first hit. Same fix: restart the dev server.
 
 ## 2026-07-24 SESSION HANDOFF v2 (late evening) -- workflow reference (superseded as entry point by the CINEMATIC BRAIN SWAP plan above)
 
-**State**: branch `redesign-v2` (NOT pushed, deliberately: Jesus wants a
+**State**: branch `redesign-v2` (NOT pushed, deliberately: Rio wants a
 local feedback round first), 11 commits ahead of `main`, all builds green,
 working tree clean. Phases 0-6 functionally COMPLETE including the Phase 5
 reveal; Phase 7 (hardening/launch) not started. Q1-Q6 answered (bottom).
 
-**NEXT SESSION = VISUAL FEEDBACK ROUND**: Jesus will supply screenshots
+**NEXT SESSION = VISUAL FEEDBACK ROUND**: Rio will supply screenshots
 with change requests against the running site. Before touching code, make
 sure the dev server is up (`cd oscen-website && npm run dev` -> :4321,
 restart it after any `npm run build` -- the build invalidates the Vite
@@ -593,7 +593,7 @@ before moving on; commit in small logical chunks. Push only when he says.
 - Inner pages (architecture/research/invest/build/contact/support/
   privacy/terms): restyled tokens + shared `Footer.astro`.
 
-**Design contracts currently in force (change only if Jesus asks):**
+**Design contracts currently in force (change only if Rio asks):**
 - One accent (blue); semantic exceptions: red = problem/flaw/severity,
   green = live/advantage/excitatory, pink = inhibitory (arch 80/20),
   amber = warnings. Type: Instrument Serif narrative headlines, Space
@@ -621,10 +621,10 @@ before moving on; commit in small logical chunks. Push only when he says.
    kill via `ps ax -o pid,command | grep mcp-chrome | awk '{print $1}' | xargs kill`.
 
 **Next steps in order (updated 2026-07-24 late evening):**
-1. VISUAL FEEDBACK ROUND (next session): apply Jesus's screenshot-driven
+1. VISUAL FEEDBACK ROUND (next session): apply Rio's screenshot-driven
    fixes. See "NEXT SESSION" block above for the workflow.
 2. After sign-off: push `redesign-v2`, enable the Netlify branch preview,
-   and have Jesus do the REAL-DEVICE mobile check on the preview URL
+   and have Rio do the REAL-DEVICE mobile check on the preview URL
    (emulated pass done; DPR cap 1.5 on small screens shipped; add a
    static poster fallback only if a real phone struggles).
 3. Phase 7 hardening/launch checklist as written (analytics/consent
@@ -634,7 +634,7 @@ before moving on; commit in small logical chunks. Push only when he says.
    shoulder-joint texture cleanup on the GLB (needs a DCC tool, not code);
    deep-link-past-reveal shows the plain brain backdrop (accepted).
 
-**Reminders owed to Jesus** (surface these when relevant):
+**Reminders owed to Rio** (surface these when relevant):
 - ASK FOR THE AMBIENT AUDIO TRACK: player fully wired, activates the
   moment `public/audio/ambient.mp3` exists (reminder already given once).
 - After landing launch: revisit inner pages (architecture/research/
@@ -879,7 +879,7 @@ Total estimate: ~3 weeks focused work.
 
 ---
 
-## Open questions for Jesus (answer before Phase 1 ends)
+## Open questions for Rio (answer before Phase 1 ends)
 
 - **Q1 -- Stack sign-off**: ANSWERED 2026-07-24 -- YES, Astro + vanilla three.js
   in-repo on `redesign-v2`.
@@ -902,7 +902,7 @@ Total estimate: ~3 weeks focused work.
   treatment.
 - **Q6 -- Sound**: ANSWERED 2026-07-24 -- build the audio functionality now
   (player + HUD toggle + autoplay-with-gesture-unlock, off until a track file is
-  dropped in); Jesus will supply the actual track later. REMINDER OWED TO JESUS:
+  dropped in); Rio will supply the actual track later. REMINDER OWED TO JESUS:
   ask for the audio track when Phase 6 polish starts.
 
 ## Reference file map
