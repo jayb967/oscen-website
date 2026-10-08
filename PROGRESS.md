@@ -12,6 +12,44 @@ Status legend: [ ] todo · [~] in progress · [x] done
 
 ---
 
+## 2026-10-08 REDDIT + TIKTOK AD TRACKING (built, NOT deployed, needs env)
+
+Mirrors the Meta setup for the paid /invest campaign. Everything is default-off
+and consent-gated; nothing changes on prod until the env vars below are set.
+
+- Pixels: `src/scripts/reddit-pixel.ts`, `src/scripts/tiktok-pixel.ts`, sharing
+  `src/scripts/pixel-gate.ts` (load only after consent, queue pre-consent calls,
+  drop on deny, skip `/investor-pitch`). Page view + ViewContent per page.
+  Exposes `window.redditTrack` / `window.tiktokTrack`. Loaded from Base.astro.
+- Fan-out: `src/lib/ad-conversions.ts`, called from `forms.ts` next to
+  `metaTrack`, so ONE event_id reaches Meta, Reddit and TikTok (browser + server).
+  Event map lives in `src/lib/ad-events.ts`: investor/contact/build = Lead
+  (investor value from LEAD_VALUE), newsletter = SignUp / Subscribe, thank-you
+  newsletter = SignUp / CompleteRegistration, supporter checkout return
+  (`/support?ok=1&tier=X`) = Purchase on all three, value from
+  `TIER_PRICE_USD` (parsed from `src/lib/support.ts` prices), once per tier per
+  session (sessionStorage guard). Meta gained a `purchase` CAPI route.
+- Server legs: `netlify/functions/reddit-capi.ts` (CAPI v3,
+  `/api/v3/pixels/{pixel}/conversion_events`) and
+  `netlify/functions/tiktok-events.ts` (Events API v1.3), both on the shared
+  `netlify/lib/ad-relay.ts`: Origin allowlist, route-based event allowlist,
+  4 KB body cap, per-IP rate limit, SHA-256 email, upstream bodies logged only,
+  `{ok:false, reason:"not_configured"}` when unset. `meta-capi.ts` now
+  runs on the same module (M3 closed 2026-10-08).
+- Attribution: `attribution.ts` now captures `rdt_cid`, `ttclid`, `fbclid`,
+  `gclid` (first value wins); they ride the form hidden inputs and are in the
+  inquiry relay ALLOWED_FIELDS, so the CRM receives them.
+- Env: see `.env.example` (PUBLIC_REDDIT_PIXEL_*, REDDIT_CAPI_TOKEN,
+  REDDIT_CAPI_TEST_ID, PUBLIC_TIKTOK_PIXEL_*, TIKTOK_EVENTS_ACCESS_TOKEN,
+  TIKTOK_TEST_EVENT_CODE). Public ids added to SECRETS_SCAN_OMIT_KEYS.
+- Verified locally 2026-10-08: build green (17 pages); with consent denied no
+  Reddit/TikTok request; after grant both scripts load; investor submit fires
+  Lead on all three with one event_id and posts all three server legs; click ids
+  reach the inquiry payload; supporter Purchase fires once, not on reload.
+- Open: CSP (M2b) must allow redditstatic.com, analytics.tiktok.com when it
+  lands. Reddit's ad-level "Tracking" fields need an approved measurement
+  provider; nothing to paste there without one.
+
 ## 2026-09-30 SITE-WIDE ACCURACY AUDIT + CHANGE PLAN (every page checked against the live brain)
 
 **Why now.** The 2026-09-28/29 honesty sweep corrected three premises across the code repo, and
@@ -216,11 +254,14 @@ Done from the scan:
 Remaining:
 - [ ] **M2b (Medium) Content-Security-Policy** -- start `Content-Security-Policy-
   Report-Only` enumerating the third-party script hosts, then enforce.
-- [ ] **M3 (Medium) `meta-capi.ts` is an open forwarder** -- no honeypot/kill
-  switch; any client can POST events forwarded to Meta with the server access
-  token, and it reflects Meta's raw response body (`details: result.body`) to
-  the caller. Add a same-origin nonce / CAPTCHA gate and stop reflecting the
-  body (log server-side, return a generic error).
+- [x] **M3 (Medium) `meta-capi.ts` is an open forwarder** -- CLOSED 2026-10-08.
+  Moved onto the shared `netlify/lib/ad-relay.ts`: Origin allowlist (oscen.ai,
+  www, this site's own Netlify URLs), fixed route allowlist
+  (lead/subscribe/registration/purchase; the free-form `/custom` route is gone),
+  4 KB body cap, per-IP rate limit, SHA-256 email, bounded flat custom_data,
+  Meta's response logged server-side only (client sees `{ok}`), unconfigured =
+  200 `{ok:false, reason:"not_configured"}`. Client contract unchanged. Origin is
+  forgeable outside a browser, so this bounds abuse; it does not authenticate.
 - [ ] **L2 (Low) dev pages** -- `/dev/humanoid` reads `?src=` and loads an
   arbitrary GLB URL in the visitor's browser (noindex'd but reachable). Exclude
   `src/pages/dev/**` from prod builds or restrict `?src=` to same-origin

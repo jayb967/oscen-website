@@ -19,7 +19,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
       Thank you.
     </h2>
     <p class="text-sm text-text-secondary leading-relaxed max-w-xl mb-6" id="thanks-body">
-      Your support just bought hours of real brain time. A receipt is on the way from Stripe.
+      Your support just bought real brain time. Your welcome email is on its way to the address you used at checkout.
     </p>
 
     <form id="thanks-form" class="space-y-4 max-w-xl" novalidate>
@@ -27,7 +27,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
 
       <div>
         <label for="thanks-email" class="block text-[11px] font-tech text-text-muted uppercase tracking-wider mb-1.5">
-          Email <span id="thanks-email-hint" class="text-text-muted/60 normal-case">for thanks and updates</span>
+          Optional: also get the public Progress Log
         </label>
         <input
           type="email"
@@ -38,7 +38,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
           placeholder="your@email.com"
           class="w-full px-4 py-2.5 rounded-lg bg-void/50 border border-border text-sm text-text-primary placeholder-text-muted/40 focus:border-accent-amber/30 focus:outline-none transition-colors"
         />
-        <p class="text-[10px] text-text-muted/70 mt-1.5 font-tech">Your contributor-wall name comes from the display name you entered at Stripe checkout.</p>
+        <p class="text-[10px] text-text-muted/70 mt-1.5 font-tech">Your perks don't depend on this. It's the occasional public update for everyone following the build.</p>
       </div>
 
       <div class="flex items-center gap-3 pt-1">
@@ -47,7 +47,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
           id="thanks-submit"
           class="px-6 py-2.5 rounded-lg bg-accent-amber/10 border border-accent-amber/30 text-accent-amber text-sm font-medium hover:bg-accent-amber/20 hover:border-accent-amber/50 transition-all duration-300 cursor-pointer"
         >
-          Keep me posted
+          Subscribe
         </button>
         <button
           type="button"
@@ -74,7 +74,7 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
     const url = new URL(window.location.href);
     const ok = url.searchParams.get("ok") === "1";
     const rawTier = (url.searchParams.get("tier") || "").toLowerCase();
-    const tier = ["spark", "synapse", "cortex", "custom"].includes(rawTier) ? rawTier : "";
+    const tier = ["spark", "synapse", "cortex", "custom", "founding", "holiday", "office", "region", "labday", "company"].includes(rawTier) ? rawTier : "";
 
     if (ok) {
       section.classList.remove("hidden");
@@ -82,46 +82,77 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
       const eyebrow  = document.getElementById("thanks-eyebrow");
       const headline = document.getElementById("thanks-headline");
       const body     = document.getElementById("thanks-body");
-      const hint     = document.getElementById("thanks-email-hint");
       const tierInput = /** @type {HTMLInputElement|null} */ (document.getElementById("thanks-tier"));
 
+      // Mirrors what the CRM actually sends (oscencrm src/lib/support-tiers.ts
+      // "next" lines). The welcome email goes to the Stripe checkout address
+      // automatically; the form below is only the optional public newsletter.
+      const INBOX = "Your welcome email is on its way to the address you used at checkout.";
+      const WALL = "If you chose to be listed, your name goes up on the wall below.";
       const COPY = {
         spark: {
-          eyebrow: "Spark supporter",
-          headline: "Thanks for the spark.",
-          body: "A day and a half of brain time on us. A receipt is on the way from Stripe. Leave your email below for the occasional update.",
-          hint: "for thanks and the occasional update",
+          eyebrow: "Name a Neuron",
+          headline: "You're in the brain now.",
+          body: `${INBOX} Your neuron certificate is attached to it.`,
         },
         synapse: {
-          eyebrow: "Synapse supporter",
-          headline: "You bought us a week of brain time.",
-          body: "The display name from your Stripe checkout goes up on the contributor wall below. Add your email for updates. Stripe will email a receipt.",
-          hint: "for thanks and the occasional update",
+          eyebrow: "Milestone Witness Pass",
+          headline: "You'll be there when it happens.",
+          body: `${INBOX} It has your neuron certificate, and the clips of its first steps and first word will come to the same address the day each happens. ${WALL}`,
         },
         cortex: {
-          eyebrow: "Cortex supporter",
-          headline: "Welcome to the monthly circle.",
-          body: "You bankroll a specialist brain. Leave your email for the monthly progress note and first crack at new demos. Your wall name comes from your Stripe checkout.",
-          hint: "required for monthly notes",
+          eyebrow: "Cortex Circle",
+          headline: "Welcome to the Circle.",
+          body: `${INBOX} It has your certificate, a link to manage or cancel your membership, and when to expect the first Lab Log. Your crewneck ships in 4 to 6 weeks. ${WALL}`,
+        },
+        founding: {
+          eyebrow: "Founding 100",
+          headline: "You're one of the hundred.",
+          body: `${INBOX} It has your Founding number and your neuron certificate. Your crewneck ships in 4 to 6 weeks. ${WALL}`,
+        },
+        holiday: {
+          eyebrow: "Holiday Gift Box",
+          headline: "Gift sorted.",
+          body: `${INBOX} It has their neuron certificate to print or forward. The box ships to them by December 20, and we'll email you tracking when it goes out.`,
+        },
+        office: {
+          eyebrow: "Office Hours",
+          headline: "Let's talk.",
+          body: `${INBOX} It explains how we'll set up your call, held within 30 days. Your crewneck ships in 4 to 6 weeks.`,
+        },
+        region: {
+          eyebrow: "Region Sponsor",
+          headline: "A part of the mind has your name on it.",
+          body: `${INBOX} It names your region, has your neuron certificate, and explains how we'll set up your call. Your crewneck ships in 4 to 6 weeks.`,
+        },
+        labday: {
+          eyebrow: "Lab Day",
+          headline: "See you in the lab.",
+          body: `${INBOX} It has a link to split your three crewneck sizes and explains how we'll schedule your session, held within 60 days.`,
+        },
+        company: {
+          eyebrow: "Company Sponsor",
+          headline: "Welcome aboard.",
+          body: `${INBOX} It has a link to upload your logo and send your team's crewneck sizes, and explains how we'll schedule the talk.`,
         },
         custom: {
           eyebrow: "Supporter",
           headline: "Thank you, for whatever it was.",
-          body: "Every dollar buys compute, sensors, or runway. Leave your email for updates. Any display name you set at Stripe checkout shows on the wall.",
-          hint: "for thanks and updates",
+          body: `${INBOX} Every dollar buys compute, sensors, or runway. ${WALL}`,
         },
       };
 
       const copy = tier ? COPY[tier] : null;
-      if (copy && eyebrow && headline && body && hint && tierInput) {
+      if (copy && eyebrow && headline && body && tierInput) {
         eyebrow.textContent = copy.eyebrow;
         headline.textContent = copy.headline;
         body.textContent = copy.body;
-        hint.textContent = copy.hint;
         tierInput.value = tier;
       }
 
       window.scrollTo({ top: 0, behavior: "instant" });
+      headline?.setAttribute("tabindex", "-1");
+      headline?.focus({ preventScroll: true });
     }
 
     const form    = /** @type {HTMLFormElement|null} */ (document.getElementById("thanks-form"));
@@ -135,6 +166,12 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
       synapse: "supporter-synapse",
       cortex: "supporter-cortex",
       custom: "supporter-custom",
+      founding: "supporter-founding",
+      holiday: "supporter-holiday",
+      office: "supporter-office",
+      region: "supporter-region",
+      labday: "supporter-labday",
+      company: "supporter-company",
     };
 
     function showDone() {
@@ -149,43 +186,23 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
       window.history.replaceState({}, "", clean.toString());
     }
 
+    // Tier prices in USD for conversion values (custom is unknown here).
+    const TIER_VALUE = {
+      spark: 20, synapse: 50, cortex: 100, founding: 100, holiday: 175,
+      office: 250, region: 500, labday: 2500, company: 5000,
+    };
+
+    // Delegates to the shared fan-out (Meta + Reddit + TikTok, one event_id,
+    // consent-gated server legs) exposed by the module script below.
     function fireRegistration(email, tierValue) {
-      const eventId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : "evt_" + Date.now();
       const params = {
         registration_method: "supporter_wall",
         tier: tierValue || "unknown",
-        value: 50,
+        value: TIER_VALUE[tierValue] ?? 0,
         currency: "USD",
       };
-      if (typeof window.metaTrack === "function") {
-        window.metaTrack("CompleteRegistration", params, eventId);
-      }
-      if (typeof window.gtmPush === "function") {
-        window.gtmPush("completeregistration", { ...params, event_id: eventId });
-      }
-      // Consent gate: do not send PII to the CAPI mirror unless granted.
-      if (window.oscenConsent && window.oscenConsent.state() !== "granted") return;
-      // Read fbp/fbc cookies for CAPI server-side dedup.
-      function readCookie(name) {
-        const m = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
-        return m ? decodeURIComponent(m[1]) : undefined;
-      }
-      try {
-        fetch("/.netlify/functions/meta-capi/registration", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            event_id: eventId,
-            event_source_url: window.location.href,
-            user_data: email ? { em: email } : {},
-            custom_data: params,
-            fbp: readCookie("_fbp"),
-            fbc: readCookie("_fbc"),
-          }),
-          keepalive: true,
-        });
-      } catch {
-        // best-effort; pixel already fired
+      if (typeof window.oscenFireRegistration === "function") {
+        window.oscenFireRegistration(params, email);
       }
     }
 
@@ -237,5 +254,65 @@ import { BUTTONDOWN_ACTION } from "../lib/forms";
         }
       });
     }
+  }
+</script>
+
+<script>
+  // Ad conversions for the Stripe checkout return. Bundled module (can import),
+  // reads ?ok / ?tier before anything strips them (only the form's done step does).
+  import { fireStandaloneConversion, trackingForPurchase } from "../lib/forms";
+  import { TIER_PRICE_USD, TIER_NAMES } from "../lib/support";
+
+  type TierId = keyof typeof TIER_NAMES;
+
+  declare global {
+    interface Window {
+      oscenFireRegistration?: (params: Record<string, unknown>, email?: string) => void;
+    }
+  }
+
+  window.oscenFireRegistration = (params, email) => {
+    fireStandaloneConversion(
+      { event: "CompleteRegistration", route: "registration", customData: params },
+      email,
+    );
+  };
+
+  // Run after DOMContentLoaded: this component's module executes before the
+  // consent + pixel modules at the end of Base.astro, so firing now would find
+  // no window.oscenConsent / redditTrack / tiktokTrack / metaTrack yet.
+  function firePurchaseOnce() {
+    const url = new URL(window.location.href);
+    const tier = (url.searchParams.get("tier") || "").toLowerCase();
+    if (url.searchParams.get("ok") === "1" && tier in TIER_NAMES) {
+      // ?ok=1 survives a reload until the visitor finishes or skips the form,
+      // so guard with sessionStorage: one Purchase per tier per session.
+      const key = `oscen_purchase_fired_${tier}`;
+      let already = false;
+      try {
+        already = sessionStorage.getItem(key) === "1";
+        if (!already) sessionStorage.setItem(key, "1");
+      } catch {
+        // Storage blocked (rare): fire anyway; a reload could then count twice.
+      }
+      if (!already) {
+        fireStandaloneConversion(trackingForPurchase(tier, TIER_PRICE_USD[tier as TierId]));
+      }
+    }
+  }
+
+  // Module scripts run while readyState is already "interactive" but before
+  // DOMContentLoaded, so only "complete" means it is safe to fire now.
+  let purchaseHandled = false;
+  const runOnce = () => {
+    if (purchaseHandled) return;
+    purchaseHandled = true;
+    firePurchaseOnce();
+  };
+  if (document.readyState === "complete") {
+    runOnce();
+  } else {
+    document.addEventListener("DOMContentLoaded", runOnce, { once: true });
+    window.addEventListener("load", runOnce, { once: true });
   }
 </script>

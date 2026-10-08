@@ -10,7 +10,9 @@
  * webhook data exists.
  */
 
-export type ContributorTier = "spark" | "synapse" | "cortex" | "custom";
+export type ContributorTier =
+  | "spark" | "synapse" | "cortex" | "custom"
+  | "founding" | "holiday" | "office" | "region" | "labday" | "company";
 export type ContributorWallEntry = {
   displayName: string;
   tier: ContributorTier;
@@ -22,6 +24,12 @@ export const TIER_DOT: Record<ContributorTier, string> = {
   synapse: "bg-accent-blue",
   cortex:  "bg-accent-amber",
   custom:  "bg-accent-purple",
+  founding: "bg-accent-amber",
+  holiday:  "bg-accent-cyan",
+  office:   "bg-accent-purple",
+  region:   "bg-accent-purple",
+  labday:   "bg-accent-purple",
+  company:  "bg-accent-blue",
 };
 
 const sampleNames = [

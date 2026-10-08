@@ -8,7 +8,7 @@
  * Form flow. accreditation fork drives downstream segment:
  *   Yes        → investor-accredited (brief + call link)
  *   Not sure   → investor-unverified (qualifying question, then brief)
- *   No         → investor-retail   (Reg CF waitlist)
+ *   No         → investor-retail   (saved, then handed off to /support)
  *
  * CONFIDENTIAL. kept off this page entirely (and noindex'd under
  * /investor-pitch/*): valuation, raise size, cap table, ownership splits.
@@ -18,6 +18,7 @@ import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import Turnstile from "../components/Turnstile.astro";
 import TeamCards from "../components/TeamCards.astro";
+import HandoffOverlay from "../components/HandoffOverlay.astro";
 import { SEGMENTS } from "../lib/forms";
 import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
 ---
@@ -362,7 +363,7 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
             {[
               { value: "yes", label: "Yes, accredited" },
               { value: "not-sure", label: "Not sure" },
-              { value: "no", label: "No (Reg CF waitlist)" },
+              { value: "no", label: "No, not accredited" },
             ].map((opt) => (
               <label class="cursor-pointer">
                 <input type="radio" name="accreditation" value={opt.value} required class="peer sr-only" />
@@ -428,13 +429,14 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
           Send
         </button>
 
-        <p id="investor-status" class="text-center text-sm font-tech hidden"></p>
+        <p id="investor-status" role="status" aria-live="polite" class="text-center text-sm font-tech hidden"></p>
       </form>
 
-      <div id="investor-success" class="hidden glass-bright rounded-2xl p-9 text-center">
+      <div id="investor-success" tabindex="-1" role="status" class="hidden glass-bright rounded-2xl p-9 text-center focus:outline-none">
         <p class="text-[10px] font-tech text-accent-green uppercase tracking-[0.3em] mb-3">Received</p>
-        <h3 class="font-display text-2xl text-text-primary">Thanks. We'll be in touch within 48 hours.</h3>
+        <h3 id="investor-success-title" class="font-display text-2xl text-text-primary">Thanks. We'll be in touch within 48 hours.</h3>
         <p id="investor-success-detail" class="text-sm text-text-secondary mt-3 max-w-md mx-auto leading-relaxed"></p>
+        <a href="/support" data-support-link class="hidden inline-block mt-6 px-6 py-2.5 rounded-full bg-accent-blue/15 border border-accent-blue/30 text-accent-blue text-sm font-medium hover:bg-accent-blue/25 transition-all">Back the brain →</a>
       </div>
 
       <p class="reveal text-[10px] text-text-muted mt-6 text-center max-w-xl mx-auto leading-relaxed">
@@ -449,10 +451,12 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
     </section>
   </main>
   <Footer />
+  <HandoffOverlay mode="leave" />
 </Base>
 
 <script>
   import { SEGMENTS, submitInquiry, trackingForInvestor } from "../lib/forms";
+  import { leaveForSupport } from "../scripts/handoff";
 
   const form = document.getElementById("investor-form-el") as HTMLFormElement | null;
   const btn = document.getElementById("investor-submit") as HTMLButtonElement | null;
@@ -462,8 +466,8 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
   const successDetail = document.getElementById("investor-success-detail") as HTMLElement | null;
 
   // Reflect accreditation choice into the UI + hidden routing segment.
-  // "no" hides the accredited-only fields entirely (retail goes straight to the
-  // Reg CF waitlist without check-size theatre).
+  // "no" hides the accredited-only fields entirely (no check-size theatre for
+  // someone this round can't take).
   function updateAccreditationUI() {
     if (!form || !accreditedFields) return;
     const selected = form.querySelector<HTMLInputElement>('input[name="accreditation"]:checked');
@@ -488,7 +492,40 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
     input.addEventListener("change", updateAccreditationUI);
   });
 
-  if (form && btn && status && successCard && successDetail) {
+  const successTitle = document.getElementById("investor-success-title") as HTMLElement | null;
+
+  // One copy per answer. "no" is shown when someone returns here after the
+  // hand-off to /support (Back button, or a reload in the same tab).
+  const SUCCESS: Record<string, { title: string; detail: string }> = {
+    yes: { title: "Thanks. We'll be in touch within 48 hours.", detail: "We'll reply with the investor brief and a call link." },
+    "not-sure": { title: "Thanks. We'll be in touch within 48 hours.", detail: "We'll reply with a quick qualifying question, then the brief." },
+    no: {
+      title: "Thanks. Your note reached us.",
+      detail: "This round is for accredited investors only. The best way to be part of OSCEN today is to back the brain on our Support page.",
+    },
+  };
+  const SUBMITTED_KEY = "oscen_invest_submitted";
+
+  function showSuccess(answer: string) {
+    if (!form || !successCard || !successDetail || !successTitle) return;
+    const copy = SUCCESS[answer] ?? SUCCESS["not-sure"];
+    successTitle.textContent = copy.title;
+    successDetail.textContent = copy.detail;
+    successCard.querySelector("[data-support-link]")?.classList.toggle("hidden", answer !== "no");
+    form.classList.add("hidden");
+    successCard.classList.remove("hidden");
+    successCard.focus({ preventScroll: true });
+  }
+
+  // Already submitted in this tab: don't hand people an empty form to resend.
+  try {
+    const prior = sessionStorage.getItem(SUBMITTED_KEY);
+    if (prior) showSuccess(prior);
+  } catch {
+    // Storage blocked: the form simply shows again.
+  }
+
+  if (form && btn && status) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       submitInquiry(
@@ -497,15 +534,18 @@ import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../data/brain";
         btn,
         status,
         () => {
-          const selected = form.querySelector<HTMLInputElement>('input[name="accreditation"]:checked');
-          successDetail.textContent =
-            selected?.value === "yes"
-              ? "We'll reply with the investor brief and a call link."
-              : selected?.value === "no"
-              ? "You're on the Reg CF waitlist. We'll notify you when our community raise opens."
-              : "We'll reply with a quick qualifying question, then the brief.";
-          form.classList.add("hidden");
-          successCard.classList.remove("hidden");
+          const answer = form.querySelector<HTMLInputElement>('input[name="accreditation"]:checked')?.value ?? "not-sure";
+          try {
+            sessionStorage.setItem(SUBMITTED_KEY, answer);
+          } catch {
+            // Non-fatal.
+          }
+          // Not accredited: the inquiry is saved, then we hand off to /support.
+          if (answer === "no") {
+            leaveForSupport(btn, () => showSuccess("no"));
+            return;
+          }
+          showSuccess(answer);
         },
         trackingForInvestor(form),
       );

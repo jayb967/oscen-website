@@ -309,7 +309,7 @@ export const CONVERSION_PATHS: ConversionPath[] = [
   {
     title: "Invest",
     eyebrow: "Path A · Investors",
-    desc: "Accredited investors and Reg CF backers. We'll send the brief after a short qualification step.",
+    desc: "Accredited investors. We'll send the brief after a short qualification step.",
     cta: "Back the brain",
     href: "/invest",
   },

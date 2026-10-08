@@ -8,7 +8,8 @@
  */
 import { LOCAL_SAMPLE_SUPPORTERS, TIER_DOT } from "../data/contributors";
 
-const SUPPORTERS_URL = "https://crm.oscen.ai/api/public/supporters"
+const SUPPORTERS_URL =
+  import.meta.env.PUBLIC_SUPPORTERS_URL ?? "https://crm.oscen.ai/api/public/supporters"
 // Sample names are a layout aid for local dev only. Never ship them.
 const SAMPLE_SUPPORTERS = import.meta.env.DEV ? LOCAL_SAMPLE_SUPPORTERS : []
 ---
@@ -16,13 +17,19 @@ const SAMPLE_SUPPORTERS = import.meta.env.DEV ? LOCAL_SAMPLE_SUPPORTERS : []
 <section class="max-w-5xl mx-auto px-6 mb-24">
   <h2 class="reveal font-display text-[clamp(1.5rem,3vw,2.5rem)] text-text-primary mb-4">Contributors</h2>
   <p class="reveal text-sm text-text-muted mb-12 max-w-xl">
-    The people keeping the brain learning. Synapse and above show up here by choice.
+    The people keeping the brain learning. Milestone Witness Pass and above show up here by choice.
   </p>
+
+  <!-- Company sponsors. Hidden until the CRM reports an approved logo. -->
+  <div id="sponsor-strip" class="hidden mb-6">
+    <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.3em] mb-4">Company sponsors</p>
+    <ul id="sponsor-logos" class="glass rounded-xl p-6 flex flex-wrap items-center gap-x-10 gap-y-6"></ul>
+  </div>
 
   <!-- Empty state: default, and what stays on an empty list or a failed fetch. -->
   <div id="wall-empty" class="reveal glass rounded-xl p-8 text-center">
     <p class="text-sm text-text-secondary">Be the first.</p>
-    <p class="text-xs text-text-muted mt-2 font-tech">The wall lights up the moment someone backs Synapse or above.</p>
+    <p class="text-xs text-text-muted mt-2 font-tech">The wall lights up the moment someone backs the Milestone Witness Pass or above.</p>
   </div>
 
   <!-- Populated state: revealed by the script once the CRM returns supporters. -->
@@ -41,17 +48,39 @@ const SAMPLE_SUPPORTERS = import.meta.env.DEV ? LOCAL_SAMPLE_SUPPORTERS : []
     if (!emptyEl || !listEl || !itemsEl || !countEl) return;
 
     let supporters = [];
+    let companies = [];
     try {
       const res = await fetch(supportersUrl, { headers: { Accept: "application/json" } });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data?.supporters)) supporters = [...data.supporters, ...sampleSupporters];
+        if (Array.isArray(data?.companies)) companies = data.companies;
       }
     } catch {
       supporters = sampleSupporters;
     }
 
     if (supporters.length === 0 && sampleSupporters.length > 0) supporters = sampleSupporters;
+
+    // Company sponsor logos: https URLs only, rendered as images (no HTML).
+    const strip = document.getElementById("sponsor-strip");
+    const logos = document.getElementById("sponsor-logos");
+    const validCompanies = companies.filter(
+      (c) => c && typeof c.name === "string" && typeof c.logoUrl === "string" && c.logoUrl.startsWith("https://"),
+    );
+    if (strip && logos && validCompanies.length > 0) {
+      for (const c of validCompanies) {
+        const li = document.createElement("li");
+        const img = document.createElement("img");
+        img.src = c.logoUrl;
+        img.alt = c.name;
+        img.loading = "lazy";
+        img.className = "h-10 w-auto max-w-[160px] object-contain opacity-80";
+        li.appendChild(img);
+        logos.appendChild(li);
+      }
+      strip.classList.remove("hidden");
+    }
 
     // Keep only well-formed rows, preserving the server's order (biggest gifts
     // first). We deliberately do NOT re-sort here: re-sorting by month would
@@ -62,6 +91,8 @@ const SAMPLE_SUPPORTERS = import.meta.env.DEV ? LOCAL_SAMPLE_SUPPORTERS : []
         displayName: s.displayName.trim(),
         tier: s.tier,
         since: typeof s.since === "string" ? s.since : "",
+        foundingNumber: Number.isInteger(s.foundingNumber) ? s.foundingNumber : null,
+        region: typeof s.region === "string" ? s.region : "",
       }));
 
     if (clean.length === 0) return; // Nothing eligible: leave the empty state.
@@ -79,6 +110,17 @@ const SAMPLE_SUPPORTERS = import.meta.env.DEV ? LOCAL_SAMPLE_SUPPORTERS : []
       name.textContent = s.displayName; // textContent = no HTML injection.
 
       li.append(dot, name);
+
+      // Founding 100 number and sponsored region, as the CRM reports them.
+      const badge = s.foundingNumber
+        ? `#${String(s.foundingNumber).padStart(3, "0")}`
+        : s.region ? s.region : "";
+      if (badge) {
+        const tag = document.createElement("span");
+        tag.className = "text-[10px] font-tech text-accent-amber/80";
+        tag.textContent = badge;
+        li.appendChild(tag);
+      }
       itemsEl.appendChild(li);
     }
 

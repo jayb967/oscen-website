@@ -1,0 +1,56 @@
+---
+/**
+ * One /support offer card: name, price, hook, value stack, real scarcity,
+ * ship window. The whole card is the Stripe link. `wide` lays the stack out
+ * beside the hook (featured and full-width cards).
+ */
+import { ACCENT, type SupportTier } from "../lib/support";
+
+interface Props {
+  tier: SupportTier;
+  featured?: boolean;
+  wide?: boolean;
+}
+const { tier, featured = false, wide = featured } = Astro.props;
+const a = ACCENT[tier.accent];
+---
+
+<a
+  href={tier.href}
+  data-tier={tier.id}
+  data-expires={tier.expires}
+  class:list={[
+    "reveal rounded-xl group flex flex-col transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60",
+    featured ? "glass-bright glass-ticks p-8 md:p-10 border border-accent-amber/30" : "glass p-7",
+    a.borderHover,
+  ]}
+>
+  <div class="flex items-baseline justify-between gap-4 mb-4">
+    <h3 class:list={["font-display", featured ? "text-3xl md:text-4xl" : "text-2xl", a.textBold]}>{tier.name}</h3>
+    <div class="text-right shrink-0">
+      <div class={`font-tech text-text-primary ${featured ? "text-3xl" : "text-2xl"} ${a.priceHover} transition-colors`}>{tier.price}</div>
+      <div class="text-[10px] font-tech text-text-muted uppercase tracking-wider">{tier.cadence}</div>
+    </div>
+  </div>
+
+  <div class:list={[wide && "md:grid md:grid-cols-2 md:gap-10"]}>
+    <p class:list={["text-text-secondary leading-relaxed mb-5", featured ? "text-base" : "text-sm"]}>{tier.blurb}</p>
+
+    <ul class="space-y-2.5 mb-5">
+      {tier.stack.map((item) => (
+        <li class="flex gap-3 text-xs text-text-secondary leading-relaxed">
+          <span class={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${a.dot}`}></span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="mt-auto space-y-1.5">
+    {tier.scarcity && <p data-scarcity class="text-[11px] font-tech text-accent-amber/90">{tier.scarcity}</p>}
+    {tier.ships && <p class="text-[10px] font-tech text-text-muted">{tier.ships}</p>}
+    <div class={`pt-3 text-[11px] font-tech ${a.ctaIdle} ${a.ctaHover} transition-colors`}>
+      Continue on Stripe →
+    </div>
+  </div>
+</a>
