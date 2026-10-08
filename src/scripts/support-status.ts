@@ -9,7 +9,7 @@
  *  - The First in Line confirmed total shows only from MIN_LINE people up.
  *
  * Every number here comes from real purchases. If the fetch fails, the page
- * keeps its static copy, which is also true ("100 made", "8 calls a month").
+ * keeps its static copy, which is also true ("100 made", "8 seats a month").
  */
 import { TIER_NAMES } from "../lib/support";
 
@@ -80,8 +80,8 @@ function applyTiers(t: Status["tiers"]) {
 
   const o = t.office;
   if (o) {
-    if (!o.open && o.remaining <= 0) markClaimed("office", `This month's spots are booked. Reopens ${nextMonthName(o.period)} 1.`, "Full this month");
-    else setScarcity("office", `${o.remaining} of ${o.cap} calls left this month.`);
+    if (!o.open && o.remaining <= 0) markClaimed("office", `This month's seats are taken. Reopens ${nextMonthName(o.period)} 1.`, "Full this month");
+    else setScarcity("office", `${o.remaining} of ${o.cap} seats left this month.`);
   }
 
   const l = t.labday;
