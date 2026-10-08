@@ -49,15 +49,22 @@ function collectSections() {
   });
 }
 
-/** The most specific section crossing the vertical middle of the viewport. */
+/**
+ * The most specific section crossing the vertical middle of the viewport.
+ * When the middle falls in the spacing between two sections, the section
+ * just above gets the time, so every active second lands somewhere.
+ */
 function sectionAtCenter(): string | undefined {
   const mid = window.innerHeight / 2;
   let best: { name: string; h: number } | undefined;
+  let above: { name: string; bottom: number } | undefined;
   for (const s of sections) {
     const r = s.el.getBoundingClientRect();
-    if (r.height > 0 && r.top <= mid && r.bottom >= mid && (!best || r.height < best.h)) best = { name: s.name, h: r.height };
+    if (r.height <= 0) continue;
+    if (r.top <= mid && r.bottom >= mid && (!best || r.height < best.h)) best = { name: s.name, h: r.height };
+    if (r.bottom < mid && (!above || r.bottom > above.bottom)) above = { name: s.name, bottom: r.bottom };
   }
-  return best?.name;
+  return best?.name ?? above?.name;
 }
 
 function markActive() {
