@@ -8,13 +8,18 @@
  * Contact facts are real only: info@oscen.ai is the sole public email;
  * there are no social profiles yet, so FOLLOW points at the newsletter.
  */
+import { isInvestPath } from "../lib/jsonld";
+
+// The FAQ link is hidden on the invest pages, which must stay unchanged
+// (founder instruction 2026-10-08).
+const showFaq = !isInvestPath(Astro.url.pathname);
 const links = [
   { label: "Architecture", href: "/architecture" },
   { label: "Research", href: "/research" },
   { label: "Build", href: "/build" },
   { label: "Invest", href: "/invest" },
   { label: "Contact", href: "/contact" },
-  { label: "FAQ", href: "/faq" },
+  ...(showFaq ? [{ label: "FAQ", href: "/faq" }] : []),
   { label: "Support", href: "/support" },
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },

@@ -5,6 +5,14 @@
  */
 import { COMPANY, SITE_URL } from "../data/company";
 
+/**
+ * Founder instruction (2026-10-08): the invest pages must not change in any
+ * way, so shared components skip their GEO additions on these paths.
+ */
+export function isInvestPath(pathname: string): boolean {
+  return /^\/(invest|investor-pitch)(\/|$)/.test(pathname);
+}
+
 const ORG_ID = `${SITE_URL}/#organization`;
 
 export function organizationLd() {
