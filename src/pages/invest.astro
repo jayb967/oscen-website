@@ -50,7 +50,7 @@ import { SEGMENTS } from "../lib/forms";
         Start the <span class="italic gradient-text">conversation.</span>
       </h2>
       <p class="reveal text-sm text-text-secondary mb-10 max-w-xl mx-auto text-center">
-        Tell us who you are. We'll reply within 48 hours with the brief. what we're raising, milestones, and a call link if you're a fit.
+        Tell us who you are. Accredited investors can book a 30-minute intro call right after sending this, and receive our deck under NDA. Everyone else hears back within 48 hours.
       </p>
 
       <form
@@ -178,6 +178,28 @@ import { SEGMENTS } from "../lib/forms";
         <a href="/support" data-support-link class="hidden inline-block mt-6 px-6 py-2.5 rounded-full bg-accent-blue/15 border border-accent-blue/30 text-accent-blue text-sm font-medium hover:bg-accent-blue/25 transition-all">Back the brain →</a>
       </div>
 
+      <!-- Accredited only: Calendly intro-call picker, prefilled from the form
+           (src/scripts/calendly-booking.ts). Calendly loads only when shown. -->
+      <div id="investor-calendly" class="hidden mt-6">
+        <div class="glass rounded-2xl overflow-hidden">
+          <div class="px-6 pt-6 pb-2 text-center">
+            <p class="text-[10px] font-tech text-accent-blue uppercase tracking-[0.3em] mb-2">Book your intro call</p>
+            <p class="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
+              Your name and email are already filled in. Pick a time that works and we'll send our deck under NDA before we talk.
+            </p>
+          </div>
+          <div data-calendly-mount class="w-full" style="min-width:320px;height:700px;">
+            <p data-calendly-loading class="h-full flex items-center justify-center text-xs font-tech text-text-muted">Loading the calendar...</p>
+          </div>
+        </div>
+        <p data-calendly-booked role="status" class="hidden mt-4 text-center text-sm text-accent-green font-tech">
+          Booked. Check your email for the invite. Our NDA and deck follow before the call.
+        </p>
+        <p class="mt-3 text-center text-[11px] font-tech text-text-muted">
+          Calendar not loading? <a data-calendly-fallback href="https://calendly.com/rio-oscen/30min" target="_blank" rel="noopener" class="text-accent-blue/80 hover:text-accent-blue underline">Open it in a new tab</a>.
+        </p>
+      </div>
+
       <p class="reveal text-[10px] text-text-muted mt-6 text-center max-w-xl mx-auto leading-relaxed">
         Nothing on this page constitutes an offer to sell or a solicitation to buy any security. All conversations are subject to applicable securities law.
       </p>
@@ -196,6 +218,7 @@ import { SEGMENTS } from "../lib/forms";
 <script>
   import { SEGMENTS, submitInquiry, trackingForInvestor } from "../lib/forms";
   import { leaveForSupport } from "../scripts/handoff";
+  import { showCalendly } from "../scripts/calendly-booking";
 
   const form = document.getElementById("investor-form-el") as HTMLFormElement | null;
   const btn = document.getElementById("investor-submit") as HTMLButtonElement | null;
@@ -236,16 +259,34 @@ import { SEGMENTS } from "../lib/forms";
   // One copy per answer. "no" is shown when someone returns here after the
   // hand-off to /support (Back button, or a reload in the same tab).
   const SUCCESS: Record<string, { title: string; detail: string }> = {
-    yes: { title: "Thanks. We'll be in touch within 48 hours.", detail: "We'll reply with the investor brief and a call link." },
-    "not-sure": { title: "Thanks. We'll be in touch within 48 hours.", detail: "We'll reply with a quick qualifying question, then the brief." },
+    yes: { title: "Thanks. Let's find a time.", detail: "Book a 30-minute intro call below. We'll send our deck under NDA before we talk." },
+    "not-sure": { title: "Thanks. We'll be in touch within 48 hours.", detail: "We'll reply with a quick qualifying question, then our deck under NDA." },
     no: {
       title: "Thanks. Your note reached us.",
       detail: "This round is for accredited investors only. The best way to be part of OSCEN today is to back the brain on our Support page.",
     },
   };
   const SUBMITTED_KEY = "oscen_invest_submitted";
+  /** Name + email for the Calendly prefill if they come back in this tab. */
+  const PERSON_KEY = "oscen_invest_person";
+  const calendlyRoot = document.getElementById("investor-calendly") as HTMLElement | null;
 
-  function showSuccess(answer: string) {
+  type Person = { name: string; email: string; notes?: string };
+
+  /** Everything they already typed, so Calendly asks for nothing twice. */
+  function personFromForm(): Person {
+    const v = (n: string) =>
+      (form?.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[name="${n}"]`)?.value ?? "").trim();
+    const checkLabel = form?.querySelector<HTMLSelectElement>('select[name="check_size"]')?.selectedOptions[0]?.textContent?.trim();
+    const notes = [
+      v("check_size") && checkLabel ? `Check size: ${checkLabel}` : "",
+      v("linkedin") ? `LinkedIn / site: ${v("linkedin")}` : "",
+      v("message"),
+    ].filter(Boolean).join("\n");
+    return { name: v("name"), email: v("email"), notes: notes || undefined };
+  }
+
+  function showSuccess(answer: string, person?: Person) {
     if (!form || !successCard || !successDetail || !successTitle) return;
     const copy = SUCCESS[answer] ?? SUCCESS["not-sure"];
     successTitle.textContent = copy.title;
@@ -254,12 +295,15 @@ import { SEGMENTS } from "../lib/forms";
     form.classList.add("hidden");
     successCard.classList.remove("hidden");
     successCard.focus({ preventScroll: true });
+    // Accredited only: the intro-call picker, prefilled so nothing is typed twice.
+    if (answer === "yes" && calendlyRoot && person?.email) void showCalendly(calendlyRoot, person);
   }
 
   // Already submitted in this tab: don't hand people an empty form to resend.
   try {
     const prior = sessionStorage.getItem(SUBMITTED_KEY);
-    if (prior) showSuccess(prior);
+    const person = JSON.parse(sessionStorage.getItem(PERSON_KEY) || "null");
+    if (prior) showSuccess(prior, person ?? undefined);
   } catch {
     // Storage blocked: the form simply shows again.
   }
@@ -274,8 +318,10 @@ import { SEGMENTS } from "../lib/forms";
         status,
         () => {
           const answer = form.querySelector<HTMLInputElement>('input[name="accreditation"]:checked')?.value ?? "not-sure";
+          const person = personFromForm();
           try {
             sessionStorage.setItem(SUBMITTED_KEY, answer);
+            sessionStorage.setItem(PERSON_KEY, JSON.stringify(person));
           } catch {
             // Non-fatal.
           }
@@ -284,7 +330,7 @@ import { SEGMENTS } from "../lib/forms";
             leaveForSupport(btn, () => showSuccess("no"));
             return;
           }
-          showSuccess(answer);
+          showSuccess(answer, person);
         },
         trackingForInvestor(form),
       );

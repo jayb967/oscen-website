@@ -48,14 +48,14 @@ export type AdConversion<K extends string = ConversionKind> = {
   userAgent?: string;
 };
 
-const MAX_BODY_BYTES = 4096;
+export const MAX_BODY_BYTES = 4096;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 20;
 const ipHits = new Map<string, number[]>();
 
 const ALLOWED_ORIGINS = ["https://oscen.ai", "https://www.oscen.ai"];
 
-function isAllowedOrigin(origin: string | undefined): boolean {
+export function isAllowedOrigin(origin: string | undefined): boolean {
   if (!origin) return false;
   if (ALLOWED_ORIGINS.includes(origin)) return true;
   // This site's own Netlify URLs (prod + deploy previews), not any *.netlify.app.
@@ -100,14 +100,14 @@ export function hashEmail(raw: string | undefined): string | undefined {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) ? sha256(e) : undefined;
 }
 
-function clientIp(headers: Record<string, string | undefined>): string | undefined {
+export function clientIp(headers: Record<string, string | undefined>): string | undefined {
   // Netlify's own header is the real TCP source and cannot be spoofed.
   const nf = headers["x-nf-client-connection-ip"];
   if (nf) return nf;
   return headers["x-forwarded-for"]?.split(",")[0]?.trim() || undefined;
 }
 
-function rateLimited(ip: string | undefined): boolean {
+export function rateLimited(ip: string | undefined): boolean {
   const key = ip || "unknown";
   const now = Date.now();
   const hits = (ipHits.get(key) || []).filter((t) => t > now - RATE_LIMIT_WINDOW_MS);
