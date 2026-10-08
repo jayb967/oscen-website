@@ -109,8 +109,9 @@ export const handler = async (event: HandlerEvent): Promise<HandlerResponse> => 
 
   // Field allowlist: only these reach the CRM. Everything else is dropped.
   const payload: Record<string, string> = { email };
+  // The CRM contract field is `name` (the form field is first_name).
   const firstName = boundedStr(body.first_name, 60);
-  if (firstName) payload.first_name = firstName;
+  if (firstName) payload.name = firstName;
   const ref = boundedStr(body.ref, 40, CODE);
   if (ref) payload.ref = ref;
   for (const k of ATTRIBUTION_KEYS) {
