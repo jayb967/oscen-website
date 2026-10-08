@@ -24,9 +24,13 @@ import { CONVERSION_PATHS } from "@data/sections";
       {CONVERSION_PATHS.map((p) => (
         <a
           href={p.href}
-          class="reveal glass glass-ticks rounded-2xl p-7 group hover:border-border-bright transition-all duration-300 block"
+          data-cta={`path-${p.href.replace(/[^a-z]/g, "") || "anchor"}`}
+          class:list={[
+            "reveal glass glass-ticks rounded-2xl p-7 group transition-all duration-300 block",
+            p.featured ? "border border-accent-amber/40 hover:border-accent-amber/70 shadow-[0_0_40px_-12px_rgba(245,166,35,0.45)]" : "hover:border-border-bright",
+          ]}
         >
-          <p class="text-[10px] font-tech uppercase tracking-[0.25em] text-accent-blue/70">{p.eyebrow}</p>
+          <p class:list={["text-[10px] font-tech uppercase tracking-[0.25em]", p.featured ? "text-accent-amber" : "text-accent-blue/70"]}>{p.eyebrow}</p>
           <h3 class="mt-3 text-2xl font-display text-text-primary group-hover:text-accent-blue transition-colors">
             {p.title}
           </h3>

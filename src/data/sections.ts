@@ -303,28 +303,31 @@ export interface ConversionPath {
   desc: string;
   cta: string;
   href: string;
+  /** The primary path, highlighted (site-wide main CTA: First in Line). */
+  featured?: boolean;
 }
 
 export const CONVERSION_PATHS: ConversionPath[] = [
   {
+    title: "Be first in line",
+    eyebrow: "Path A · Everyone",
+    desc: "Free. Get a numbered place in line for the OSCEN humanoid, and back the brain to move to the front.",
+    cta: "Get my place",
+    href: "/support",
+    featured: true,
+  },
+  {
     title: "Invest",
-    eyebrow: "Path A · Investors",
+    eyebrow: "Path B · Investors",
     desc: "Accredited investors. We'll send the brief after a short qualification step.",
-    cta: "Back the brain",
+    cta: "Start the conversation",
     href: "/invest",
   },
   {
     title: "Build with us",
-    eyebrow: "Path B · Collaborators",
+    eyebrow: "Path C · Collaborators",
     desc: "Engineers, researchers, and robotics partners. Tell us how you'd push it, in your own words.",
     cta: "Apply to collaborate",
     href: "/build",
-  },
-  {
-    title: "Follow",
-    eyebrow: "Path C · Followers",
-    desc: "One short update when something real happens. No filler. One click to unsubscribe.",
-    cta: "Watch it learn",
-    href: "#email-capture",
   },
 ];
