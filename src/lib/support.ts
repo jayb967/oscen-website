@@ -84,7 +84,7 @@ const ALL_TIERS: SupportTier[] = [
     cadence: "one-time",
     blurb: "Be one of the first 100 people to back a brain that learns without a GPU. Wear the number.",
     stack: [
-      "Numbered Champion crewneck, #1 to #100. This design is never reprinted.",
+      "Numbered OSCEN-branded crewneck, #1 to #100. This design is never reprinted.",
       "A Founding 100 mark next to your name on the contributor wall, for good",
       "Milestone Witness Pass ($50): first steps and first word, sent the day each happens",
       "Name a Neuron ($20): your name on one neuron in the brain, with a certificate",
@@ -128,7 +128,7 @@ const ALL_TIERS: SupportTier[] = [
     cadence: "monthly",
     blurb: "Watch it learn, month by month, from the inside. Keeps a specialist brain running.",
     stack: [
-      "Champion crewneck with your first month",
+      "OSCEN-branded crewneck with your first month",
       "The Lab Log: a private monthly note and video from the founder, the wins and the misses",
       "A seat on the quarterly live Q&A with the founder",
       "Milestone Witness Pass ($50)",
@@ -144,7 +144,7 @@ const ALL_TIERS: SupportTier[] = [
     cadence: "one-time",
     blurb: "The gift for the person who already has every gadget: a piece of a brain that's still learning.",
     stack: [
-      "Champion crewneck, shipped straight to them",
+      "OSCEN-branded crewneck, shipped straight to them",
       "An \"I backed a brain\" patch and sticker set",
       "A neuron named after them, with a gift certificate",
     ],
@@ -162,7 +162,7 @@ const ALL_TIERS: SupportTier[] = [
     blurb: "Thirty minutes, one on one, with the person building the brain. Ask anything.",
     stack: [
       "A 30-minute video call with the founder",
-      "Champion crewneck",
+      "OSCEN-branded crewneck",
       "Milestone Witness Pass ($50)",
     ],
     scarcity: "8 Office Hours spots a month.",
@@ -179,7 +179,7 @@ const ALL_TIERS: SupportTier[] = [
     stack: [
       "Honorary sponsor of one brain region, named on the contributor wall",
       "Office Hours ($250): a 30-minute call with the founder",
-      "Champion crewneck",
+      "OSCEN-branded crewneck",
       "Milestone Witness Pass ($50)",
     ],
     scarcity: `${BRAIN_STATS.brainRegions} regions. One sponsor each.`,
@@ -195,7 +195,7 @@ const ALL_TIERS: SupportTier[] = [
     blurb: "Spend a half day in the lab with the founder, live, while the brain trains.",
     stack: [
       "A half-day live session: watch the brain train, help design a test, name an experiment",
-      "Three Champion crewnecks, one for you and two to give",
+      "Three OSCEN-branded crewnecks, one for you and two to give",
       "Milestone Witness Pass ($50)",
     ],
     scarcity: "4 a year.",
@@ -212,7 +212,7 @@ const ALL_TIERS: SupportTier[] = [
     stack: [
       "Your logo on this page as a company sponsor, once you send it",
       "A 45-minute talk for your team on brain-inspired AI and where it's going",
-      "Ten Champion crewnecks for your team",
+      "Ten OSCEN-branded crewnecks for your team",
     ],
     ships: `Talk held within 60 days. Crewnecks ship in 4 to 6 weeks. ${US_ONLY}`,
     href: env.PUBLIC_STRIPE_SUPPORT_COMPANY ?? "",
