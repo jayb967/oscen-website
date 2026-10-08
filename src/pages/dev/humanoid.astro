@@ -155,7 +155,19 @@
 
       // ?src= override > default /models/humanoid.glb (probe first so a
       // missing default reads as "waiting", not a load error).
-      const override = new URLSearchParams(location.search).get("src");
+      // Same-origin only: a crafted link must not make oscen.ai render (and
+      // parse) an arbitrary third-party model. Use a path like /models/x.glb.
+      const rawOverride = new URLSearchParams(location.search).get("src");
+      let override: string | null = null;
+      if (rawOverride) {
+        try {
+          const u = new URL(rawOverride, location.origin);
+          if (u.origin === location.origin) override = u.pathname + u.search;
+          else console.warn("?src= ignored: only same-origin paths are allowed");
+        } catch {
+          console.warn("?src= ignored: not a valid URL");
+        }
+      }
       if (override) {
         load(override, "src param");
       } else {
