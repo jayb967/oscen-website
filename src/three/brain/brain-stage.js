@@ -18,7 +18,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { BrainModule } from './brain-module.js';
 import { createGradePass } from './brain-postfx.js';
-import { detectQualityTier } from './quality-tier.js';
+import { detectQualityTier, capQualityTier } from './quality-tier.js';
 
 const DEFAULTS = {
     mode: 'sim',            // 'sim' | 'live'
@@ -34,6 +34,7 @@ const DEFAULTS = {
     cinematic: true,        // lazy-load the glass shell + point cloud after first paint
     shellUrl: '/models/brain.glb',
     dracoDecoderPath: '/draco/',
+    maxQuality: null,       // 'low' | 'med' | 'high' ceiling on the GPU auto-tier
 };
 
 // Cinematic bloom regime (from canonical brain-scene-cinematic.js): the
@@ -110,7 +111,7 @@ export class BrainStage {
         // and a total-megapixel budget wins over both: a large desktop
         // window at DPR 2 is an 8+ MP drawing buffer, and the additive
         // point cloud + bloom chain pay for every pixel of it.
-        this.quality = detectQualityTier(this.renderer);
+        this.quality = capQualityTier(detectQualityTier(this.renderer), this.opts.maxQuality);
         this.renderer.setPixelRatio(this._computePixelRatio());
         this.renderer.setClearColor(this.opts.clearColor, this.opts.clearAlpha);
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
