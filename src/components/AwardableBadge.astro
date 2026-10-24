@@ -1,0 +1,74 @@
+---
+/**
+ * CDAO Tradewinds Solutions Marketplace "Awardable" badge (assessed 2026-10-23).
+ * Fixed bottom-right, always visible. Used on the home, team and invest pages only.
+ * Welcome-kit rules: link to www.tradewindai.com, note that viewing needs a
+ * government login, and never recolor the badge.
+ */
+---
+
+<a
+  href="https://www.tradewindai.com"
+  target="_blank"
+  rel="noopener"
+  class="awardable-badge fixed right-4 md:right-6 z-40 block rounded-full"
+  title="Awardable on the CDAO Tradewinds Solutions Marketplace. Viewing our solution video requires a government login."
+  aria-label="OSCEN is Awardable on the CDAO Tradewinds Solutions Marketplace (opens tradewindai.com; viewing the solution video requires a government login)"
+>
+  <picture>
+    <source type="image/webp" srcset="/badges/tsm-awardable-192.webp 1x, /badges/tsm-awardable-384.webp 2x" />
+    <img
+      src="/badges/tsm-awardable-192.png"
+      srcset="/badges/tsm-awardable-192.png 1x, /badges/tsm-awardable-384.png 2x"
+      alt="Chief Digital and Artificial Intelligence Office, Awardable, Tradewinds Solutions Marketplace"
+      width="96"
+      height="96"
+      decoding="async"
+      class="w-16 h-16 md:w-24 md:h-24"
+    />
+  </picture>
+</a>
+
+<style>
+  .awardable-badge {
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.45));
+    transition: transform 0.2s ease, bottom 0.3s ease;
+  }
+  .awardable-badge:hover,
+  .awardable-badge:focus-visible {
+    transform: scale(1.06);
+  }
+  .awardable-badge:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+  /* Ride above the cookie banner while it is open, so the badge stays visible. */
+  .awardable-badge {
+    bottom: max(1rem, calc(var(--cookie-banner-h, 0px) + 0.75rem));
+  }
+  @media (min-width: 768px) {
+    .awardable-badge {
+      bottom: max(1.5rem, calc(var(--cookie-banner-h, 0px) + 1rem));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .awardable-badge { transition: none; }
+    .awardable-badge:hover,
+    .awardable-badge:focus-visible { transform: none; }
+  }
+</style>
+
+<script>
+  // Track the cookie banner's height (0 when hidden) in --cookie-banner-h.
+  const banner = document.getElementById("cookie-consent");
+  if (banner) {
+    const root = document.documentElement;
+    const sync = () => {
+      const open = !banner.classList.contains("hidden");
+      root.style.setProperty("--cookie-banner-h", open ? `${banner.offsetHeight}px` : "0px");
+    };
+    new MutationObserver(sync).observe(banner, { attributes: true, attributeFilter: ["class"] });
+    new ResizeObserver(sync).observe(banner);
+    sync();
+  }
+</script>

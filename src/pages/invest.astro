@@ -16,6 +16,7 @@
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import AwardableBadge from "../components/AwardableBadge.astro";
 import Turnstile from "../components/Turnstile.astro";
 import InvestCase from "../components/invest/InvestCase.astro";
 import InvestProof from "../components/invest/InvestProof.astro";
@@ -211,6 +212,7 @@ import { SEGMENTS } from "../lib/forms";
       <a href="/" class="text-sm font-tech text-accent-blue/70 hover:text-accent-blue transition-colors">← Back to overview</a>
     </section>
   </main>
+  <AwardableBadge />
   <Footer />
   <HandoffOverlay mode="leave" />
 </Base>
