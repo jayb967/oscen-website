@@ -9,7 +9,7 @@
  */
 import gsap from "gsap";
 
-const SUPPORT_URL = "/support?from=invest";
+const SUPPORT_URL = "/support/?from=invest";
 /** Long enough to read the three lines of copy before we move. */
 const READ_SECONDS = 6.5;
 

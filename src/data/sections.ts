@@ -52,25 +52,25 @@ export const SOLUTION_FEATURES: SolutionFeature[] = [
   {
     title: "Learns from experience",
     body: "Like a kid learning to catch a ball, the brain rewires itself with every try. No instruction manual. No giant training run. A million neurons, learning the way yours did.",
-    link: "/architecture",
+    link: "/architecture/",
     linkLabel: "Explore the architecture",
   },
   {
     title: "Runs on a sip of power",
     body: "Today's robot brains burn power like a space heater. OSCEN is built to sip it like a phone charger. Published spiking-chip benchmarks show up to 109x less energy per inference (Blouw et al. 2019), microjoules instead of millijoules. OSCEN is built to run on that class of chip, so robots can work all day on one battery.",
-    link: "/research",
+    link: "/research/",
     linkLabel: "See the benchmarks",
   },
   {
     title: "Grows up in stages",
     body: "Like a baby becoming a toddler becoming a kid, OSCEN moves through five stages of growth. Each one rewires what it can learn next. Old skills stay even as new ones come in.",
-    link: "/research",
+    link: "/research/",
     linkLabel: "Read the science",
   },
   {
     title: "Works with any body",
     body: "Cameras, microphones, motors, speakers. Built body-agnostic: a new body is a manifest and a plugin, with no brain changes. The brain is the product. The body plugs in.",
-    link: "/architecture",
+    link: "/architecture/",
     linkLabel: "View the integration",
   },
 ];
@@ -139,7 +139,7 @@ export const PROOF_CARDS: ProofCard[] = [
     value: "Patent pending",
     label: "US 63/986,737",
     back: "Filed February 20, 2026. 6 core claims covering the complete architecture. 258 prior art patents searched, zero overlap. 20 continuation patents planned.",
-    link: "/invest",
+    link: "/invest/",
     linkLabel: "Patent details",
   },
 ];
@@ -313,7 +313,7 @@ export const CONVERSION_PATHS: ConversionPath[] = [
     eyebrow: "Path A · Everyone",
     desc: "Free. Get a numbered place in line for the OSCEN humanoid, and back the brain to move to the front.",
     cta: "Get my place",
-    href: "/support",
+    href: "/support/",
     featured: true,
   },
   {
@@ -321,13 +321,13 @@ export const CONVERSION_PATHS: ConversionPath[] = [
     eyebrow: "Path B · Investors",
     desc: "Accredited investors. We'll send the brief after a short qualification step.",
     cta: "Start the conversation",
-    href: "/invest",
+    href: "/invest/",
   },
   {
     title: "Build with us",
     eyebrow: "Path C · Collaborators",
     desc: "Engineers, researchers, and robotics partners. Tell us how you'd push it, in your own words.",
     cta: "Apply to collaborate",
-    href: "/build",
+    href: "/build/",
   },
 ];
