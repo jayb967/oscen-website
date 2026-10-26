@@ -43,7 +43,7 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: "Is the technology patented?",
-    a: `${COMPANY.patent}. The site describes what the technology does and why it matters, and keeps the internal mechanisms covered by the filing out of public pages.`,
+    a: `${COMPANY.patent}. The site describes what the technology does and why it matters, and keeps the internal mechanisms covered by the filings out of public pages.`,
   },
   {
     q: "Who founded OSCEN?",

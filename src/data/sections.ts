@@ -136,9 +136,9 @@ export const PROOF_CARDS: ProofCard[] = [
     back: "Started as a blank slate. Watching video, listening to audio. Forming associations through temporal correlation. Growing through developmental phases.",
   },
   {
-    value: "Patent pending",
-    label: "US 63/986,737",
-    back: "Filed February 20, 2026. 6 core claims covering the complete architecture. 258 prior art patents searched, zero overlap. 20 continuation patents planned.",
+    value: "4 Patents pending",
+    label: "US 63/986,737 · 64/184,488 · 64/184,586 · 64/184,614",
+    back: "Four U.S. provisional applications filed (Feb & Oct 2026) covering the core neuromorphic architecture, body-agnostic robotics & safety arbitration, reward-credit & vector-credit learning rules, and neuromorphic silicon, photonic & 3D-stacked hardware.",
     link: "/invest/",
     linkLabel: "Patent details",
   },
@@ -146,7 +146,7 @@ export const PROOF_CARDS: ProofCard[] = [
 
 // ── Proof strip ────────────────────────────────────────────────────
 export const PROOF_STRIP_ITEMS = [
-  { label: "Patent pending", value: "US 63/986,737" },
+  { label: "4 Patents pending", value: "US 63/986,737 · 64/184,488 · 64/184,586 · 64/184,614" },
   { label: "Approach", value: "Brain-inspired" },
 ];
 

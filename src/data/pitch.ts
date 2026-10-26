@@ -448,7 +448,7 @@ export const COMPARABLES: Comparable[] = [
     stage: "Pre-seed",
     hadProduct: false,
     hadPatent: true,
-    note: "1M neurons training live, no customers yet. Patent filed. Seed to prove hardware + robot integration.",
+    note: "1M neurons training live, no customers yet. 4 U.S. provisional patents filed. Seed to prove hardware + robot integration.",
   },
 ];
 

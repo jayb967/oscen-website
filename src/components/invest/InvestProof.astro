@@ -8,6 +8,33 @@
 import SectionHead from "./SectionHead.astro";
 import { BRAIN_STATS, SYNAPSES_DISPLAY } from "../../data/brain";
 
+const PATENT_FILINGS = [
+  {
+    number: "US 63/986,737",
+    date: "Filed Feb 20, 2026",
+    title: "Core Neuromorphic Cognitive Architecture",
+    desc: "Integrated 6-mechanism biological learning, 5 developmental critical periods, multi-compartment dendrites, cross-modal binding, and hybrid SNN-LLM oracle.",
+  },
+  {
+    number: "US 64/184,488",
+    date: "Filed Oct 26, 2026",
+    title: "Body-Agnostic Robotics & Safety Kernel",
+    desc: "Self-describing robot interface, per-body hardware safety arbitration, cross-body skill transfer, demonstration teaching, governed self-modification, and physical reflexes.",
+  },
+  {
+    number: "US 64/184,586",
+    date: "Filed Oct 26, 2026",
+    title: "Reward-Credit, Vector-Credit & Verification",
+    desc: "Credit-gated consolidation, routed dopamine, typed aversive learning, extended 6-channel neuromodulation, vector-credit motor control, and causal verification batteries.",
+  },
+  {
+    number: "US 64/184,614",
+    date: "Filed Oct 26, 2026",
+    title: "Neuromorphic Silicon, Photonic & 3D Hardware",
+    desc: "Developmental synaptic compression, 3-tier thalamic capsule paging, quantum-on-chip stochastic plasticity, split PQC + PUF security, photonic WDM, and 3D bare-die packaging.",
+  },
+];
+
 const CLAIMS = [
   { claim: "1", title: "Integrated Multi-Mechanism Learning", desc: "6 learning rules operating simultaneously across the network" },
   { claim: "2", title: "Developmental Critical Periods", desc: "5 phases with experience-dependent adolescent entry: pruning, myelination, identity" },
@@ -18,9 +45,9 @@ const CLAIMS = [
 ];
 
 const PATENT_STATS = [
+  { value: "4", label: "U.S. provisional patents filed", color: "text-accent-blue" },
   { value: "258", label: "Prior art patents searched", color: "text-accent-blue" },
   { value: "0", label: "Overlapping claims found", color: "text-accent-green" },
-  { value: "20", label: "Continuation patents planned", color: "text-accent-blue" },
 ];
 
 const BUILT = [
@@ -46,13 +73,29 @@ const BUILT = [
       <div>
         <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/30 text-accent-blue text-[10px] font-tech uppercase tracking-wider">
           <span class="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse" aria-hidden="true"></span>
-          Patent Pending
+          4 Patents Pending
         </span>
-        <p class="text-2xl md:text-4xl text-text-primary font-tech font-bold tracking-tight mt-4">US 63/986,737</p>
+        <p class="text-2xl md:text-4xl text-text-primary font-tech font-bold tracking-tight mt-4">Full-Stack IP Portfolio</p>
       </div>
-      <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.2em]">Filed February 20, 2026</p>
+      <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.2em]">Filed Feb &amp; Oct 2026 &middot; USPTO</p>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+      {PATENT_FILINGS.map((p) => (
+        <div class="reveal glass glass-ticks rounded-xl p-5 flex flex-col justify-between border border-accent-blue/20">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <p class="text-base md:text-lg text-accent-blue font-tech font-bold tracking-tight">{p.number}</p>
+              <span class="text-[10px] font-tech text-text-muted uppercase tracking-wider">{p.date}</span>
+            </div>
+            <p class="text-sm md:text-base text-text-primary font-medium mt-1.5">{p.title}</p>
+            <p class="text-xs text-text-secondary leading-relaxed mt-2">{p.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <p class="text-[10px] font-tech text-text-muted uppercase tracking-[0.2em] mb-3">Foundation Architecture Claims (US 63/986,737)</p>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       {CLAIMS.map((c) => (
         <div class="reveal glass glass-ticks rounded-xl p-5 flex gap-4">

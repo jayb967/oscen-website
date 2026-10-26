@@ -33,7 +33,7 @@ export const COMPANY = {
   email: "info@oscen.ai",
   address: { locality: "Denver", region: "CO", regionName: "Colorado", country: "US" },
   stage: "early-stage, pre-revenue research company",
-  patent: "Patent pending (U.S. provisional application filed February 2026)",
+  patent: "Patent pending (4 U.S. provisional applications filed in February and October 2026: US 63/986,737, US 64/184,488, US 64/184,586, and US 64/184,614)",
   programs: ["NVIDIA Inception member", "AWS Activate credit recipient"],
   founders: [
     {
